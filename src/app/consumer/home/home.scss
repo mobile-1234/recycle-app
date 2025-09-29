@@ -1,0 +1,521 @@
+.home-container {
+  min-height: 100vh;
+  background: #f5f7fa;
+  padding-bottom: 80px; // 为底部导航留空间
+}
+
+// 顶部导航栏
+.top-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .user-details {
+      h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      p {
+        margin: 4px 0 0 0;
+        font-size: 14px;
+        opacity: 0.9;
+      }
+    }
+  }
+
+  .logout-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+}
+
+// 数据概览卡片
+.stats-section {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    .stat-icon {
+      font-size: 32px;
+    }
+
+    .stat-content {
+      h4 {
+        margin: 0 0 4px 0;
+        color: #666;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .stat-value {
+        margin: 0;
+        font-size: 24px;
+        font-weight: bold;
+        color: #2d3748;
+      }
+    }
+
+    &.earnings .stat-value {
+      color: #4CAF50;
+    }
+
+    &.points .stat-value {
+      color: #2196F3;
+    }
+
+    &.monthly .stat-value {
+      color: #FF9800;
+    }
+  }
+}
+
+// 快捷功能
+.quick-actions-section {
+  padding: 0 20px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  h2 {
+    margin: 0 0 16px 0;
+    color: #2d3748;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .action-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    border-left: 4px solid #e2e8f0;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .action-icon {
+      font-size: 32px;
+    }
+
+    .action-content {
+      flex: 1;
+
+      h4 {
+        margin: 0 0 4px 0;
+        color: #2d3748;
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      p {
+        margin: 0;
+        color: #718096;
+        font-size: 14px;
+      }
+    }
+
+    .action-arrow {
+      font-size: 20px;
+      color: #a0aec0;
+    }
+  }
+}
+
+// 最近订单
+.recent-orders-section {
+  padding: 0 20px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    h2 {
+      margin: 0;
+      color: #2d3748;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .view-all-link {
+      color: #667eea;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .order-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .order-info {
+      flex: 1;
+
+      .order-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+
+        .order-id {
+          font-weight: 600;
+          color: #2d3748;
+        }
+
+        .order-status {
+          padding: 4px 8px;
+          border-radius: 12px;
+          font-size: 12px;
+          font-weight: 500;
+
+          &.status-pending {
+            background: #fff3cd;
+            color: #856404;
+          }
+
+          &.status-processing {
+            background: #d1ecf1;
+            color: #0c5460;
+          }
+
+          &.status-completed {
+            background: #d4edda;
+            color: #155724;
+          }
+
+          &.status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+          }
+        }
+      }
+
+      .order-type {
+        margin: 0 0 4px 0;
+        color: #4a5568;
+        font-size: 14px;
+      }
+
+      .order-date {
+        margin: 0;
+        color: #718096;
+        font-size: 12px;
+      }
+    }
+
+    .order-amount {
+      .amount {
+        font-size: 18px;
+        font-weight: bold;
+        color: #4CAF50;
+      }
+    }
+  }
+
+  .no-orders {
+    background: white;
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .no-orders-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    p {
+      margin: 0 0 20px 0;
+      color: #718096;
+      font-size: 16px;
+    }
+
+    .create-order-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+    }
+  }
+}
+
+// 环保提示
+.eco-tip-section {
+  padding: 0 20px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .eco-tip-card {
+    background: linear-gradient(135deg, #8BC34A 0%, #4CAF50 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .tip-icon {
+      font-size: 32px;
+    }
+
+    .tip-content {
+      h4 {
+        margin: 0 0 8px 0;
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      p {
+        margin: 0;
+        font-size: 14px;
+        opacity: 0.9;
+        line-height: 1.5;
+      }
+    }
+  }
+}
+
+// 底部导航
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #a0aec0;
+    transition: color 0.3s ease;
+    padding: 8px;
+
+    &.active {
+      color: #667eea;
+    }
+
+    &:hover {
+      color: #667eea;
+    }
+
+    .nav-icon {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .nav-label {
+      font-size: 12px;
+      font-weight: 500;
+    }
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .top-header {
+    padding: 16px;
+
+    .user-info {
+      .avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+      }
+
+      .user-details {
+        h3 {
+          font-size: 16px;
+        }
+
+        p {
+          font-size: 12px;
+        }
+      }
+    }
+
+    .logout-btn {
+      padding: 6px 12px;
+      font-size: 14px;
+    }
+  }
+
+  .stats-section {
+    padding: 16px;
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .stat-card {
+      padding: 16px;
+
+      .stat-icon {
+        font-size: 28px;
+      }
+
+      .stat-content {
+        .stat-value {
+          font-size: 20px;
+        }
+      }
+    }
+  }
+
+  .quick-actions-section {
+    padding: 0 16px 16px;
+
+    .actions-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .action-card {
+      padding: 16px;
+
+      .action-icon {
+        font-size: 28px;
+      }
+    }
+  }
+
+  .recent-orders-section {
+    padding: 0 16px 16px;
+
+    .order-card {
+      padding: 12px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+
+      .order-amount {
+        align-self: flex-end;
+      }
+    }
+  }
+
+  .eco-tip-section {
+    padding: 0 16px 16px;
+
+    .eco-tip-card {
+      padding: 16px;
+
+      .tip-icon {
+        font-size: 28px;
+      }
+
+      .tip-content {
+        h4 {
+          font-size: 14px;
+        }
+
+        p {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+}
