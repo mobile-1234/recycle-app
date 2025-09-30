@@ -1,6 +1,188 @@
-<div class="booking-recycle-container">
-  <div class="booking-header">
-    <h1>预约回收</h1>
-  </div>
-  <!-- 页面内容已清理，保留基本结构 -->
+<!-- 顶部标题栏 -->
+<div class="header">
+  <div class="back-btn" (click)="goBack()"><i class="fas fa-arrow-left"></i></div>
+  <div class="header-title">预约回收</div>
 </div>
+
+<div class="container">
+  <!-- 废品信息填写 -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="fas fa-trash-alt"></i> 废品信息
+    </div>
+    
+    <div class="category-select">
+      <div 
+        *ngFor="let category of wasteCategories" 
+        class="category-item" 
+        [class.active]="category.active"
+        (click)="selectCategory(category)">
+        <div class="category-icon"><i [class]="category.icon"></i></div>
+        <div>{{category.name}}</div>
+      </div>
+    </div>
+    
+    <div class="weight-input">
+      <input 
+        type="number" 
+        placeholder="输入预估重量" 
+        [(ngModel)]="weight"
+        (input)="calculateEarnings()">
+      <div class="unit">公斤</div>
+    </div>
+    
+    <div class="photo-upload">
+      <div class="upload-btn" (click)="uploadPhoto()">
+        <i class="fas fa-camera"></i>
+        <div>上传照片</div>
+      </div>
+      <div 
+        *ngFor="let photo of photos; let i = index" 
+        class="photo-preview">
+        <img [src]="photo" alt="废品照片">
+        <div class="remove-photo" (click)="removePhoto(i)">
+          <i class="fas fa-times"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 回收方式选择 -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="fas fa-truck"></i> 回收方式
+    </div>
+    
+    <div class="recycle-method">
+      <div 
+        *ngFor="let method of recycleMethods"
+        class="method-card" 
+        [class.active]="method.active"
+        (click)="selectMethod(method)">
+        <div class="method-icon"><i [class]="method.icon"></i></div>
+        <div class="method-title">{{method.name}}</div>
+        <div class="method-desc">{{method.description}}</div>
+      </div>
+    </div>
+    
+    <div class="address-select" *ngIf="isPickupMethod">
+      <div class="address-info">
+        <div class="address-text">
+          <div>{{address}}</div>
+          <div style="font-size: 12px; color: #6c757d;">{{contactName}} {{contactPhone}}</div>
+        </div>
+        <div class="change-address" (click)="changeAddress()">更改</div>
+      </div>
+    </div>
+    
+    <div class="point-select" *ngIf="!isPickupMethod">
+      <div class="point-info">
+        <div>
+          <div class="point-name">阳光小区东门回收点</div>
+          <div class="point-detail">350米 | 70% 满箱</div>
+        </div>
+        <button class="navigate-btn" (click)="navigateToPoint()">导航</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 时间选择 -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="far fa-clock"></i> 回收时间
+    </div>
+    
+    <div class="time-options">
+      <div 
+        *ngFor="let option of timeOptions"
+        class="time-option" 
+        [class.active]="option.active"
+        (click)="selectTimeOption(option)">
+        <div class="method-icon"><i [class]="option.icon"></i></div>
+        <div class="method-title">{{option.name}}</div>
+        <div class="method-desc">{{option.description}}</div>
+      </div>
+    </div>
+    
+    <div class="date-selector" *ngIf="isScheduledTime">
+      <div class="date-scroll">
+        <div 
+          *ngFor="let date of dateItems"
+          class="date-item" 
+          [class.active]="date.active"
+          (click)="selectDate(date)">
+          <div class="date-day">{{date.day}}</div>
+          <div class="date-week">{{date.date}}</div>
+        </div>
+      </div>
+      
+      <div class="time-slots">
+        <div 
+          *ngFor="let slot of timeSlots"
+          class="time-slot" 
+          [class.active]="slot.active"
+          (click)="selectTimeSlot(slot)">
+          {{slot.time}}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 附加服务 -->
+  <div class="form-section">
+    <div class="section-title">
+      <i class="fas fa-concierge-bell"></i> 附加服务
+    </div>
+    
+    <div class="additional-services">
+      <div 
+        *ngFor="let service of additionalServices"
+        class="service-item">
+        <div class="service-info">
+          <div class="service-icon"><i [class]="service.icon"></i></div>
+          <div>
+            <div class="service-name">{{service.name}}</div>
+            <div class="service-desc">{{service.description}}</div>
+          </div>
+        </div>
+        <div class="service-price">{{service.price}}</div>
+        <label class="switch">
+          <input 
+            type="checkbox" 
+            [checked]="service.enabled"
+            (change)="toggleService(service)">
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+      <div class="service-item" style="flex-direction: column; align-items: flex-start;">
+        <div class="service-info" style="width: 100%; margin-bottom: 10px;">
+          <div class="service-icon"><i class="fas fa-note-sticky"></i></div>
+          <div>
+            <div class="service-name">备注</div>
+            <div class="service-desc">特殊要求或说明</div>
+          </div>
+        </div>
+        <div style="position: relative; width: 100%;">
+          <textarea 
+            class="notes-input" 
+            placeholder="请输入备注信息..."
+            [(ngModel)]="notes"></textarea>
+          <div class="voice-input"><i class="fas fa-microphone"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 确认预约栏 -->
+<div class="confirm-bar">
+  <div class="estimate-earnings">
+    <div class="earnings-title">预估收益</div>
+    <div class="earnings-amount">¥{{estimatedEarnings.toFixed(2)}}</div>
+  </div>
+  <button class="submit-btn" (click)="submitBooking()">确认提交</button>
+</div>
+
+<!-- 底部导航栏 -->
+<app-bottom-nav [activeTab]="'booking'"></app-bottom-nav>

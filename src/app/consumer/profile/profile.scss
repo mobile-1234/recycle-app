@@ -1,0 +1,243 @@
+/* 页面基础布局 */
+.container {
+  padding: 16px;
+  padding-bottom: 88px; /* 为底部导航留空 */
+}
+
+/* 顶部标题与头像区域 */
+.header {
+  position: relative;
+  text-align: center;
+  padding: 20px 0 12px;
+}
+
+.back-btn,
+.edit-profile {
+  position: absolute;
+  top: 16px;
+  font-size: 18px;
+  color: #2e7d32;
+}
+
+.back-btn { left: 12px; }
+.edit-profile { right: 12px; }
+
+.avatar-container {
+  position: relative;
+  display: inline-block;
+  margin: 8px 0 12px;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #2ecc71, #1abc9c);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 32px;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+}
+
+.avatar-edit {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 28px;
+  height: 28px;
+  background: #2e7d32;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  border: 2px solid #fff;
+}
+
+.user-name {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.user-level {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff9800, #ff5722);
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
+/* 统计与徽章 */
+.section { margin-top: 10px; }
+
+.stats-container {
+  display: flex;
+  justify-content: space-around;
+  padding-top: 16px;
+  border-top: 1px solid #f1f3f4;
+}
+
+.stat-item { text-align: center; }
+.stat-value { font-size: 18px; font-weight: 600; color: #2e7d32; margin-bottom: 4px; }
+.stat-label { font-size: 12px; color: #6c757d; }
+
+.badges-container { margin-top: 18px; }
+.badges-title { font-size: 14px; color: #6c757d; margin-bottom: 10px; text-align: left; }
+
+.badges {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 84px;
+}
+
+.badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  position: relative;
+}
+
+.badge.recycling { background: linear-gradient(135deg, #2ecc71, #1abc9c); }
+.badge.environment { background: linear-gradient(135deg, #66bb6a, #43a047); }
+.badge.achievement { background: linear-gradient(135deg, #ffa726, #fb8c00); }
+.badge.community { background: linear-gradient(135deg, #42a5f5, #1e88e5); }
+
+.badge-tooltip {
+  position: absolute;
+  bottom: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.badge-label {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #6c757d;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.badge-more {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  color: #666;
+  font-size: 14px;
+}
+
+/* 菜单列表 */
+.menu-list { margin-top: 8px; }
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 6px;
+  border-bottom: 1px solid #eee;
+}
+
+.menu-info { display: flex; align-items: center; gap: 10px; }
+.menu-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2e7d32;
+}
+.menu-text { display: flex; flex-direction: column; }
+.menu-name { font-size: 14px; font-weight: 500; color: #495057; }
+.menu-desc { font-size: 12px; color: #6c757d; }
+.menu-arrow { color: #999; }
+.menu-badge { font-size: 12px; color: #ff5722; margin-right: 8px; }
+
+/* 退出登录按钮样式优化 */
+.logout-btn {
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #2ecc71, #1abc9c);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+}
+
+/* 模态框 */
+.modal {
+  position: fixed;
+  left: 0; right: 0; top: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  width: 86%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 14px;
+}
+
+.modal-title { font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+.modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 12px; }
+.modal-btn { padding: 8px 14px; border-radius: 8px; border: none; }
+.modal-btn.cancel { background: #f5f5f5; color: #666; }
+.modal-btn.confirm { background: #2e7d32; color: #fff; }
+
+.edit-form { margin-top: 8px; }
+.form-group { margin-bottom: 10px; }
+.form-label { margin-bottom: 6px; font-size: 14px; font-weight: 500; color: #495057; }
+.form-input { width: 100%; padding: 10px 12px; border: 1px solid #e9ecef; border-radius: 8px; font-size: 14px; }
+.avatar-options { display: flex; gap: 10px; margin-top: 10px; }
+.avatar-option { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 24px; cursor: pointer; border: 2px solid transparent; }
+.avatar-option.active { border-color: #2e7d32; }
+.avatar-1 { background: linear-gradient(135deg, #2ecc71, #1abc9c); }
+.avatar-2 { background: linear-gradient(135deg, #3498db, #2980b9); }
+.avatar-3 { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+.avatar-4 { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+
+/* 响应式优化，防止底部导航截断 */
+@media (max-width: 360px) {
+  .menu-item { padding: 10px 4px; }
+  .menu-name { font-size: 13px; }
+  .menu-desc { font-size: 11px; }
+}

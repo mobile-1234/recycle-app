@@ -8,6 +8,6 @@ import { RouterModule } from '@angular/router';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
-export class DashboardComponent {
+export class Dashboard {
   constructor() {}
 }

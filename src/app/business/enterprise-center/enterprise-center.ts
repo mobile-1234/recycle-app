@@ -8,6 +8,6 @@ import { RouterModule } from '@angular/router';
   templateUrl: './enterprise-center.html',
   styleUrl: './enterprise-center.scss'
 })
-export class EnterpriseCenterComponent {
+export class EnterpriseCenter {
   constructor() {}
 }

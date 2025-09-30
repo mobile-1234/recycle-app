@@ -1,6 +1,167 @@
-<div class="points-mall-container">
-  <div class="mall-header">
-    <h1>积分商城</h1>
-  </div>
-  <!-- 页面内容已清理，保留基本结构 -->
+<!-- 顶部标题栏 -->
+<div class="header">
+  <div class="back-btn" (click)="goBack()"><i class="fas fa-arrow-left"></i></div>
+  <div class="header-title">积分商城</div>
 </div>
+
+<div class="container">
+  <!-- 积分余额显示区 -->
+  <div class="points-header">
+    <div class="points-balance">{{userPoints}}</div>
+    <div class="points-label">我的积分</div>
+    <div class="points-actions">
+      <div class="points-action-btn" (click)="showPointsRules()">积分规则</div>
+      <div class="points-action-btn" (click)="showPointsHistory()">积分记录</div>
+    </div>
+  </div>
+  
+  <!-- 活动专区轮播 -->
+  <div class="section">
+    <div class="section-title">
+      <span>活动专区</span>
+      <span style="font-size: 14px; color: #6c757d;">限时优惠</span>
+    </div>
+    
+    <div class="carousel">
+      <div class="carousel-inner" #carouselInner>
+        <div class="carousel-item" *ngFor="let activity of activities; let i = index" [class.active]="i === currentActivityIndex">
+          <div class="carousel-tag">{{activity.tag}}</div>
+          <div class="carousel-title">{{activity.title}}</div>
+          <div class="carousel-desc">{{activity.description}}</div>
+          <div class="carousel-time">{{activity.time}}</div>
+        </div>
+      </div>
+      <div class="carousel-indicators">
+        <div 
+          *ngFor="let activity of activities; let i = index"
+          class="carousel-indicator" 
+          [class.active]="i === currentActivityIndex"
+          (click)="setActiveActivity(i)"></div>
+      </div>
+    </div>
+    
+    <!-- 商品分类导航 -->
+    <div class="section-title">商品分类</div>
+    <div class="category-nav">
+      <div 
+        *ngFor="let category of categories"
+        class="category-item" 
+        [class.active]="category.active"
+        (click)="selectCategory(category)">
+        <div class="category-icon"><i [class]="category.icon"></i></div>
+        <div class="category-name">{{category.name}}</div>
+      </div>
+    </div>
+    
+    <!-- 商品列表 -->
+    <div class="section-title">热门商品</div>
+    <div class="products-grid">
+      <div 
+        *ngFor="let product of filteredProducts"
+        class="product-card" 
+        (click)="showProductDetail(product)">
+        <div class="product-image">
+          <img *ngIf="product.image" [src]="product.image" [alt]="product.name" class="product-img">
+          <i *ngIf="!product.image" [class]="product.icon + ' fa-2x'"></i>
+          <div class="product-tag" *ngIf="product.tag">{{product.tag}}</div>
+        </div>
+        <div class="product-info">
+          <div class="product-name">{{product.name}}</div>
+          <div class="product-price">
+            <div class="price-info">
+              <div class="points-price">{{product.pointsPrice}}积分</div>
+              <div class="cash-price">市场价: ¥{{product.marketPrice}}</div>
+            </div>
+            <button 
+              class="exchange-btn" 
+              [disabled]="userPoints < product.pointsPrice"
+              (click)="exchangeProduct(product, $event)">兑换</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 积分任务中心 -->
+<div class="container">
+  <div class="section tasks-section">
+    <div class="section-title">
+      <span>积分任务</span>
+      <span style="font-size: 14px; color: #6c757d;">赚取更多积分</span>
+    </div>
+    
+    <div class="task-list">
+      <div 
+        *ngFor="let task of tasks"
+        class="task-item">
+        <div class="task-info">
+          <div class="task-icon"><i [class]="task.icon"></i></div>
+          <div class="task-details">
+            <div class="task-name">{{task.name}}</div>
+            <div class="task-desc">{{task.description}}</div>
+            <div class="task-progress" *ngIf="task.progress">{{task.progress}}</div>
+          </div>
+        </div>
+        <div class="task-reward">+{{task.reward}}积分</div>
+        <button 
+          class="task-btn" 
+          [class.completed]="task.completed"
+          (click)="doTask(task)">
+          {{task.completed ? '已完成' : task.buttonText}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 商品详情模态框 -->
+<div class="modal" [style.display]="showProductModal ? 'flex' : 'none'" (click)="closeProductModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()" *ngIf="selectedProduct">
+    <div class="modal-title">{{selectedProduct.name}}</div>
+    <div class="product-detail-image">
+      <img *ngIf="selectedProduct.image" [src]="selectedProduct.image" [alt]="selectedProduct.name" class="product-detail-img">
+      <i *ngIf="!selectedProduct.image" [class]="selectedProduct.icon + ' fa-4x'"></i>
+    </div>
+    <div class="product-detail-info">
+      <div class="detail-price">
+        <span class="points-price">{{selectedProduct.pointsPrice}}积分</span>
+        <span class="cash-price">市场价: ¥{{selectedProduct.marketPrice}}</span>
+      </div>
+      <div class="product-description">{{selectedProduct.description}}</div>
+    </div>
+    <div class="modal-buttons">
+      <button class="modal-btn cancel" (click)="closeProductModal()">取消</button>
+      <button 
+        class="modal-btn confirm" 
+        [disabled]="userPoints < selectedProduct.pointsPrice"
+        (click)="confirmExchange()">确认兑换</button>
+    </div>
+  </div>
+</div>
+
+<!-- 签到模态框 -->
+<div class="modal" [style.display]="showCheckinModal ? 'flex' : 'none'" (click)="closeCheckinModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-title">每日签到</div>
+    <div class="checkin-calendar">
+      <div 
+        *ngFor="let day of checkinDays"
+        class="checkin-day" 
+        [class.checked]="day.checked"
+        [class.today]="day.isToday">
+        {{day.day}}
+      </div>
+    </div>
+    <div style="text-align: center; margin: 15px 0;">
+      <div style="color: #2e7d32; font-weight: 600;">签到成功！</div>
+      <div style="color: #ff9800; font-size: 18px; margin-top: 5px;">+{{dailyCheckinReward}}积分</div>
+    </div>
+    <div class="modal-buttons">
+      <button class="modal-btn confirm" (click)="closeCheckinModal()">确定</button>
+    </div>
+  </div>
+</div>
+
+<!-- 底部导航栏 -->
+<app-bottom-nav [activeTab]="'mall'"></app-bottom-nav>

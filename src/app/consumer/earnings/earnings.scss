@@ -1,0 +1,491 @@
+// 全局样式重置
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+// 顶部标题栏
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(135deg, #2e7d32, #4caf50);
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+  .back-btn {
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  .header-title {
+    flex: 1;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    margin-right: 36px; // 平衡返回按钮的宽度
+  }
+}
+
+// 主容器
+.container {
+  padding: 80px 20px 100px; // 顶部留出header空间，底部留出导航栏空间
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+// 收益总览卡片
+.earnings-overview {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+  .earnings-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 25px;
+
+    .stat-item {
+      text-align: center;
+
+      .stat-value {
+        font-size: 28px;
+        font-weight: bold;
+        color: #2e7d32;
+        margin-bottom: 5px;
+      }
+
+      .stat-label {
+        font-size: 14px;
+        color: #6c757d;
+      }
+    }
+  }
+
+  .carbon-section {
+    border-top: 1px solid #e9ecef;
+    padding-top: 20px;
+
+    .carbon-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+
+      .carbon-title {
+        font-size: 16px;
+        color: #333;
+      }
+
+      .carbon-value {
+        font-size: 20px;
+        font-weight: bold;
+        color: #1abc9c;
+      }
+    }
+
+    .chart-container {
+      height: 200px;
+      position: relative;
+    }
+  }
+}
+
+// 通用区块样式
+.section {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+// 筛选栏
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  overflow-x: auto;
+
+  .filter-btn {
+    padding: 8px 16px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 20px;
+    font-size: 14px;
+    color: #6c757d;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.3s;
+
+    &.active {
+      background: #2e7d32;
+      color: white;
+      border-color: #2e7d32;
+    }
+
+    &:hover:not(.active) {
+      background: #e9ecef;
+    }
+  }
+}
+
+// 日期筛选
+.date-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+
+  .date-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  span {
+    color: #6c757d;
+    font-size: 14px;
+  }
+}
+
+// 收益列表
+.earnings-list {
+  .earning-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: #f8f9fa;
+      margin: 0 -20px;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .earning-info {
+      display: flex;
+      align-items: center;
+      flex: 1;
+
+      .earning-icon {
+        width: 40px;
+        height: 40px;
+        background: #e8f5e8;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        color: #2e7d32;
+        font-size: 18px;
+      }
+
+      .earning-details {
+        .earning-category {
+          font-size: 16px;
+          font-weight: 500;
+          color: #333;
+          margin-bottom: 4px;
+        }
+
+        .earning-time {
+          font-size: 12px;
+          color: #6c757d;
+        }
+      }
+    }
+
+    .earning-amount {
+      text-align: right;
+
+      .cash-amount {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2e7d32;
+        margin-bottom: 2px;
+      }
+
+      .points-amount {
+        font-size: 12px;
+        color: #ff9800;
+      }
+    }
+  }
+}
+
+// 空状态
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+
+  .empty-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.5;
+  }
+}
+
+// 功能按钮区
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+
+  .action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 1px solid #e9ecef;
+
+    &:hover {
+      background: #e9ecef;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    i {
+      font-size: 24px;
+      color: #2e7d32;
+      margin-bottom: 8px;
+    }
+
+    div {
+      font-size: 14px;
+      color: #333;
+      font-weight: 500;
+    }
+  }
+}
+
+// 模态框样式
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+
+  .modal-content {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    width: 100%;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+
+      .modal-btn {
+        flex: 1;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &.cancel {
+          background: #f8f9fa;
+          color: #6c757d;
+          border: 1px solid #e9ecef;
+
+          &:hover {
+            background: #e9ecef;
+          }
+        }
+
+        &.confirm {
+          background: #2e7d32;
+          color: white;
+
+          &:hover {
+            background: #1b5e20;
+          }
+        }
+      }
+    }
+  }
+}
+
+// 提现选项
+.withdraw-options {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+
+  .withdraw-option {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &.active {
+      border-color: #2e7d32;
+      background: #e8f5e8;
+    }
+
+    .withdraw-icon {
+      font-size: 24px;
+      color: #2e7d32;
+      margin-bottom: 8px;
+    }
+
+    div {
+      font-size: 14px;
+      color: #333;
+    }
+  }
+}
+
+// 底部导航栏
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  display: flex;
+  padding: 10px 0 20px;
+  box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &.active {
+      color: #4caf50;
+      
+      .nav-icon {
+        background: linear-gradient(135deg, #4caf50, #66bb6a);
+        color: white;
+        transform: scale(1.1);
+      }
+    }
+    
+    .nav-icon {
+      width: 35px;
+      height: 35px;
+      background: #f8f9fa;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 5px;
+      transition: all 0.3s ease;
+      
+      i {
+        font-size: 16px;
+      }
+    }
+    
+    div:last-child {
+      font-size: 10px;
+      font-weight: 500;
+    }
+    
+    &:hover:not(.active) {
+      color: #4caf50;
+      
+      .nav-icon {
+        background: #f1f8e9;
+        transform: scale(1.05);
+      }
+    }
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .container {
+    padding: 80px 15px 100px;
+  }
+
+  .earnings-overview .earnings-stats {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .action-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .modal {
+    padding: 15px;
+
+    .modal-content {
+      padding: 20px;
+    }
+  }
+}

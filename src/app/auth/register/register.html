@@ -1,8 +1,108 @@
-<div class="register-container">
-  <div class="register-card">
-    <div class="register-header">
-      <h1>注册页面</h1>
+<div class="register-page">
+  <div class="header">
+    <button class="back-btn" (click)="goBack()">←</button>
+    <div class="app-title">绿色回收</div>
+    <div class="logo">♻️</div>
+  </div>
+  
+  <div class="container">
+    <h2 class="form-title">创建账户</h2>
+    <p class="form-subtitle">加入我们，共同守护地球家园</p>
+    
+    <form #regForm="ngForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="identity">选择身份</label>
+        <div class="identity-options">
+          <div 
+            *ngFor="let option of identityOptions" 
+            class="identity-option"
+            [class.active]="registerForm.identity === option.value"
+            (click)="selectIdentity(option.value)">
+            <div class="identity-icon">{{option.icon}}</div>
+            <div>{{option.label}}</div>
+          </div>
+        </div>
+        <div class="error-message" [style.display]="formErrors.identity ? 'block' : 'none'">
+          请选择身份类型
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="account">账户信息</label>
+        <div class="input-with-icon">
+          <span class="input-icon">📱</span>
+          <input 
+            type="text" 
+            id="account" 
+            name="account"
+            [(ngModel)]="registerForm.account"
+            (blur)="validateAccount()"
+            placeholder="手机号/邮箱/用户名" 
+            required>
+        </div>
+        <div class="error-message" [style.display]="formErrors.account ? 'block' : 'none'">
+          请输入有效的账户信息
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">设置密码</label>
+        <div class="input-with-icon">
+          <span class="input-icon">🔒</span>
+          <input 
+            [type]="showPassword ? 'text' : 'password'" 
+            id="password" 
+            name="password"
+            [(ngModel)]="registerForm.password"
+            (input)="validatePassword()"
+            placeholder="6-20位数字、字母或特殊字符" 
+            required>
+          <button 
+            type="button" 
+            class="password-toggle"
+            (click)="togglePasswordVisibility('password')">
+            {{showPassword ? '🙈' : '👁️'}}
+          </button>
+        </div>
+        <div class="password-requirements">密码需包含6-20位字符，可使用数字、字母或特殊字符</div>
+        <div class="error-message" [style.display]="formErrors.password ? 'block' : 'none'">
+          密码不符合要求
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="confirmPassword">确认密码</label>
+        <div class="input-with-icon">
+          <span class="input-icon">🔒</span>
+          <input 
+            [type]="showConfirmPassword ? 'text' : 'password'" 
+            id="confirmPassword" 
+            name="confirmPassword"
+            [(ngModel)]="registerForm.confirmPassword"
+            (input)="validateConfirmPassword()"
+            placeholder="请再次输入密码" 
+            required>
+          <button 
+            type="button" 
+            class="password-toggle"
+            (click)="togglePasswordVisibility('confirmPassword')">
+            {{showConfirmPassword ? '🙈' : '👁️'}}
+          </button>
+        </div>
+        <div class="error-message" [style.display]="formErrors.confirmPassword ? 'block' : 'none'">
+          两次输入的密码不一致
+        </div>
+      </div>
+      
+      <button type="submit" class="btn-register">注册账号</button>
+    </form>
+    
+    <div class="login-link">
+      已有账户？<a (click)="goToLogin()">立即登录</a>
     </div>
-    <!-- 页面内容已清理，保留基本结构 -->
+  </div>
+  
+  <div class="footer">
+    注册即表示同意<a href="#">《用户协议》</a>和<a href="#">《隐私政策》</a>
   </div>
 </div>

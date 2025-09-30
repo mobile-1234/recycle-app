@@ -1,6 +1,213 @@
-<div class="profile-container">
-  <div class="profile-header">
-    <h1>个人中心</h1>
+<!-- 顶部标题栏 -->
+<div class="header">
+  <div class="back-btn" (click)="goBack()"><i class="fas fa-arrow-left"></i></div>
+  <div class="header-title">个人中心</div>
+  <div class="edit-profile" (click)="openEditModal()"><i class="fas fa-cog"></i></div>
+  
+  <div class="avatar-container">
+    <div class="avatar" id="userAvatar">
+      <i class="fas fa-user"></i>
+    </div>
+    <div class="avatar-edit" (click)="openEditModal()">
+      <i class="fas fa-pencil-alt"></i>
+    </div>
   </div>
-  <!-- 页面内容已清理，保留基本结构 -->
+  
+  <div class="user-name">{{ userName }}</div>
+  <div class="user-level">{{ userLevel }}</div>
 </div>
+
+<div class="container">
+  <!-- 统计数据 -->
+  <div class="section">
+    <div class="stats-container">
+      <div class="stat-item">
+        <div class="stat-value">{{ statRecycleCount }}</div>
+        <div class="stat-label">回收次数</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">{{ statCashTotal }}</div>
+        <div class="stat-label">累计收益(元)</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">{{ statCarbonTotal }}</div>
+        <div class="stat-label">碳减排(kg)</div>
+      </div>
+    </div>
+    
+    <div class="badges-container">
+      <div class="badges-title">成就徽章</div>
+      <div class="badges">
+        <div class="badge-item">
+          <div class="badge recycling"><i class="fas fa-recycle"></i></div>
+          <div class="badge-label">回收达人 · 完成20次回收</div>
+        </div>
+        <div class="badge-item">
+          <div class="badge environment"><i class="fas fa-leaf"></i></div>
+          <div class="badge-label">环保先锋 · 减排超100kg</div>
+        </div>
+        <div class="badge-item">
+          <div class="badge achievement"><i class="fas fa-trophy"></i></div>
+          <div class="badge-label">月度之星 · 本月排名前10</div>
+        </div>
+        <div class="badge-item">
+          <div class="badge community"><i class="fas fa-users"></i></div>
+          <div class="badge-label">社区贡献 · 邀请3位好友</div>
+        </div>
+        <div class="badge-item more" (click)="showAllBadges()">
+          <div class="badge-more">+2</div>
+          <div class="badge-label">更多徽章</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 功能列表 -->
+  <div class="section">
+    <div class="menu-list">
+      <div class="menu-item" (click)="goToPage('orders')">
+        <div class="menu-info">
+          <div class="menu-icon"><i class="fas fa-list-alt"></i></div>
+          <div class="menu-text">
+            <div class="menu-name">我的订单</div>
+            <div class="menu-desc">查看回收订单记录</div>
+          </div>
+        </div>
+        <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      
+      <div class="menu-item" (click)="goToPage('address')">
+        <div class="menu-info">
+          <div class="menu-icon"><i class="fas fa-map-marker-alt"></i></div>
+          <div class="menu-text">
+            <div class="menu-name">我的地址</div>
+            <div class="menu-desc">管理收货地址</div>
+          </div>
+        </div>
+        <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      
+      <div class="menu-item" (click)="goToPage('favorites')">
+        <div class="menu-info">
+          <div class="menu-icon"><i class="fas fa-heart"></i></div>
+          <div class="menu-text">
+            <div class="menu-name">我的收藏</div>
+            <div class="menu-desc">商品和知识收藏</div>
+          </div>
+        </div>
+        <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      
+      <div class="menu-item" (click)="goToPage('invite')">
+        <div class="menu-info">
+          <div class="menu-icon"><i class="fas fa-user-plus"></i></div>
+          <div class="menu-text">
+            <div class="menu-name">邀请好友</div>
+            <div class="menu-desc">邀请好友得奖励</div>
+          </div>
+        </div>
+        <div class="menu-badge">+100积分</div>
+        <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      
+      <div class="menu-item" (click)="goToPage('customerService')">
+        <div class="menu-info">
+          <div class="menu-icon"><i class="fas fa-headset"></i></div>
+          <div class="menu-text">
+            <div class="menu-name">客服与反馈</div>
+            <div class="menu-desc">问题咨询与建议</div>
+          </div>
+        </div>
+        <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      
+      <div class="menu-item" (click)="goToPage('settings')">
+        <div class="menu-info">
+          <div class="menu-icon"><i class="fas fa-cog"></i></div>
+          <div class="menu-text">
+            <div class="menu-name">设置</div>
+            <div class="menu-desc">账号与隐私设置</div>
+          </div>
+        </div>
+        <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 通用入口 -->
+  <div class="section general-menu">
+    <div class="menu-list">
+      <div class="menu-item" (click)="goToPage('about')">
+        <div class="menu-info">
+          <div class="menu-icon"><i class="fas fa-info-circle"></i></div>
+          <div class="menu-text">
+            <div class="menu-name">关于我们</div>
+          </div>
+        </div>
+        <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      
+      <div class="menu-item" (click)="goToPage('agreement')">
+        <div class="menu-info">
+          <div class="menu-icon"><i class="fas fa-file-contract"></i></div>
+          <div class="menu-text">
+            <div class="menu-name">用户协议</div>
+          </div>
+        </div>
+        <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      
+      <div class="menu-item" (click)="goToPage('privacy')">
+        <div class="menu-info">
+          <div class="menu-icon"><i class="fas fa-shield-alt"></i></div>
+          <div class="menu-text">
+            <div class="menu-name">隐私政策</div>
+          </div>
+        </div>
+        <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+      </div>
+    </div>
+    
+    <button class="logout-btn" (click)="openLogoutModal()">退出登录</button>
+  </div>
+</div>
+
+<!-- 退出登录模态框 -->
+<div class="modal" [style.display]="showLogout ? 'flex' : 'none'" (click)="closeLogoutModal($event)">
+  <div class="modal-content">
+    <div class="modal-title">确认退出登录？</div>
+    <div class="modal-buttons">
+      <button class="modal-btn cancel" (click)="showLogout = false">取消</button>
+      <button class="modal-btn confirm" (click)="confirmLogout()">退出</button>
+    </div>
+  </div>
+</div>
+
+<!-- 编辑资料模态框 -->
+<div class="modal" [style.display]="showEdit ? 'flex' : 'none'" (click)="closeEditModal($event)">
+  <div class="modal-content">
+    <div class="modal-title">编辑资料</div>
+    <div class="edit-form">
+      <div class="form-group">
+        <label class="form-label">昵称</label>
+        <input class="form-input" [(ngModel)]="userName" placeholder="请输入昵称" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">头像</label>
+        <div class="avatar-options">
+          <div class="avatar-option avatar-1" [class.active]="selectedAvatar === 1" (click)="selectAvatar(1)"><i class="fas fa-user"></i></div>
+          <div class="avatar-option avatar-2" [class.active]="selectedAvatar === 2" (click)="selectAvatar(2)"><i class="fas fa-user"></i></div>
+          <div class="avatar-option avatar-3" [class.active]="selectedAvatar === 3" (click)="selectAvatar(3)"><i class="fas fa-user"></i></div>
+          <div class="avatar-option avatar-4" [class.active]="selectedAvatar === 4" (click)="selectAvatar(4)"><i class="fas fa-user"></i></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-buttons">
+      <button class="modal-btn cancel" (click)="showEdit = false">取消</button>
+      <button class="modal-btn confirm" (click)="saveProfile()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 底部统一导航 -->
+<app-bottom-nav [activeTab]="'profile'"></app-bottom-nav>

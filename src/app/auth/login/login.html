@@ -1,8 +1,87 @@
-<div class="login-container">
-  <div class="login-card">
-    <div class="login-header">
-      <h1>登录页面</h1>
+<div class="header">
+  <a (click)="goBack()" class="back-btn">←</a>
+  <div class="app-title">绿色回收</div>
+  <div class="logo">♻️</div>
+</div>
+
+<div class="container">
+  <h2 class="form-title">欢迎回来</h2>
+  <p class="form-subtitle">登录您的账户，继续环保之旅</p>
+  
+  <form (ngSubmit)="onSubmit()" #loginFormRef="ngForm">
+    <div class="form-group">
+      <label for="account">账户信息</label>
+      <div class="input-with-icon">
+        <span class="input-icon">📱</span>
+        <input 
+          type="text" 
+          id="account" 
+          name="account"
+          [(ngModel)]="loginForm.account"
+          placeholder="手机号/邮箱/用户名" 
+          required>
+      </div>
+      <div class="error-message" [style.display]="errors.account ? 'block' : 'none'">
+        {{ errors.account }}
+      </div>
     </div>
-    <!-- 页面内容已清理，保留基本结构 -->
+    
+    <div class="form-group">
+      <label for="password">密码</label>
+      <div class="input-with-icon">
+        <span class="input-icon">🔒</span>
+        <input 
+          [type]="passwordVisible ? 'text' : 'password'" 
+          id="password" 
+          name="password"
+          [(ngModel)]="loginForm.password"
+          placeholder="请输入密码" 
+          required>
+        <button 
+          type="button" 
+          class="password-toggle"
+          (click)="togglePasswordVisibility()">
+          {{ passwordVisible ? '🙈' : '👁️' }}
+        </button>
+      </div>
+      <div class="error-message" [style.display]="errors.password ? 'block' : 'none'">
+        {{ errors.password }}
+      </div>
+    </div>
+    
+    <div class="remember-forgot">
+      <div class="remember-me">
+        <input 
+          type="checkbox" 
+          id="remember" 
+          name="remember"
+          [(ngModel)]="loginForm.remember">
+        <label for="remember">记住我</label>
+      </div>
+      <a (click)="forgotPassword()" class="forgot-password">忘记密码？</a>
+    </div>
+    
+    <button 
+      type="submit" 
+      class="btn-login"
+      [disabled]="isLoading">
+      {{ isLoading ? '登录中...' : '登录' }}
+    </button>
+    
+    <div class="divider">或使用以下方式登录</div>
+    
+    <div class="social-login">
+      <div class="social-btn wechat" (click)="socialLogin('微信')">💬</div>
+      <div class="social-btn qq" (click)="socialLogin('QQ')">🐧</div>
+      <div class="social-btn weibo" (click)="socialLogin('微博')">🔴</div>
+    </div>
+  </form>
+  
+  <div class="register-link">
+    还没有账户？<a (click)="goToRegister()">立即注册</a>
   </div>
+</div>
+
+<div class="footer">
+  登录即表示同意<a href="#">《用户协议》</a>和<a href="#">《隐私政策》</a>
 </div>

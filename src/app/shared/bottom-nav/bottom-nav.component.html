@@ -1,0 +1,22 @@
+<div class="bottom-nav">
+  <div class="nav-item" [class.active]="activeTab === 'home'" (click)="navigate('home')">
+    <div class="nav-icon"><i class="fas fa-home"></i></div>
+    <div>首页</div>
+  </div>
+  <div class="nav-item" [class.active]="activeTab === 'booking'" (click)="navigate('booking')">
+    <div class="nav-icon"><i class="fas fa-calendar-alt"></i></div>
+    <div>预约</div>
+  </div>
+  <div class="nav-item" [class.active]="activeTab === 'earnings'" (click)="navigate('earnings')">
+    <div class="nav-icon"><i class="fas fa-coins"></i></div>
+    <div>收益</div>
+  </div>
+  <div class="nav-item" [class.active]="activeTab === 'mall'" (click)="navigate('mall')">
+    <div class="nav-icon"><i class="fas fa-store"></i></div>
+    <div>商城</div>
+  </div>
+  <div class="nav-item" [class.active]="activeTab === 'profile'" (click)="navigate('profile')">
+    <div class="nav-icon"><i class="fas fa-user"></i></div>
+    <div>我的</div>
+  </div>
+</div>

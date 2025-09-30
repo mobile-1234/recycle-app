@@ -8,6 +8,6 @@ import { RouterModule } from '@angular/router';
   templateUrl: './ai-operations-assistant.html',
   styleUrl: './ai-operations-assistant.scss'
 })
-export class AiOperationsAssistantComponent {
+export class AiOperationsAssistant {
   constructor() {}
 }

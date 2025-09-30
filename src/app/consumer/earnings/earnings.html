@@ -1,6 +1,242 @@
-<div class="earnings-container">
-  <div class="earnings-header">
-    <h1>收益管理</h1>
-  </div>
-  <!-- 页面内容已清理，保留基本结构 -->
+<!-- 顶部标题栏 -->
+<div class="header">
+  <div class="back-btn" (click)="goBack()"><i class="fas fa-arrow-left"></i></div>
+  <div class="header-title">我的收益</div>
 </div>
+
+<div class="container">
+  <!-- 收益总览卡片 -->
+  <div class="earnings-overview">
+    <div class="earnings-stats">
+      <div class="stat-item">
+        <div class="stat-value">¥{{totalCashEarnings.toFixed(2)}}</div>
+        <div class="stat-label">累计现金收益</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">{{totalPointsEarnings}}</div>
+        <div class="stat-label">累计积分收益</div>
+      </div>
+    </div>
+    
+    <div class="carbon-section">
+      <div class="carbon-header">
+        <div class="carbon-title">累计碳减排量</div>
+        <div class="carbon-value">{{totalCarbonReduction}} kg</div>
+      </div>
+      <div class="chart-container">
+        <canvas #carbonChart></canvas>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 收益明细 -->
+  <div class="section">
+    <div class="section-title">
+      <span>收益明细</span>
+      <span style="font-size: 14px; color: #6c757d;">最近30天</span>
+    </div>
+    
+    <!-- 筛选栏 -->
+    <div class="filter-bar">
+      <div 
+        *ngFor="let filter of filterOptions"
+        class="filter-btn" 
+        [class.active]="filter.active"
+        (click)="selectFilter(filter)">
+        {{filter.name}}
+      </div>
+    </div>
+    
+    <div class="date-filter">
+      <input 
+        type="date" 
+        class="date-input" 
+        [(ngModel)]="startDate"
+        (change)="filterByDate()">
+      <span>至</span>
+      <input 
+        type="date" 
+        class="date-input" 
+        [(ngModel)]="endDate"
+        (change)="filterByDate()">
+    </div>
+    
+    <!-- 收益列表 -->
+    <div class="earnings-list" *ngIf="filteredEarnings.length > 0">
+      <div 
+        *ngFor="let earning of filteredEarnings"
+        class="earning-item" 
+        (click)="showOrderDetail(earning)">
+        <div class="earning-info">
+          <div class="earning-icon"><i [class]="earning.icon"></i></div>
+          <div class="earning-details">
+            <div class="earning-category">{{earning.category}}</div>
+            <div class="earning-time">{{earning.time}} | 订单号: {{earning.orderNo}}</div>
+          </div>
+        </div>
+        <div class="earning-amount">
+          <div class="cash-amount">¥{{earning.cashAmount.toFixed(2)}}</div>
+          <div class="points-amount">+{{earning.pointsAmount}}积分</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 空状态 -->
+    <div class="empty-state" *ngIf="filteredEarnings.length === 0">
+      <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+      <div>暂无收益记录</div>
+    </div>
+  </div>
+  
+  <!-- 收益管理功能区 -->
+  <div class="section">
+    <div class="section-title">收益管理</div>
+    <div class="action-buttons">
+      <div class="action-btn" (click)="showWithdrawModal()">
+        <i class="fas fa-money-bill-wave"></i>
+        <div>提现</div>
+      </div>
+      <div class="action-btn" (click)="goToMall()">
+        <i class="fas fa-shopping-cart"></i>
+        <div>积分兑换</div>
+      </div>
+      <div class="action-btn" (click)="showDonationModal()">
+        <i class="fas fa-hand-holding-heart"></i>
+        <div>公益捐赠</div>
+      </div>
+      <div class="action-btn" (click)="exportBill()">
+        <i class="fas fa-file-export"></i>
+        <div>导出账单</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 提现模态框 -->
+<div class="modal" [style.display]="showWithdraw ? 'flex' : 'none'">
+  <div class="modal-content">
+    <div class="modal-title">提现到账</div>
+    <p style="margin-bottom: 15px; color: #6c757d;">选择提现方式，预计1-3个工作日到账</p>
+    
+    <div class="withdraw-options">
+      <div 
+        *ngFor="let option of withdrawOptions"
+        class="withdraw-option" 
+        [class.active]="option.active"
+        (click)="selectWithdrawOption(option)">
+        <div class="withdraw-icon"><i [class]="option.icon"></i></div>
+        <div>{{option.name}}</div>
+      </div>
+    </div>
+    
+    <div style="margin: 15px 0;">
+      <input 
+        type="number" 
+        placeholder="输入提现金额" 
+        [(ngModel)]="withdrawAmount"
+        style="width: 100%; padding: 12px 15px; border: 1px solid #e9ecef; border-radius: 8px; font-size: 16px;">
+      <div style="text-align: left; font-size: 12px; color: #6c757d; margin-top: 5px;">
+        可提现金额: ¥{{totalCashEarnings.toFixed(2)}}
+      </div>
+    </div>
+    
+    <div class="modal-buttons">
+      <button class="modal-btn cancel" (click)="closeModal('withdraw')">取消</button>
+      <button class="modal-btn confirm" (click)="confirmWithdraw()">确认提现</button>
+    </div>
+  </div>
+</div>
+
+<!-- 捐赠模态框 -->
+<div class="modal" [style.display]="showDonation ? 'flex' : 'none'">
+  <div class="modal-content">
+    <div class="modal-title">公益捐赠</div>
+    <p style="margin-bottom: 15px; color: #6c757d;">选择您想支持的环保公益项目</p>
+    
+    <div style="text-align: left; margin-bottom: 15px;">
+      <div 
+        *ngFor="let project of donationProjects"
+        style="padding: 12px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px; cursor: pointer;"
+        [style.border]="selectedProject?.id === project.id ? '2px solid #2e7d32' : '1px solid #e9ecef'"
+        (click)="selectDonationProject(project)">
+        <div style="font-weight: 500; margin-bottom: 5px;">{{project.name}}</div>
+        <div style="font-size: 12px; color: #6c757d;">{{project.description}}</div>
+      </div>
+    </div>
+    
+    <div style="margin: 15px 0;">
+      <input 
+        type="number" 
+        placeholder="输入捐赠金额" 
+        [(ngModel)]="donationAmount"
+        style="width: 100%; padding: 12px 15px; border: 1px solid #e9ecef; border-radius: 8px; font-size: 16px;">
+    </div>
+    
+    <div class="modal-buttons">
+      <button class="modal-btn cancel" (click)="closeModal('donation')">取消</button>
+      <button class="modal-btn confirm" (click)="confirmDonation()">确认捐赠</button>
+    </div>
+  </div>
+</div>
+
+<!-- 订单详情模态框 -->
+<div class="modal" [style.display]="showOrderDetailModal ? 'flex' : 'none'">
+  <div class="modal-content">
+    <div class="modal-title">订单详情</div>
+    <div style="text-align: left;" *ngIf="selectedOrder">
+      <div style="margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: #6c757d;">品类:</span>
+          <span>{{selectedOrder.category}}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: #6c757d;">时间:</span>
+          <span>{{selectedOrder.time}}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: #6c757d;">订单号:</span>
+          <span>{{selectedOrder.orderNo}}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: #6c757d;">重量:</span>
+          <span>{{selectedOrder.weight}}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: #6c757d;">单价:</span>
+          <span>{{selectedOrder.price}}</span>
+        </div>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: #6c757d;">现金收益:</span>
+          <span style="color: #2e7d32; font-weight: 600;">¥{{selectedOrder.cashAmount.toFixed(2)}}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: #6c757d;">积分收益:</span>
+          <span style="color: #ff9800; font-weight: 600;">{{selectedOrder.pointsAmount}}积分</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: #6c757d;">碳减排:</span>
+          <span style="color: #1abc9c; font-weight: 600;">{{selectedOrder.carbonReduction}}kg</span>
+        </div>
+      </div>
+      
+      <div style="margin-bottom: 15px;">
+        <div style="color: #6c757d; margin-bottom: 5px;">回收地址:</div>
+        <div>{{selectedOrder.address}}</div>
+      </div>
+      
+      <div>
+        <div style="color: #6c757d; margin-bottom: 5px;">回收员:</div>
+        <div>{{selectedOrder.collector}}</div>
+      </div>
+    </div>
+    <div class="modal-buttons">
+      <button class="modal-btn confirm" (click)="closeModal('orderDetail')">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- 底部导航栏 -->
+<app-bottom-nav [activeTab]="'earnings'"></app-bottom-nav>

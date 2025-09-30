@@ -1,6 +1,98 @@
 <div class="eco-knowledge-container">
-  <div class="knowledge-header">
-    <h1>环保知识</h1>
+  <!-- 顶部标题栏 -->
+  <div class="header">
+    <div class="back-btn" (click)="goBack()"><i class="fas fa-arrow-left"></i></div>
+    <div class="header-title">环保知识</div>
   </div>
-  <!-- 页面内容已清理，保留基本结构 -->
+
+  <div class="container">
+    <!-- 搜索栏 -->
+    <div class="search-bar">
+      <i class="fas fa-magnifying-glass"></i>
+      <input [(ngModel)]="searchText" type="text" placeholder="搜索环保知识...">
+    </div>
+
+    <!-- 知识分类导航 -->
+    <div class="section">
+      <div class="knowledge-categories">
+        <div 
+          class="knowledge-category"
+          *ngFor="let cat of categories"
+          [class.active]="cat.active"
+          (click)="selectCategory(cat.id)"
+        >
+          <div class="category-icon"><i [class]="cat.icon"></i></div>
+          <div class="category-name">{{cat.name}}</div>
+        </div>
+      </div>
+
+      <!-- 内容列表 -->
+      <div class="content-list">
+        <div class="content-item" *ngFor="let item of contents" (click)="openContent(item)">
+          <div class="content-image" [ngClass]="item.imageClass">
+            <i [class]="item.icon + ' fa-2x'"></i>
+            <div class="content-tag">{{ item.tag }}</div>
+          </div>
+          <div class="content-details">
+            <div class="content-title">{{ item.title }}</div>
+            <div class="content-desc">{{ item.desc }}</div>
+            <div class="content-meta">
+              <span>{{ item.time }}</span>
+              <div class="content-actions">
+                <div class="action-btn" [class.active]="item.favorited" (click)="$event.stopPropagation(); toggleFavorite(item)">
+                  <i [class]="(item.favorited ? 'fas' : 'far') + ' fa-bookmark'"></i>
+                  <span>收藏</span>
+                </div>
+                <div class="action-btn" [class.active]="item.liked" (click)="$event.stopPropagation(); toggleLike(item)">
+                  <i [class]="(item.liked ? 'fas' : 'far') + ' fa-thumbs-up'"></i>
+                  <span>{{ item.likes }}</span>
+                </div>
+                <div class="action-btn" (click)="$event.stopPropagation()">
+                  <i class="far fa-share-from-square"></i>
+                  <span>分享</span>
+                </div>
+              </div>
+            </div>
+            <div class="learning-progress" *ngIf="item.progress">
+              <span>学习进度</span>
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="item.progress"></div>
+              </div>
+              <span>{{ item.progress }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 内容详情模态框 -->
+  <div class="modal" [style.display]="showModal ? 'flex' : 'none'">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">{{ modalTitle }}</div>
+        <div class="close-btn" (click)="closeModal()">
+          <i class="fas fa-xmark"></i>
+        </div>
+      </div>
+      <div class="modal-tag">{{ modalTag }}</div>
+      <div class="modal-image">
+        <i [class]="modalIcon + ' fa-3x'"></i>
+      </div>
+      <div class="modal-content-text">
+        这里展示内容详情，占位文本。可对接后端返回详细文章或视频信息。
+      </div>
+      <div class="modal-actions">
+        <div class="modal-action-buttons">
+          <div class="modal-action-btn"><i class="far fa-bookmark"></i> 收藏</div>
+          <div class="modal-action-btn"><i class="far fa-thumbs-up"></i> 点赞</div>
+          <div class="modal-action-btn"><i class="far fa-share-from-square"></i> 分享</div>
+        </div>
+        <button class="continue-btn" (click)="closeModal()">继续学习</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部统一导航 -->
+  <app-bottom-nav [activeTab]="'mall'"></app-bottom-nav>
 </div>

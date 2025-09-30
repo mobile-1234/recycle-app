@@ -1,6 +1,93 @@
-<div class="home-container">
-  <div class="home-header">
-    <h1>首页</h1>
+<!-- 顶部状态栏 -->
+<div class="status-bar">
+  <div class="user-level">
+    <div class="level-badge">环保达人 LV.{{ userLevel }}</div>
+    <div class="level-progress">
+      <div class="progress-bar" [style.width.%]="levelProgress"></div>
+    </div>
   </div>
-  <!-- 页面内容已清理，保留基本结构 -->
+  <div class="points-cash">
+    <div>积分: {{ userPoints | number }}</div>
+    <div>现金: ¥{{ userCash | number:'1.2-2' }}</div>
+  </div>
+  <div class="notification-icon" (click)="openNotifications()">
+    <i class="far fa-bell"></i>
+  </div>
 </div>
+
+<!-- 核心功能入口区 -->
+<div class="core-functions">
+  <div class="function-title">核心功能</div>
+  <div class="quick-booking" (click)="quickBooking()">
+    <i class="fas fa-recycle"></i> 一键预约回收
+  </div>
+  <div class="function-buttons">
+    <div class="func-btn" (click)="openARRecognition()">
+      <div class="func-icon"><i class="fas fa-camera"></i></div>
+      <div>AR识废品</div>
+    </div>
+    <div class="func-btn" (click)="findDropPoints()">
+      <div class="func-icon"><i class="fas fa-map-marker-alt"></i></div>
+      <div>自助投递点</div>
+    </div>
+  </div>
+</div>
+
+<!-- 动态信息区 -->
+<div class="dynamic-info">
+  <!-- 附近回收员动态 -->
+  <div class="info-section">
+    <div class="section-title">
+      <h3>附近回收员</h3>
+      <a (click)="viewMoreCollectors()" class="more-link">查看更多</a>
+    </div>
+    <div class="collector-list">
+      <div class="collector-card" *ngFor="let collector of nearbyCollectors">
+        <div class="collector-avatar"><i class="fas fa-user"></i></div>
+        <div class="collector-name">{{ collector.name }}</div>
+        <div class="collector-status">{{ collector.distance }} · {{ collector.status }}</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 自助投递点状态 -->
+  <div class="info-section">
+    <div class="section-title">
+      <h3>自助投递点</h3>
+      <a (click)="viewMoreDropPoints()" class="more-link">查看更多</a>
+    </div>
+    <div class="drop-points">
+      <div class="point-card" *ngFor="let point of dropPoints">
+        <div class="point-name">{{ point.name }}</div>
+        <div class="point-distance">{{ point.distance }}</div>
+        <div class="capacity-bar">
+          <div class="capacity-fill" [style.width.%]="point.capacity"></div>
+        </div>
+        <div class="capacity-text">{{ point.capacity }}% 满箱</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 环保活动/政策公告轮播 -->
+  <div class="info-section">
+    <div class="section-title">
+      <h3>环保活动</h3>
+      <a (click)="viewMoreActivities()" class="more-link">查看更多</a>
+    </div>
+    <div class="activity-carousel">
+      <div class="activity-card" *ngFor="let activity of activities">
+        <div class="activity-tag">{{ activity.tag }}</div>
+        <div class="activity-title">{{ activity.title }}</div>
+        <div class="activity-desc">{{ activity.description }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI助手入口 -->
+<div class="ai-assistant" (click)="openAIAssistant()">
+  <i class="fas fa-robot"></i>
+</div>
+
+<!-- 底部导航栏 -->
+<app-bottom-nav [activeTab]="'home'"></app-bottom-nav>

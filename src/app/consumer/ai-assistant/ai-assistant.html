@@ -1,6 +1,64 @@
 <div class="ai-assistant-container">
   <div class="assistant-header">
-    <h1>AI助手</h1>
+    <div class="title">AI回收助手</div>
+    <button class="back-home" (click)="goHome()"><i class="fas fa-home"></i> 返回首页</button>
   </div>
-  <!-- 页面内容已清理，保留基本结构 -->
+
+  <!-- 对话区域 -->
+  <div class="chat-container">
+    <div class="messages">
+      <div class="message" *ngFor="let m of messages" [class.user]="m.role==='user'" [class.assistant]="m.role==='assistant'">
+        <div class="avatar">
+          <i class="fas" [ngClass]="m.role==='user' ? 'fa-user' : 'fa-robot'"></i>
+        </div>
+        <div class="bubble">{{ m.text }}</div>
+      </div>
+    </div>
+    <div class="input-bar">
+      <input [(ngModel)]="inputText" placeholder="请输入问题或上传图片..." />
+      <button class="voice-btn" [class.recording]="isRecording" (mousedown)="startRecording()" (mouseup)="stopRecording()" (touchstart)="startRecording()" (touchend)="stopRecording()">
+        <i class="fas fa-microphone"></i>
+      </button>
+      <button class="send-btn" (click)="sendMessage()">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 助手能力导航 -->
+  <div class="section">
+    <div class="section-title">助手能力</div>
+    <div class="abilities-grid">
+      <div class="ability-card" (click)="askQuickQuestion('帮我识别这个物品是否可以回收')">
+        <div class="ability-icon"><i class="fas fa-question-circle"></i></div>
+        <div class="ability-name">识别答疑</div>
+        <div class="ability-desc">物品分类识别</div>
+      </div>
+      <div class="ability-card" (click)="askQuickQuestion('查询当前回收价格')">
+        <div class="ability-icon"><i class="fas fa-tag"></i></div>
+        <div class="ability-name">价格查询</div>
+        <div class="ability-desc">实时价格信息</div>
+      </div>
+      <div class="ability-card" (click)="askQuickQuestion('回收流程指导')">
+        <div class="ability-icon"><i class="fas fa-list-alt"></i></div>
+        <div class="能力-name">流程指导</div>
+        <div class="ability-desc">标准化流程说明</div>
+      </div>
+      <div class="ability-card" (click)="askQuickQuestion('附近投递点查询')">
+        <div class="能力-icon"><i class="fas fa-location-dot"></i></div>
+        <div class="ability-name">投递点</div>
+        <div class="ability-desc">附近站点信息</div>
+      </div>
+      <div class="ability-card" (click)="askQuickQuestion('预约上门时间建议')">
+        <div class="ability-icon"><i class="fas fa-calendar-days"></i></div>
+        <div class="ability-name">时间建议</div>
+        <div class="ability-desc">合适预约时间</div>
+      </div>
+      <div class="ability-card" (click)="askQuickQuestion('环保积分规则说明')">
+        <div class="ability-icon"><i class="fas fa-coins"></i></div>
+        <div class="ability-name">积分规则</div>
+        <div class="ability-desc">获取与使用</div>
+      </div>
+    </div>
+  </div>
 </div>

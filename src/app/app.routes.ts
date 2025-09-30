@@ -11,11 +11,11 @@ export const routes: Routes = [
     loadChildren: () => import('./auth/auth-module').then(m => m.AuthModule)
   },
   
-  // C端个人用户路由 - 需要认证
+  // C端个人用户路由 - 临时移除认证守卫用于测试
   {
     path: 'consumer',
-    loadChildren: () => import('./consumer/consumer-module').then(m => m.ConsumerModule),
-    canActivate: [authGuard]
+    loadChildren: () => import('./consumer/consumer-module').then(m => m.ConsumerModule)
+    // canActivate: [authGuard] // 临时注释掉用于测试
   },
   
   // B端企业用户路由 - 需要认证

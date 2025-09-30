@@ -8,6 +8,6 @@ import { RouterModule } from '@angular/router';
   templateUrl: './government-center.html',
   styleUrl: './government-center.scss'
 })
-export class GovernmentCenterComponent {
+export class GovernmentCenter {
   constructor() {}
 }

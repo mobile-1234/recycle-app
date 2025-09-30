@@ -8,6 +8,6 @@ import { RouterModule } from '@angular/router';
   templateUrl: './device-management.html',
   styleUrl: './device-management.scss'
 })
-export class DeviceManagementComponent {
+export class DeviceManagement {
   constructor() {}
 }

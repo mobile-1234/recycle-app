@@ -8,6 +8,6 @@ import { RouterModule } from '@angular/router';
   templateUrl: './supervision-overview.html',
   styleUrl: './supervision-overview.scss'
 })
-export class SupervisionOverviewComponent {
+export class SupervisionOverview {
   constructor() {}
 }

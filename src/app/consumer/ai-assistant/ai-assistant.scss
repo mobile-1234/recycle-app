@@ -1,0 +1,77 @@
+/* 容器与头部 */
+.ai-assistant-container {
+  padding-bottom: 88px; /* 预留底部导航空间（若后续添加） */
+}
+
+.assistant-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #2ecc71, #1abc9c);
+  color: #fff;
+}
+.assistant-header .title { font-size: 18px; font-weight: 600; }
+.assistant-header .back-home {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 12px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* 对话区域 */
+.chat-container { padding: 12px 12px 0; }
+.messages { display: flex; flex-direction: column; gap: 10px; }
+.message { display: flex; gap: 8px; align-items: flex-end; }
+.message .avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: #f1f3f4; color: #2e7d32;
+}
+.message .bubble {
+  max-width: 72%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #f8f9fa; color: #333; font-size: 14px;
+}
+.message.user { flex-direction: row-reverse; }
+.message.user .bubble { background: #e8f5e9; }
+.message.user .avatar { background: #e0f2f1; }
+.message.assistant .avatar { background: #e3f2fd; color: #1e88e5; }
+
+/* 输入栏 */
+.input-bar {
+  display: flex; gap: 8px; align-items: center;
+  padding: 10px 12px; background: #fff; border-top: 1px solid #ececec;
+  position: sticky; bottom: 0; left: 0; right: 0;
+}
+.input-bar input {
+  flex: 1; height: 40px; border: 1px solid #e9ecef; border-radius: 8px; padding: 0 10px;
+}
+.voice-btn, .send-btn {
+  width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  background: #f1f3f4; color: #333;
+}
+.voice-btn.recording { animation: pulse 1.2s infinite; background: #ffebee; color: #e53935; }
+@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
+.send-btn { background: #2e7d32; color: #fff; }
+
+/* 能力导航 */
+.section { padding: 12px; }
+.section-title { font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+.abilities-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.ability-card { background: #f8f9fa; border-radius: 12px; padding: 14px 10px; text-align: center; cursor: pointer; transition: all .2s; }
+.ability-card:hover { background: rgba(46, 204, 113, 0.1); transform: translateY(-2px); }
+.ability-icon {
+  width: 48px; height: 48px; margin: 0 auto 8px; border-radius: 50%;
+  background: rgba(46, 204, 113, 0.1); color: #2e7d32; display: flex; align-items: center; justify-content: center;
+}
+.ability-name { font-size: 14px; font-weight: 500; }
+.ability-desc { font-size: 12px; color: #6c757d; }
+
+@media (max-width: 360px) {
+  .abilities-grid { grid-template-columns: repeat(2, 1fr); }
+}

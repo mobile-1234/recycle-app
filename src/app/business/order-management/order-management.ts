@@ -8,6 +8,6 @@ import { RouterModule } from '@angular/router';
   templateUrl: './order-management.html',
   styleUrl: './order-management.scss'
 })
-export class OrderManagementComponent {
+export class OrderManagement {
   constructor() {}
 }

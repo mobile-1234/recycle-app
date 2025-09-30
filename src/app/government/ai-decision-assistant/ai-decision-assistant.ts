@@ -8,6 +8,6 @@ import { RouterModule } from '@angular/router';
   templateUrl: './ai-decision-assistant.html',
   styleUrl: './ai-decision-assistant.scss'
 })
-export class AiDecisionAssistantComponent {
+export class AiDecisionAssistant {
   constructor() {}
 }
