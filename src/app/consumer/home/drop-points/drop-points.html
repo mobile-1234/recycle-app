@@ -1,0 +1,144 @@
+<div class="drop-points-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left" (click)="goBack()">
+      <app-svg-icon name="arrow-left" class="back-icon"></app-svg-icon>
+    </div>
+    <div class="header-title">附近投放点</div>
+    <div class="header-right">
+      <app-svg-icon name="map" class="map-icon"></app-svg-icon>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <div class="search-bar">
+      <app-svg-icon name="search" class="search-icon"></app-svg-icon>
+      <input 
+        type="text" 
+        class="search-input"
+        placeholder="搜索投放点名称或地址"
+        [value]="searchQuery"
+        (input)="onSearchChange($event)"
+      >
+    </div>
+
+    <div class="filter-tabs">
+      <div 
+        class="filter-tab" 
+        [class.active]="selectedFilter === 'all'"
+        (click)="selectFilter('all')"
+      >
+        全部
+      </div>
+      <div 
+        class="filter-tab" 
+        [class.active]="selectedFilter === 'nearby'"
+        (click)="selectFilter('nearby')"
+      >
+        附近
+      </div>
+      <div 
+        class="filter-tab" 
+        [class.active]="selectedFilter === 'available'"
+        (click)="selectFilter('available')"
+      >
+        可用
+      </div>
+      <div 
+        class="filter-tab" 
+        [class.active]="selectedFilter === 'full-service'"
+        (click)="selectFilter('full-service')"
+      >
+        全服务
+      </div>
+    </div>
+  </div>
+
+  <!-- Drop Points List -->
+  <div class="drop-points-list">
+    <div class="drop-point-item" *ngFor="let point of filteredDropPoints">
+      <div class="drop-point-header">
+        <div class="drop-point-info">
+          <h3 class="drop-point-name">{{ point.name }}</h3>
+          <div class="drop-point-meta">
+            <div class="meta-item">
+              <app-svg-icon name="location" class="meta-icon"></app-svg-icon>
+              <span>{{ point.distance }}</span>
+            </div>
+            <div class="meta-item">
+              <app-svg-icon name="star" class="meta-icon"></app-svg-icon>
+              <span>{{ point.rating }}</span>
+            </div>
+          </div>
+        </div>
+        <div 
+          class="drop-point-status" 
+          [class.busy]="point.status === 'busy'"
+          [class.closed]="point.status === 'closed'"
+        >
+          {{ getStatusText(point.status) }}
+        </div>
+      </div>
+
+      <div class="drop-point-details">
+        <div class="detail-row">
+          <app-svg-icon name="location" class="detail-icon"></app-svg-icon>
+          <span class="detail-text">{{ point.address }}</span>
+        </div>
+        <div class="detail-row">
+          <app-svg-icon name="clock" class="detail-icon"></app-svg-icon>
+          <span class="detail-text">{{ point.hours }}</span>
+        </div>
+        <div class="detail-row">
+          <app-svg-icon name="phone" class="detail-icon"></app-svg-icon>
+          <span class="detail-text">{{ point.phone }}</span>
+        </div>
+      </div>
+
+      <div class="drop-point-types">
+        <div class="types-title">接收类型</div>
+        <div class="types-list">
+          <span class="type-tag" *ngFor="let type of point.types">
+            {{ getTypeLabel(type) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="drop-point-features">
+        <div class="features-title">服务特色</div>
+        <div class="features-list">
+          <span class="feature-tag" *ngFor="let feature of point.features">
+            {{ feature }}
+          </span>
+        </div>
+      </div>
+
+      <div class="drop-point-actions">
+        <button class="action-btn" (click)="callDropPoint(point.phone)">
+          <app-svg-icon name="phone" class="btn-icon"></app-svg-icon>
+          电话
+        </button>
+        <button class="action-btn" (click)="navigateToDropPoint(point)">
+          <app-svg-icon name="navigation" class="btn-icon"></app-svg-icon>
+          导航
+        </button>
+        <button class="action-btn" (click)="viewDropPointDetails(point)">
+          <app-svg-icon name="info" class="btn-icon"></app-svg-icon>
+          详情
+        </button>
+        <button class="action-btn primary" (click)="bookDropPoint(point)">
+          <app-svg-icon name="calendar" class="btn-icon"></app-svg-icon>
+          预约
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredDropPoints.length === 0">
+      <app-svg-icon name="empty-location" class="empty-icon"></app-svg-icon>
+      <div class="empty-text">未找到符合条件的投放点</div>
+      <div class="empty-sub-text">请尝试调整筛选条件或搜索关键词</div>
+    </div>
+  </div>
+</div>

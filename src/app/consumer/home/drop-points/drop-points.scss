@@ -1,0 +1,551 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.drop-points-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding-bottom: 80px;
+
+  .header {
+    @include header-style();
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    .header-left, .header-right {
+      .back-icon, .map-icon {
+        width: 24px;
+        height: 24px;
+        color: var(--primary-color);
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: scale(1.1);
+          color: var(--primary-dark);
+        }
+      }
+    }
+
+    .header-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  }
+
+  .search-section {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+    .search-bar {
+      position: relative;
+      margin-bottom: 20px;
+
+      .search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+        color: var(--text-secondary);
+        z-index: 2;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 15px 20px 15px 50px;
+        border: 2px solid transparent;
+        border-radius: 25px;
+        background: rgba(255, 255, 255, 0.8);
+        font-size: 16px;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+        &:focus {
+          outline: none;
+          border-color: var(--primary-color);
+          background: white;
+          box-shadow: 0 6px 25px rgba(var(--primary-rgb), 0.2);
+          transform: translateY(-2px);
+        }
+
+        &::placeholder {
+          color: var(--text-secondary);
+        }
+      }
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 5px;
+
+      .filter-tab {
+        flex-shrink: 0;
+        padding: 12px 20px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.7);
+        color: var(--text-secondary);
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        white-space: nowrap;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.9);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        &.active {
+          background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+          color: white;
+          border-color: var(--primary-light);
+          box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.3);
+        }
+      }
+    }
+  }
+
+  .drop-points-list {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .drop-point-item {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .drop-point-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+
+        .drop-point-info {
+          flex: 1;
+
+          .drop-point-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 12px 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+          }
+
+          .drop-point-meta {
+            display: flex;
+            gap: 20px;
+
+            .meta-item {
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              color: var(--text-secondary);
+              font-size: 14px;
+
+              .meta-icon {
+                width: 16px;
+                height: 16px;
+                color: var(--primary-color);
+              }
+            }
+          }
+        }
+
+        .drop-point-status {
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-size: 12px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          background: linear-gradient(135deg, #4CAF50, #45a049);
+          color: white;
+          box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+
+          &.busy {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+          }
+
+          &.closed {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+          }
+        }
+      }
+
+      .drop-point-details {
+        margin-bottom: 20px;
+
+        .detail-row {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 12px;
+          padding: 8px 0;
+
+          .detail-icon {
+            width: 18px;
+            height: 18px;
+            color: var(--primary-color);
+            flex-shrink: 0;
+          }
+
+          .detail-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+          }
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
+
+      .drop-point-types {
+        margin-bottom: 20px;
+
+        .types-title {
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--text-primary);
+          margin-bottom: 12px;
+        }
+
+        .types-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+
+          .type-tag {
+            padding: 6px 12px;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary-light));
+            color: var(--primary-color);
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid var(--primary-light);
+          }
+        }
+      }
+
+      .drop-point-features {
+        margin-bottom: 24px;
+
+        .features-title {
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--text-primary);
+          margin-bottom: 12px;
+        }
+
+        .features-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+
+          .feature-tag {
+            padding: 6px 12px;
+            background: rgba(var(--secondary-rgb), 0.1);
+            color: var(--secondary-color);
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid rgba(var(--secondary-rgb), 0.2);
+          }
+        }
+      }
+
+      .drop-point-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 12px;
+
+        .action-btn {
+          @include center-flex;
+          flex-direction: column;
+          gap: 6px;
+          padding: 12px 8px;
+          border: 2px solid var(--border-light);
+          border-radius: 15px;
+          background: rgba(255, 255, 255, 0.8);
+          color: var(--text-secondary);
+          font-size: 12px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          .btn-icon {
+            width: 20px;
+            height: 20px;
+          }
+
+          &:hover {
+            background: var(--primary-light);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.2);
+          }
+
+          &.primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3);
+
+            &:hover {
+              background: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
+              transform: translateY(-3px);
+              box-shadow: 0 6px 25px rgba(var(--primary-rgb), 0.4);
+            }
+          }
+        }
+      }
+    }
+
+    .empty-state {
+      @include center-flex;
+      flex-direction: column;
+      padding: 60px 20px;
+      text-align: center;
+
+      .empty-icon {
+        width: 80px;
+        height: 80px;
+        color: var(--text-disabled);
+        margin-bottom: 20px;
+        opacity: 0.6;
+      }
+
+      .empty-text {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+      }
+
+      .empty-sub-text {
+        font-size: 14px;
+        color: var(--text-disabled);
+        line-height: 1.5;
+      }
+    }
+  }
+}
+
+// 平板响应式设计
+@include tablet {
+  .drop-points-container {
+    .search-section {
+      padding: 24px;
+
+      .filter-tabs {
+        justify-content: center;
+        
+        .filter-tab {
+          min-width: 100px;
+        }
+      }
+    }
+
+    .drop-points-list {
+      padding: 24px;
+      
+      .drop-point-item {
+        .drop-point-actions {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+    }
+  }
+}
+
+// 移动端响应式设计
+@include mobile {
+  .drop-points-container {
+    .header {
+      padding: 12px 16px;
+      
+      .header-title {
+        font-size: 16px;
+      }
+
+      .header-left, .header-right {
+        .back-icon, .map-icon {
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+
+    .search-section {
+      padding: 16px;
+
+      .search-bar {
+        margin-bottom: 16px;
+
+        .search-input {
+          padding: 12px 16px 12px 45px;
+          font-size: 14px;
+        }
+
+        .search-icon {
+          width: 18px;
+          height: 18px;
+          left: 12px;
+        }
+      }
+
+      .filter-tabs {
+        gap: 8px;
+        
+        .filter-tab {
+          padding: 10px 16px;
+          font-size: 12px;
+        }
+      }
+    }
+
+    .drop-points-list {
+      padding: 16px;
+      gap: 16px;
+      
+      .drop-point-item {
+        padding: 20px;
+        border-radius: 16px;
+
+        .drop-point-header {
+          margin-bottom: 16px;
+
+          .drop-point-info {
+            .drop-point-name {
+              font-size: 18px;
+              margin-bottom: 10px;
+            }
+
+            .drop-point-meta {
+              gap: 16px;
+
+              .meta-item {
+                font-size: 13px;
+
+                .meta-icon {
+                  width: 14px;
+                  height: 14px;
+                }
+              }
+            }
+          }
+
+          .drop-point-status {
+            padding: 6px 12px;
+            font-size: 11px;
+          }
+        }
+
+        .drop-point-details {
+          margin-bottom: 16px;
+
+          .detail-row {
+            margin-bottom: 10px;
+            padding: 6px 0;
+
+            .detail-icon {
+              width: 16px;
+              height: 16px;
+            }
+
+            .detail-text {
+              font-size: 13px;
+            }
+          }
+        }
+
+        .drop-point-types, .drop-point-features {
+          margin-bottom: 16px;
+
+          .types-title, .features-title {
+            font-size: 13px;
+            margin-bottom: 10px;
+          }
+
+          .types-list, .features-list {
+            gap: 6px;
+
+            .type-tag, .feature-tag {
+              padding: 4px 10px;
+              font-size: 11px;
+            }
+          }
+        }
+
+        .drop-point-actions {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+
+          .action-btn {
+            padding: 10px 6px;
+            font-size: 11px;
+
+            .btn-icon {
+              width: 18px;
+              height: 18px;
+            }
+          }
+        }
+      }
+
+      .empty-state {
+        padding: 40px 16px;
+
+        .empty-icon {
+          width: 60px;
+          height: 60px;
+          margin-bottom: 16px;
+        }
+
+        .empty-text {
+          font-size: 16px;
+          margin-bottom: 6px;
+        }
+
+        .empty-sub-text {
+          font-size: 13px;
+        }
+      }
+    }
+  }
+}

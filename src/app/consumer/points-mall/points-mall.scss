@@ -200,6 +200,57 @@ body {
   }
 }
 
+/* 环保知识学习卡片 */
+.eco-knowledge-card {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid #e0e0e0;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(46, 125, 50, 0.2);
+  }
+
+  .eco-knowledge-icon {
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+
+  .eco-knowledge-content {
+    flex: 1;
+  }
+
+  .eco-knowledge-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2e7d32;
+    margin-bottom: 4px;
+  }
+
+  .eco-knowledge-desc {
+    font-size: 12px;
+    color: #6c757d;
+    margin-bottom: 6px;
+  }
+
+  .eco-knowledge-reward {
+    font-size: 12px;
+    color: #ff9800;
+    font-weight: 600;
+  }
+
+  .eco-knowledge-arrow {
+    color: #6c757d;
+    flex-shrink: 0;
+  }
+}
+
 /* 商品分类导航 */
 .category-nav {
   display: grid;

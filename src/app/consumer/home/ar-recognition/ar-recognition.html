@@ -1,0 +1,126 @@
+<div class="ar-recognition-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left" (click)="goBack()">
+      <app-svg-icon name="arrow-left" class="back-icon"></app-svg-icon>
+    </div>
+    <div class="header-title">AR智能识别</div>
+    <div class="header-right" (click)="viewHistory()">
+      <app-svg-icon name="history" class="history-icon"></app-svg-icon>
+    </div>
+  </div>
+
+  <!-- Camera View -->
+  <div class="camera-container">
+    <div class="camera-view" [class.scanning]="isScanning">
+      <div class="camera-overlay">
+        <div class="scan-frame">
+          <div class="corner top-left"></div>
+          <div class="corner top-right"></div>
+          <div class="corner bottom-left"></div>
+          <div class="corner bottom-right"></div>
+          
+          <div class="scan-line" *ngIf="isScanning"></div>
+        </div>
+        
+        <div class="scan-tips" *ngIf="!isScanning && !recognitionResult">
+          <app-svg-icon name="camera" class="camera-icon"></app-svg-icon>
+          <p>将垃圾物品放入框内进行识别</p>
+          <p class="sub-tip">支持塑料、纸张、金属、电池等物品识别</p>
+        </div>
+
+        <div class="scanning-tips" *ngIf="isScanning">
+          <div class="loading-spinner"></div>
+          <p>正在识别中...</p>
+          <p class="sub-tip">请保持物品清晰可见</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recognition Result -->
+    <div class="recognition-result" *ngIf="recognitionResult">
+      <div class="result-header">
+        <h3>识别结果</h3>
+        <div class="confidence">置信度: {{ recognitionResult.confidence }}%</div>
+      </div>
+      
+      <div class="result-content">
+        <div class="item-info">
+          <div class="item-name">{{ recognitionResult.item }}</div>
+          <div class="item-category" [style.color]="getCategoryColor(recognitionResult.category)">
+            {{ recognitionResult.category }}
+          </div>
+          <div class="item-points">+{{ recognitionResult.points }} 积分</div>
+        </div>
+
+        <div class="recycling-info">
+          <h4>回收信息</h4>
+          <div class="info-item">
+            <span class="label">材质:</span>
+            <span class="value">{{ recognitionResult.recyclingInfo.material }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">可回收:</span>
+            <span class="value" [class.recyclable]="recognitionResult.recyclingInfo.recyclable">
+              {{ recognitionResult.recyclingInfo.recyclable ? '是' : '否' }}
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="label">处理方式:</span>
+            <span class="value">{{ recognitionResult.recyclingInfo.process }}</span>
+          </div>
+        </div>
+
+        <div class="tips-section">
+          <h4>回收提示</h4>
+          <ul class="tips-list">
+            <li *ngFor="let tip of recognitionResult.tips">{{ tip }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="result-actions">
+        <button class="retry-btn" (click)="retryScanning()">重新识别</button>
+        <button class="confirm-btn" (click)="confirmRecognition()">确认回收</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Control Buttons -->
+  <div class="control-buttons" *ngIf="!recognitionResult">
+    <button 
+      class="scan-btn" 
+      [class.scanning]="isScanning"
+      (click)="isScanning ? stopScanning() : startScanning()"
+    >
+      <app-svg-icon [name]="isScanning ? 'stop' : 'scan'" class="btn-icon"></app-svg-icon>
+      <span>{{ isScanning ? '停止扫描' : '开始扫描' }}</span>
+    </button>
+  </div>
+
+  <!-- Scan History -->
+  <div class="scan-history" *ngIf="scanHistory.length > 0">
+    <div class="history-header">
+      <h3>扫描历史</h3>
+      <span class="history-count">{{ scanHistory.length }} 条记录</span>
+    </div>
+    
+    <div class="history-list">
+      <div class="history-item" *ngFor="let item of scanHistory.slice(0, 3)">
+        <div class="item-icon">
+          <app-svg-icon name="recycle" class="icon"></app-svg-icon>
+        </div>
+        <div class="item-details">
+          <div class="item-name">{{ item.item }}</div>
+          <div class="item-meta">
+            <span class="category" [style.color]="getCategoryColor(item.category)">
+              {{ item.category }}
+            </span>
+            <span class="time">{{ item.time }}</span>
+          </div>
+        </div>
+        <div class="item-points">+{{ item.points }}</div>
+      </div>
+    </div>
+  </div>
+</div>

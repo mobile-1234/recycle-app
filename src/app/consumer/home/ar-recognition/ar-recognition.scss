@@ -1,0 +1,736 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.ar-recognition-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding-bottom: 80px;
+  position: relative;
+
+  .header {
+    @include header-style();
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    
+    .header-title {
+      font-weight: 700;
+      color: var(--text-primary);
+      font-size: 18px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .back-icon, .history-icon {
+      color: var(--primary-color);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      
+      &:hover {
+        transform: scale(1.2) rotate(5deg);
+        color: var(--primary-dark);
+      }
+    }
+  }
+
+  .camera-container {
+    padding: 20px 16px;
+    position: relative;
+
+    .camera-view {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+      &.scanning {
+        box-shadow: 0 0 40px rgba(var(--primary-rgb), 0.6);
+        border-color: var(--primary-color);
+        animation: pulse 2s infinite;
+      }
+
+      .camera-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+
+        .scan-frame {
+          position: relative;
+          width: 250px;
+          height: 250px;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          border-radius: 16px;
+
+          .corner {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--primary-light);
+            border-radius: 4px;
+
+            &.top-left {
+              top: -3px;
+              left: -3px;
+              border-right: none;
+              border-bottom: none;
+            }
+
+            &.top-right {
+              top: -3px;
+              right: -3px;
+              border-left: none;
+              border-bottom: none;
+            }
+
+            &.bottom-left {
+              bottom: -3px;
+              left: -3px;
+              border-right: none;
+              border-top: none;
+            }
+
+            &.bottom-right {
+              bottom: -3px;
+              right: -3px;
+              border-left: none;
+              border-top: none;
+            }
+          }
+
+          .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary-light), transparent);
+            animation: scanLine 2s linear infinite;
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--primary-light);
+          }
+        }
+
+        .scan-tips, .scanning-tips {
+          margin-top: 30px;
+          text-align: center;
+          color: white;
+
+          .camera-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.8;
+            animation: float 3s ease-in-out infinite;
+          }
+
+          .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+          }
+
+          p {
+            margin: 8px 0;
+            font-size: 16px;
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+
+            &.sub-tip {
+              font-size: 14px;
+              opacity: 0.8;
+              font-weight: 400;
+            }
+          }
+        }
+      }
+    }
+
+    .recognition-result {
+      margin-top: 24px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+      .result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid rgba(var(--primary-rgb), 0.1);
+
+        h3 {
+          font-size: 20px;
+          font-weight: 700;
+          color: var(--text-primary);
+          margin: 0;
+        }
+
+        .confidence {
+          background: linear-gradient(135deg, var(--success-color), var(--success-light));
+          color: white;
+          padding: 6px 16px;
+          border-radius: 20px;
+          font-size: 12px;
+          font-weight: 600;
+          box-shadow: 0 4px 15px rgba(var(--success-rgb), 0.3);
+        }
+      }
+
+      .result-content {
+        .item-info {
+          text-align: center;
+          margin-bottom: 24px;
+          padding: 20px;
+          background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.05), rgba(var(--secondary-rgb), 0.05));
+          border-radius: 16px;
+          border: 1px solid rgba(var(--primary-rgb), 0.1);
+
+          .item-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+          }
+
+          .item-category {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding: 6px 16px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            display: inline-block;
+          }
+
+          .item-points {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--success-color);
+            background: rgba(var(--success-rgb), 0.1);
+            padding: 8px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            border: 2px solid rgba(var(--success-rgb), 0.2);
+          }
+        }
+
+        .recycling-info {
+          margin-bottom: 24px;
+          padding: 20px;
+          background: rgba(var(--info-rgb), 0.05);
+          border-radius: 16px;
+          border: 1px solid rgba(var(--info-rgb), 0.1);
+
+          h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--info-color);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            &::before {
+              content: '♻️';
+              font-size: 18px;
+            }
+          }
+
+          .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(var(--info-rgb), 0.1);
+
+            &:last-child {
+              border-bottom: none;
+            }
+
+            .label {
+              font-size: 14px;
+              color: var(--text-secondary);
+              font-weight: 500;
+            }
+
+            .value {
+              font-size: 14px;
+              font-weight: 600;
+              color: var(--text-primary);
+
+              &.recyclable {
+                color: var(--success-color);
+                background: rgba(var(--success-rgb), 0.1);
+                padding: 4px 12px;
+                border-radius: 12px;
+              }
+            }
+          }
+        }
+
+        .tips-section {
+          padding: 20px;
+          background: rgba(var(--warning-rgb), 0.05);
+          border-radius: 16px;
+          border: 1px solid rgba(var(--warning-rgb), 0.1);
+
+          h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--warning-color);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            &::before {
+              content: '💡';
+              font-size: 18px;
+            }
+          }
+
+          .tips-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+
+            li {
+              padding: 8px 0;
+              font-size: 14px;
+              color: var(--text-secondary);
+              line-height: 1.5;
+              position: relative;
+              padding-left: 20px;
+
+              &::before {
+                content: '•';
+                color: var(--warning-color);
+                font-weight: bold;
+                position: absolute;
+                left: 0;
+              }
+            }
+          }
+        }
+      }
+
+      .result-actions {
+        display: flex;
+        gap: 16px;
+        margin-top: 24px;
+
+        button {
+          flex: 1;
+          padding: 14px 24px;
+          border-radius: 16px;
+          font-size: 16px;
+          font-weight: 600;
+          border: none;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+          &.retry-btn {
+            background: rgba(var(--text-rgb), 0.1);
+            color: var(--text-primary);
+            border: 2px solid rgba(var(--text-rgb), 0.2);
+
+            &:hover {
+              background: rgba(var(--text-rgb), 0.2);
+              transform: translateY(-2px);
+            }
+          }
+
+          &.confirm-btn {
+            background: linear-gradient(135deg, var(--success-color), var(--success-dark));
+            color: white;
+            box-shadow: 0 8px 25px rgba(var(--success-rgb), 0.3);
+
+            &:hover {
+              transform: translateY(-3px);
+              box-shadow: 0 12px 35px rgba(var(--success-rgb), 0.4);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .control-buttons {
+    padding: 0 16px;
+    margin-top: 24px;
+
+    .scan-btn {
+      width: 100%;
+      padding: 18px 24px;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      border: none;
+      border-radius: 20px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.4);
+      position: relative;
+      overflow: hidden;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+      }
+
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(var(--primary-rgb), 0.5);
+
+        &::before {
+          left: 100%;
+        }
+      }
+
+      &.scanning {
+        background: linear-gradient(135deg, var(--error-color), var(--error-dark));
+        animation: pulse 2s infinite;
+      }
+
+      .btn-icon {
+        font-size: 24px;
+      }
+    }
+  }
+
+  .scan-history {
+    margin: 32px 16px 0;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid rgba(var(--primary-rgb), 0.1);
+
+      h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+      }
+
+      .history-count {
+        background: rgba(var(--primary-rgb), 0.1);
+        color: var(--primary-color);
+        padding: 6px 12px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+    }
+
+    .history-list {
+      .history-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 0;
+        border-bottom: 1px solid rgba(var(--border-rgb), 0.1);
+        transition: all 0.3s ease;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &:hover {
+          background: rgba(var(--primary-rgb), 0.05);
+          border-radius: 12px;
+          padding: 16px 12px;
+        }
+
+        .item-icon {
+          width: 48px;
+          height: 48px;
+          background: linear-gradient(135deg, var(--success-light), var(--success-color));
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 15px rgba(var(--success-rgb), 0.3);
+
+          .icon {
+            color: white;
+            font-size: 24px;
+          }
+        }
+
+        .item-details {
+          flex: 1;
+
+          .item-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+          }
+
+          .item-meta {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+
+            .category {
+              font-size: 12px;
+              font-weight: 600;
+              padding: 4px 8px;
+              background: rgba(255, 255, 255, 0.8);
+              border-radius: 8px;
+            }
+
+            .time {
+              font-size: 12px;
+              color: var(--text-tertiary);
+            }
+          }
+        }
+
+        .item-points {
+          font-size: 14px;
+          font-weight: 700;
+          color: var(--success-color);
+          background: rgba(var(--success-rgb), 0.1);
+          padding: 6px 12px;
+          border-radius: 12px;
+        }
+      }
+    }
+  }
+}
+
+// 动画定义
+@keyframes scanLine {
+  0% {
+    top: 0;
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    top: calc(100% - 3px);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 移动端响应式设计
+@include mobile {
+  .ar-recognition-container {
+    .header {
+      padding: 12px 16px;
+      
+      .header-title {
+        font-size: 16px;
+      }
+    }
+    
+    .camera-container {
+      padding: 16px 12px;
+      
+      .camera-view {
+        height: 300px;
+        border-radius: 16px;
+        
+        .camera-overlay .scan-frame {
+          width: 200px;
+          height: 200px;
+          
+          .corner {
+            width: 24px;
+            height: 24px;
+          }
+        }
+        
+        .scan-tips, .scanning-tips {
+          margin-top: 20px;
+          
+          .camera-icon {
+            font-size: 36px;
+          }
+          
+          p {
+            font-size: 14px;
+            
+            &.sub-tip {
+              font-size: 12px;
+            }
+          }
+        }
+      }
+      
+      .recognition-result {
+        padding: 20px;
+        margin-top: 16px;
+        
+        .result-header h3 {
+          font-size: 18px;
+        }
+        
+        .result-content {
+          .item-info {
+            padding: 16px;
+            
+            .item-name {
+              font-size: 20px;
+            }
+            
+            .item-category {
+              font-size: 14px;
+            }
+            
+            .item-points {
+              font-size: 16px;
+            }
+          }
+          
+          .recycling-info, .tips-section {
+            padding: 16px;
+          }
+        }
+        
+        .result-actions button {
+          padding: 12px 20px;
+          font-size: 14px;
+        }
+      }
+    }
+    
+    .control-buttons .scan-btn {
+      padding: 16px 20px;
+      font-size: 16px;
+      
+      .btn-icon {
+        font-size: 20px;
+      }
+    }
+    
+    .scan-history {
+      margin: 24px 12px 0;
+      padding: 20px;
+      
+      .history-list .history-item {
+        gap: 12px;
+        
+        .item-icon {
+          width: 40px;
+          height: 40px;
+          
+          .icon {
+            font-size: 20px;
+          }
+        }
+        
+        .item-details .item-name {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}
+
+// 平板端响应式设计
+@include tablet {
+  .ar-recognition-container {
+    .camera-container {
+      padding: 24px 20px;
+      
+      .camera-view {
+        height: 450px;
+      }
+      
+      .recognition-result {
+        padding: 28px;
+      }
+    }
+    
+    .scan-history {
+      margin: 32px 20px 0;
+      padding: 28px;
+    }
+  }
+}

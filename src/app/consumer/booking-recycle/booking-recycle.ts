@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BottomNavComponent } from '../../shared/bottom-nav/bottom-nav.component';
+import { SvgIconComponent } from '../../shared/components/svg-icons/svg-icons.component';
 
 interface WasteCategory {
   id: string;
@@ -51,7 +52,7 @@ interface AdditionalService {
 @Component({
   selector: 'app-booking-recycle',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, BottomNavComponent],
+  imports: [CommonModule, RouterModule, FormsModule, BottomNavComponent, SvgIconComponent],
   templateUrl: './booking-recycle.html',
   styleUrl: './booking-recycle.scss'
 })

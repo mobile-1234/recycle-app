@@ -1,0 +1,138 @@
+<div class="activities-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left" (click)="goBack()">
+      <app-svg-icon name="arrow-left" class="back-icon"></app-svg-icon>
+    </div>
+    <div class="header-title">环保活动</div>
+    <div class="header-right">
+      <app-svg-icon name="calendar" class="calendar-icon"></app-svg-icon>
+    </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tab-navigation">
+    <div 
+      class="tab-item"
+      *ngFor="let tab of ['ongoing', 'upcoming', 'completed']"
+      [class.active]="selectedTab === tab"
+      (click)="switchTab(tab)"
+    >
+      <span class="tab-title">{{ getTabTitle(tab) }}</span>
+      <span class="tab-count">{{ getTabCount(tab) }}</span>
+    </div>
+  </div>
+
+  <!-- Activities List -->
+  <div class="activities-list">
+    <div class="activity-item" *ngFor="let activity of getCurrentActivities()">
+      <div class="activity-header">
+        <div class="activity-image">
+          <div class="image-placeholder">
+            <app-svg-icon [name]="getCategoryIcon(activity.category)" class="category-icon"></app-svg-icon>
+          </div>
+          <div 
+            class="status-badge" 
+            [style.background-color]="getStatusColor(activity.status)"
+          >
+            {{ getStatusText(activity.status) }}
+          </div>
+        </div>
+        
+        <div class="activity-info">
+          <h3 class="activity-title">{{ activity.title }}</h3>
+          <p class="activity-subtitle">{{ activity.subtitle }}</p>
+          <p class="activity-description">{{ activity.description }}</p>
+        </div>
+      </div>
+
+      <div class="activity-meta">
+        <div class="meta-item">
+          <app-svg-icon name="calendar" class="meta-icon"></app-svg-icon>
+          <span>{{ formatDate(activity.startDate) }} - {{ formatDate(activity.endDate) }}</span>
+        </div>
+        <div class="meta-item">
+          <app-svg-icon name="users" class="meta-icon"></app-svg-icon>
+          <span>{{ activity.participants }}/{{ activity.maxParticipants }} 人参与</span>
+        </div>
+      </div>
+
+      <div class="activity-progress" *ngIf="activity.status === 'ongoing'">
+        <div class="progress-info">
+          <span class="progress-label">活动进度</span>
+          <span class="progress-value">{{ activity.progress }}%</span>
+        </div>
+        <div class="progress-bar">
+          <div 
+            class="progress-fill" 
+            [style.width.%]="activity.progress"
+          ></div>
+        </div>
+      </div>
+
+      <div class="participation-rate">
+        <div class="rate-info">
+          <span class="rate-label">参与率</span>
+          <span class="rate-value">{{ getParticipationRate(activity) }}%</span>
+        </div>
+        <div class="rate-bar">
+          <div 
+            class="rate-fill" 
+            [style.width.%]="getParticipationRate(activity)"
+          ></div>
+        </div>
+      </div>
+
+      <div class="activity-tags">
+        <div class="tag" *ngFor="let tag of activity.tags">
+          {{ tag }}
+        </div>
+      </div>
+
+      <div class="activity-rewards">
+        <div class="rewards-title">
+          <app-svg-icon name="gift" class="gift-icon"></app-svg-icon>
+          <span>活动奖励</span>
+        </div>
+        <div class="rewards-list">
+          <div class="reward-item" *ngFor="let reward of activity.rewards">
+            <app-svg-icon name="check" class="check-icon"></app-svg-icon>
+            <span>{{ reward }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="activity-actions">
+        <button class="action-btn secondary" (click)="viewActivityDetails(activity)">
+          查看详情
+        </button>
+        <button class="action-btn secondary" (click)="shareActivity(activity)">
+          <app-svg-icon name="share" class="share-icon"></app-svg-icon>
+          分享
+        </button>
+        <button 
+          class="action-btn primary" 
+          *ngIf="activity.status !== 'completed'"
+          [disabled]="activity.participants >= activity.maxParticipants"
+          (click)="joinActivity(activity)"
+        >
+          {{ activity.status === 'ongoing' ? '立即参与' : '预约参与' }}
+        </button>
+        <button 
+          class="action-btn disabled" 
+          *ngIf="activity.status === 'completed'"
+          disabled
+        >
+          活动已结束
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="getCurrentActivities().length === 0">
+      <app-svg-icon name="empty-activity" class="empty-icon"></app-svg-icon>
+      <div class="empty-text">暂无{{ getTabTitle(selectedTab) }}的活动</div>
+      <div class="empty-sub-text">请关注其他类型的活动或稍后再来查看</div>
+    </div>
+  </div>
+</div>

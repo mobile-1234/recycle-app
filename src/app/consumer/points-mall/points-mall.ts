@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { BottomNavComponent } from '../../shared/bottom-nav/bottom-nav.component';
+import { SvgIconComponent } from '../../shared/components/svg-icons/svg-icons.component';
 
 interface Product {
   id: number;
@@ -46,7 +47,7 @@ interface Task {
 
 @Component({
   selector: 'app-points-mall',
-  imports: [CommonModule, RouterModule, BottomNavComponent],
+  imports: [CommonModule, RouterModule, BottomNavComponent, SvgIconComponent],
   templateUrl: './points-mall.html',
   styleUrl: './points-mall.scss'
 })
@@ -424,5 +425,10 @@ export class PointsMall {
         this.router.navigate(['/consumer/profile']);
         break;
     }
+  }
+
+  // 导航到环保知识页面
+  navigateToEcoKnowledge(): void {
+    this.router.navigate(['/consumer/eco-knowledge']);
   }
 }

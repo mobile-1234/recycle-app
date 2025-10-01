@@ -1,6 +1,6 @@
 <!-- 顶部标题栏 -->
 <div class="header">
-  <div class="back-btn" (click)="goBack()"><i class="fas fa-arrow-left"></i></div>
+  <div class="back-btn" (click)="goBack()"><app-svg-icon name="arrow-left" size="md" color="#2e7d32"></app-svg-icon></div>
   <div class="header-title">预约回收</div>
 </div>
 
@@ -8,7 +8,7 @@
   <!-- 废品信息填写 -->
   <div class="form-section">
     <div class="section-title">
-      <i class="fas fa-trash-alt"></i> 废品信息
+      <app-svg-icon name="trash" size="md" color="#2e7d32"></app-svg-icon> 废品信息
     </div>
     
     <div class="category-select">
@@ -33,7 +33,7 @@
     
     <div class="photo-upload">
       <div class="upload-btn" (click)="uploadPhoto()">
-        <i class="fas fa-camera"></i>
+        <app-svg-icon name="camera" size="md" color="#6c757d"></app-svg-icon>
         <div>上传照片</div>
       </div>
       <div 
@@ -41,7 +41,7 @@
         class="photo-preview">
         <img [src]="photo" alt="废品照片">
         <div class="remove-photo" (click)="removePhoto(i)">
-          <i class="fas fa-times"></i>
+          <app-svg-icon name="times" size="sm" color="#dc3545"></app-svg-icon>
         </div>
       </div>
     </div>

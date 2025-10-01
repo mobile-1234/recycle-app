@@ -1,0 +1,47 @@
+<div class="notifications-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left" (click)="goBack()">
+      <app-svg-icon name="arrow-left" class="back-icon"></app-svg-icon>
+    </div>
+    <div class="header-title">消息通知</div>
+    <div class="header-right" (click)="markAllAsRead()">
+      <span class="mark-all-read">全部已读</span>
+    </div>
+  </div>
+
+  <!-- Notifications List -->
+  <div class="notifications-list">
+    <div 
+      class="notification-item" 
+      *ngFor="let notification of notifications"
+      [class.unread]="!notification.read"
+      (click)="markAsRead(notification)"
+    >
+      <div class="notification-icon">
+        <app-svg-icon [name]="getNotificationIcon(notification.type)" class="icon"></app-svg-icon>
+        <div class="unread-dot" *ngIf="!notification.read"></div>
+      </div>
+      
+      <div class="notification-content">
+        <div class="notification-header">
+          <span class="notification-title">{{ notification.title }}</span>
+          <span class="notification-time">{{ notification.time }}</span>
+        </div>
+        <div class="notification-message">{{ notification.message }}</div>
+      </div>
+      
+      <div class="notification-actions">
+        <div class="delete-btn" (click)="deleteNotification(notification.id); $event.stopPropagation()">
+          <app-svg-icon name="delete" class="delete-icon"></app-svg-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="notifications.length === 0">
+    <app-svg-icon name="empty-notification" class="empty-icon"></app-svg-icon>
+    <div class="empty-text">暂无消息通知</div>
+  </div>
+</div>

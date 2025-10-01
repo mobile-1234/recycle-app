@@ -138,50 +138,43 @@ export class HomeComponent implements OnInit {
   // 打开通知页面
   openNotifications(): void {
     console.log('Opening notifications...');
-    // 实际项目中会导航到通知页面
-    // this.router.navigate(['/consumer/notifications']);
+    this.router.navigate(['/consumer/notifications']);
   }
 
   // 一键预约回收
   quickBooking(): void {
     console.log('Quick booking initiated...');
-    // 实际项目中会导航到预约页面或打开预约弹窗
     this.router.navigate(['/consumer/booking-recycle']);
   }
 
   // 打开AR识废品功能
   openARRecognition(): void {
     console.log('Opening AR recognition...');
-    // 实际项目中会导航到AR识别页面
-    // this.router.navigate(['/consumer/ar-recognition']);
+    this.router.navigate(['/consumer/ar-recognition']);
   }
 
   // 查找自助投递点
   findDropPoints(): void {
     console.log('Finding drop points...');
-    // 实际项目中会导航到地图页面
-    // this.router.navigate(['/consumer/drop-points']);
+    this.router.navigate(['/consumer/drop-points']);
   }
 
   // 查看更多回收员
   viewMoreCollectors(): void {
     console.log('Viewing more collectors...');
-    // 实际项目中会导航到回收员列表页面
-    // this.router.navigate(['/consumer/collectors']);
+    this.router.navigate(['/consumer/collectors']);
   }
 
   // 查看更多投递点
   viewMoreDropPoints(): void {
     console.log('Viewing more drop points...');
-    // 实际项目中会导航到投递点列表页面
-    // this.router.navigate(['/consumer/drop-points']);
+    this.router.navigate(['/consumer/drop-points']);
   }
 
   // 查看更多活动
   viewMoreActivities(): void {
     console.log('Viewing more activities...');
-    // 实际项目中会导航到活动列表页面
-    // this.router.navigate(['/consumer/activities']);
+    this.router.navigate(['/consumer/activities']);
   }
 
   // 打开AI助手

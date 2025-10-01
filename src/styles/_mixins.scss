@@ -1,0 +1,301 @@
+// 通用混合样式
+
+// 卡片样式
+@mixin card-style($padding: var(--spacing-lg), $radius: var(--border-radius-medium)) {
+  background: var(--background-card);
+  border-radius: $radius;
+  padding: $padding;
+  box-shadow: var(--shadow-medium);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-light);
+  transition: var(--transition-normal);
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-heavy);
+  }
+}
+
+// 按钮样式
+@mixin button-primary($size: medium) {
+  background: var(--primary-gradient);
+  color: var(--text-white);
+  border: none;
+  border-radius: var(--border-radius-medium);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: var(--transition-normal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  
+  @if $size == small {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+  } @else if $size == medium {
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-md);
+  } @else if $size == large {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    font-size: var(--font-size-lg);
+  }
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-primary);
+  }
+  
+  &:disabled {
+    background: var(--text-muted);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+@mixin button-secondary($size: medium) {
+  background: var(--background-secondary);
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: var(--border-radius-medium);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: var(--transition-normal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  
+  @if $size == small {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+  } @else if $size == medium {
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-md);
+  } @else if $size == large {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    font-size: var(--font-size-lg);
+  }
+  
+  &:hover:not(:disabled) {
+    background: var(--primary-color);
+    color: var(--text-white);
+    transform: translateY(-1px);
+  }
+  
+  &:disabled {
+    border-color: var(--text-muted);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+// 头部样式
+@mixin header-style($background: var(--primary-gradient)) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg) var(--spacing-md);
+  background: $background;
+  color: var(--text-white);
+  box-shadow: var(--shadow-medium);
+  
+  .header-left, .header-right {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius-medium);
+    background: var(--background-overlay);
+    cursor: pointer;
+    transition: var(--transition-normal);
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+    
+    svg, i {
+      width: 20px;
+      height: 20px;
+      color: var(--text-white);
+    }
+  }
+  
+  .header-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-white);
+    text-align: center;
+  }
+}
+
+// 列表项样式
+@mixin list-item-style {
+  background: var(--background-card);
+  border-radius: var(--border-radius-medium);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  box-shadow: var(--shadow-light);
+  border: 1px solid var(--border-light);
+  transition: var(--transition-normal);
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+  }
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// 标签样式
+@mixin tag-style($color: var(--primary-color)) {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: rgba($color, 0.1);
+  color: $color;
+  border-radius: var(--border-radius-small);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  display: inline-block;
+}
+
+// Progress bar mixin
+@mixin progress-bar-style($color: #4CAF50) {
+  width: 100%;
+  height: 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+  
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, $color 0%, lighten($color, 20%) 100%);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+  }
+}
+
+// 空状态样式
+@mixin empty-state-style {
+  text-align: center;
+  padding: var(--spacing-xxl) var(--spacing-lg);
+  color: rgba(255, 255, 255, 0.8);
+  
+  .empty-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto var(--spacing-lg);
+    opacity: 0.6;
+  }
+  
+  .empty-text {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .empty-sub-text {
+    font-size: var(--font-size-md);
+    opacity: 0.8;
+  }
+}
+
+// 响应式断点
+@mixin mobile {
+  @media (max-width: 480px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: 768px) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: 769px) {
+    @content;
+  }
+}
+
+// 文本截断
+@mixin text-ellipsis($lines: 1) {
+  @if $lines == 1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  } @else {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+// 居中对齐
+@mixin center-flex($direction: row) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: $direction;
+}
+
+// 绝对居中
+@mixin absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+// 毛玻璃效果
+@mixin glass-effect($opacity: 0.1) {
+  background: rgba(255, 255, 255, $opacity);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+// 动画关键帧
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

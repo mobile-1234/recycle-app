@@ -424,33 +424,66 @@
   }
 }
 
-// 响应式设计
+// 移动端响应式设计
 @media (max-width: 480px) {
-  .status-bar {
-    padding: 12px 15px;
+  .header {
+    padding: 10px 15px;
     
-    .user-level .level-progress {
-      width: 100px;
+    .user-info {
+      .user-level {
+        font-size: 12px;
+      }
+      
+      .level-progress {
+        height: 3px;
+      }
     }
     
     .points-cash {
-      font-size: 11px;
+      gap: 15px;
+      
+      .points, .cash {
+        font-size: 12px;
+        
+        .value {
+          font-size: 16px;
+        }
+      }
     }
   }
   
   .core-functions {
-    margin: 10px 15px;
     padding: 15px;
     
-    .function-buttons .func-btn {
-      padding: 12px 8px;
+    .quick-booking {
+      padding: 15px;
       
-      .func-icon {
-        width: 35px;
-        height: 35px;
+      .booking-title {
+        font-size: 16px;
+      }
+      
+      .booking-subtitle {
+        font-size: 12px;
+      }
+    }
+    
+    .function-grid {
+      gap: 10px;
+      
+      .function-item {
+        padding: 12px 8px;
         
-        i {
-          font-size: 16px;
+        .function-icon {
+          width: 35px;
+          height: 35px;
+          
+          i {
+            font-size: 16px;
+          }
+        }
+        
+        .function-text {
+          font-size: 11px;
         }
       }
     }
@@ -461,17 +494,121 @@
     
     .info-section {
       padding: 15px;
+      
+      .section-header {
+        .section-title {
+          font-size: 16px;
+        }
+        
+        .view-more {
+          font-size: 12px;
+        }
+      }
+      
+      .collector-list {
+        gap: 8px;
+        
+        .collector-card {
+          min-width: 70px;
+          
+          .collector-avatar {
+            width: 45px;
+            height: 45px;
+            
+            i {
+              font-size: 18px;
+            }
+          }
+          
+          .collector-name {
+            font-size: 11px;
+          }
+          
+          .collector-status {
+            font-size: 9px;
+          }
+        }
+      }
+      
+      .drop-points {
+        .point-card {
+          padding: 8px 0;
+          
+          .point-name {
+            font-size: 13px;
+          }
+          
+          .point-distance {
+            font-size: 11px;
+          }
+          
+          .capacity-bar {
+            width: 50px;
+            height: 5px;
+          }
+          
+          .capacity-text {
+            font-size: 9px;
+            min-width: 35px;
+          }
+        }
+      }
+      
+      .activity-carousel {
+        .activity-card {
+          padding: 12px;
+          
+          .activity-title {
+            font-size: 13px;
+          }
+          
+          .activity-subtitle {
+            font-size: 11px;
+          }
+          
+          .activity-meta {
+            font-size: 10px;
+          }
+        }
+      }
     }
   }
   
   .ai-assistant {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     right: 15px;
-    bottom: 90px;
+    bottom: 85px;
     
     i {
-      font-size: 20px;
+      font-size: 18px;
+    }
+  }
+}
+
+// 平板端响应式设计
+@media (max-width: 768px) and (min-width: 481px) {
+  .header {
+    padding: 12px 20px;
+  }
+  
+  .core-functions {
+    padding: 20px;
+    
+    .function-grid {
+      gap: 12px;
+      
+      .function-item {
+        padding: 15px 10px;
+      }
+    }
+  }
+  
+  .dynamic-info {
+    padding: 0 20px 100px;
+    
+    .info-section {
+      padding: 18px;
     }
   }
 }

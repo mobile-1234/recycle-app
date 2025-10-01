@@ -1,0 +1,42 @@
+/* SVG 图标系统 - 再生视界回收APP专用 */
+
+.recycle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 0;
+}
+
+/* 尺寸变体 */
+.icon-sm { width: 14px; height: 14px; }
+.icon-md { width: 18px; height: 18px; }
+.icon-lg { width: 24px; height: 24px; }
+.icon-xl { width: 32px; height: 32px; }
+
+/* 颜色变体 */
+.icon-primary { color: #2e7d32; }
+.icon-secondary { color: #6c757d; }
+.icon-success { color: #28a745; }
+.icon-warning { color: #ffc107; }
+.icon-danger { color: #dc3545; }
+.icon-info { color: #17a2b8; }
+
+/* 动画效果 */
+.icon-spin {
+  animation: icon-spin 2s infinite linear;
+}
+
+@keyframes icon-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 悬停效果 */
+.icon-hover:hover {
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}

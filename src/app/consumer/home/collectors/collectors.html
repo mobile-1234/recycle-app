@@ -1,0 +1,146 @@
+<div class="collectors-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left" (click)="goBack()">
+      <app-svg-icon name="arrow-left" class="back-icon"></app-svg-icon>
+    </div>
+    <div class="header-title">附近回收员</div>
+    <div class="header-right">
+      <app-svg-icon name="filter" class="filter-icon"></app-svg-icon>
+    </div>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs">
+    <div class="tabs-container">
+      <div 
+        class="filter-tab"
+        *ngFor="let option of filterOptions"
+        [class.active]="selectedFilter === option.value"
+        (click)="selectFilter(option.value)"
+      >
+        <app-svg-icon [name]="option.icon" class="tab-icon"></app-svg-icon>
+        <span class="tab-label">{{ option.label }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Collectors List -->
+  <div class="collectors-list">
+    <div class="list-header">
+      <span class="result-count">找到 {{ filteredCollectors.length }} 位回收员</span>
+    </div>
+
+    <div class="collector-item" *ngFor="let collector of filteredCollectors">
+      <div class="collector-header">
+        <div class="collector-avatar">
+          <div class="avatar-placeholder">
+            <app-svg-icon name="user" class="avatar-icon"></app-svg-icon>
+          </div>
+          <div 
+            class="status-indicator" 
+            [style.background-color]="getStatusColor(collector.status)"
+          ></div>
+        </div>
+        
+        <div class="collector-info">
+          <div class="collector-name">{{ collector.name }}</div>
+          <div class="collector-meta">
+            <span class="rating">
+              <app-svg-icon name="star" class="star-icon"></app-svg-icon>
+              {{ collector.rating }} ({{ collector.reviewCount }})
+            </span>
+            <span class="distance">{{ collector.distance }}</span>
+            <span 
+              class="status" 
+              [style.color]="getStatusColor(collector.status)"
+            >
+              {{ getStatusText(collector.status) }}
+            </span>
+          </div>
+          <div class="collector-experience">{{ collector.experience }}</div>
+        </div>
+
+        <div class="collector-actions">
+          <button class="action-btn" (click)="callCollector(collector.phone)">
+            <app-svg-icon name="phone" class="action-icon"></app-svg-icon>
+          </button>
+          <button class="action-btn" (click)="chatWithCollector(collector)">
+            <app-svg-icon name="chat" class="action-icon"></app-svg-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="collector-specialties">
+        <span class="specialties-label">专业领域:</span>
+        <div class="specialties-list">
+          <div 
+            class="specialty-tag"
+            *ngFor="let specialty of collector.specialties"
+            [style.background-color]="getSpecialtyColor(specialty)"
+          >
+            {{ specialty }}
+          </div>
+        </div>
+      </div>
+
+      <div class="collector-details">
+        <div class="detail-row">
+          <div class="detail-item">
+            <app-svg-icon name="orders" class="detail-icon"></app-svg-icon>
+            <span>完成订单: {{ collector.completedOrders }}</span>
+          </div>
+          <div class="detail-item">
+            <app-svg-icon name="clock" class="detail-icon"></app-svg-icon>
+            <span>响应时间: {{ collector.responseTime }}</span>
+          </div>
+        </div>
+        
+        <div class="detail-row">
+          <div class="detail-item">
+            <app-svg-icon name="time" class="detail-icon"></app-svg-icon>
+            <span>工作时间: {{ collector.workingHours }}</span>
+          </div>
+          <div class="detail-item">
+            <app-svg-icon name="location" class="detail-icon"></app-svg-icon>
+            <span>服务区域: {{ collector.serviceArea }}</span>
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-item full-width">
+            <app-svg-icon name="price" class="detail-icon"></app-svg-icon>
+            <span>{{ collector.priceRange }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="collector-features">
+        <div class="feature-tag" *ngFor="let feature of collector.features">
+          <app-svg-icon name="check" class="feature-icon"></app-svg-icon>
+          {{ feature }}
+        </div>
+      </div>
+
+      <div class="collector-bottom">
+        <button class="profile-btn" (click)="viewCollectorProfile(collector)">
+          查看详情
+        </button>
+        <button 
+          class="book-btn" 
+          [disabled]="collector.status === 'offline'"
+          (click)="bookCollector(collector)"
+        >
+          立即预约
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredCollectors.length === 0">
+      <app-svg-icon name="empty-user" class="empty-icon"></app-svg-icon>
+      <div class="empty-text">暂无符合条件的回收员</div>
+      <div class="empty-sub-text">请尝试调整筛选条件</div>
+    </div>
+  </div>
+</div>
