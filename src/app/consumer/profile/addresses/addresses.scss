@@ -1,0 +1,473 @@
+// 全局重置
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+// 顶部标题栏
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  background: #2e7d32;
+  color: white;
+  position: relative;
+  
+  .back-btn, .add-btn {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    i {
+      font-size: 18px;
+    }
+  }
+  
+  .back-btn {
+    left: 16px;
+  }
+  
+  .add-btn {
+    right: 16px;
+  }
+  
+  .header-title {
+    font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+// 容器
+.container {
+  padding: 16px;
+  min-height: calc(100vh - 56px);
+  background: #f5f5f5;
+}
+
+// 地址列表
+.addresses-list {
+  .address-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    
+    &.default {
+      border-color: #2e7d32;
+    }
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    .address-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      
+      .contact-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        
+        .name {
+          font-size: 16px;
+          font-weight: 600;
+          color: #333;
+        }
+        
+        .phone {
+          font-size: 14px;
+          color: #666;
+        }
+      }
+      
+      .default-badge {
+        background: #2e7d32;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+    }
+    
+    .address-content {
+      margin-bottom: 16px;
+      
+      .address-text {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 8px;
+        
+        i {
+          color: #2e7d32;
+          margin-top: 2px;
+          flex-shrink: 0;
+        }
+        
+        span {
+          font-size: 14px;
+          color: #333;
+          line-height: 1.4;
+        }
+      }
+      
+      .address-label {
+        .label-tag {
+          display: inline-block;
+          padding: 2px 8px;
+          border-radius: 8px;
+          font-size: 12px;
+          font-weight: 600;
+          
+          &.label-home {
+            background: #e3f2fd;
+            color: #1976d2;
+          }
+          
+          &.label-company {
+            background: #fff3e0;
+            color: #f57c00;
+          }
+          
+          &.label-school {
+            background: #f3e5f5;
+            color: #7b1fa2;
+          }
+          
+          &.label-other {
+            background: #e8f5e8;
+            color: #2e7d32;
+          }
+        }
+      }
+    }
+    
+    .address-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      
+      .action-btn {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 20px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        
+        &.default-btn {
+          background: #e8f5e8;
+          color: #2e7d32;
+          
+          &:hover {
+            background: #d4edda;
+          }
+        }
+        
+        &.edit-btn {
+          background: #e3f2fd;
+          color: #1976d2;
+          
+          &:hover {
+            background: #bbdefb;
+          }
+        }
+        
+        &.delete-btn {
+          background: #ffebee;
+          color: #d32f2f;
+          
+          &:hover {
+            background: #ffcdd2;
+          }
+        }
+        
+        i {
+          font-size: 10px;
+        }
+      }
+    }
+  }
+}
+
+// 空状态
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  
+  .empty-icon {
+    margin-bottom: 16px;
+    
+    i {
+      font-size: 64px;
+      color: #ccc;
+    }
+  }
+  
+  .empty-text {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 24px;
+  }
+  
+  .empty-action {
+    background: #2e7d32;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: #1b5e20;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// 模态框
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  
+  .modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+      flex-shrink: 0;
+      
+      .modal-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+      }
+      
+      .modal-close {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          background: #f0f0f0;
+        }
+        
+        i {
+          font-size: 16px;
+          color: #666;
+        }
+      }
+    }
+    
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+      
+      .address-form {
+        .form-group {
+          margin-bottom: 20px;
+          
+          label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+          }
+          
+          .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            
+            &:focus {
+              outline: none;
+              border-color: #2e7d32;
+              box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.1);
+            }
+          }
+          
+          .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+          }
+          
+          .region-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+          }
+          
+          .label-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            
+            .label-option {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              padding: 12px 8px;
+              border: 2px solid #eee;
+              border-radius: 8px;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              
+              &:hover {
+                border-color: #2e7d32;
+              }
+              
+              &.active {
+                border-color: #2e7d32;
+                background: #e8f5e8;
+                color: #2e7d32;
+              }
+              
+              i {
+                font-size: 20px;
+                margin-bottom: 4px;
+              }
+              
+              span {
+                font-size: 12px;
+              }
+            }
+          }
+          
+          .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: normal;
+            
+            input[type="checkbox"] {
+              display: none;
+            }
+            
+            .checkmark {
+              width: 20px;
+              height: 20px;
+              border: 2px solid #ddd;
+              border-radius: 4px;
+              margin-right: 8px;
+              position: relative;
+              transition: all 0.3s ease;
+              
+              &::after {
+                content: '';
+                position: absolute;
+                left: 6px;
+                top: 2px;
+                width: 6px;
+                height: 10px;
+                border: solid white;
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
+                opacity: 0;
+                transition: all 0.3s ease;
+              }
+            }
+            
+            input[type="checkbox"]:checked + .checkmark {
+              background: #2e7d32;
+              border-color: #2e7d32;
+              
+              &::after {
+                opacity: 1;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 20px;
+      border-top: 1px solid #eee;
+      flex-shrink: 0;
+      
+      .btn-cancel, .btn-save {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 24px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      
+      .btn-cancel {
+        background: #f5f5f5;
+        color: #666;
+        
+        &:hover {
+          background: #e0e0e0;
+        }
+      }
+      
+      .btn-save {
+        background: #2e7d32;
+        color: white;
+        
+        &:hover {
+          background: #1b5e20;
+        }
+      }
+    }
+  }
+}

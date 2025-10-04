@@ -1,0 +1,530 @@
+.about-us-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+
+  .header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    .back-btn {
+      background: none;
+      border: none;
+      font-size: 18px;
+      color: #333;
+      padding: 8px;
+      margin-right: 12px;
+      border-radius: 50%;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: #f0f0f0;
+      }
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+  }
+
+  .about-content {
+    padding: 0 16px 20px;
+
+    // 应用信息区域
+    .app-info-section {
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 16px 0;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+      .app-logo {
+        margin-bottom: 20px;
+
+        .logo-icon {
+          width: 80px;
+          height: 80px;
+          background: linear-gradient(135deg, #4CAF50, #2E7D32);
+          border-radius: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 16px;
+          box-shadow: 0 4px 16px rgba(76, 175, 80, 0.3);
+
+          i {
+            font-size: 40px;
+            color: #fff;
+          }
+        }
+
+        h2 {
+          font-size: 24px;
+          font-weight: 700;
+          color: #333;
+          margin: 0 0 8px;
+        }
+
+        .app-slogan {
+          font-size: 14px;
+          color: #666;
+          margin: 0;
+        }
+      }
+
+      .version-info {
+        .version-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px 0;
+          border-bottom: 1px solid #f0f0f0;
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          .label {
+            font-size: 14px;
+            color: #666;
+          }
+
+          .value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+          }
+        }
+      }
+    }
+
+    // 通用区域样式
+    .app-intro-section,
+    .statistics-section,
+    .team-section,
+    .contact-section,
+    .social-section,
+    .copyright-section,
+    .changelog-section {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 16px 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+      h4 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        margin: 0 0 16px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #4CAF50;
+        display: inline-block;
+      }
+    }
+
+    // 应用介绍
+    .app-intro-section {
+      .intro-content {
+        p {
+          font-size: 14px;
+          line-height: 1.6;
+          color: #666;
+          margin-bottom: 20px;
+        }
+
+        .features-list {
+          .feature-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            .feature-icon {
+              width: 40px;
+              height: 40px;
+              background: linear-gradient(135deg, #4CAF50, #2E7D32);
+              border-radius: 8px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin-right: 12px;
+              flex-shrink: 0;
+
+              i {
+                font-size: 18px;
+                color: #fff;
+              }
+            }
+
+            .feature-content {
+              flex: 1;
+
+              h5 {
+                font-size: 16px;
+                font-weight: 600;
+                color: #333;
+                margin: 0 0 4px;
+              }
+
+              p {
+                font-size: 13px;
+                color: #666;
+                margin: 0;
+                line-height: 1.4;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // 数据统计
+    .statistics-section {
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+
+        .stat-item {
+          text-align: center;
+          padding: 16px;
+          background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+          border-radius: 8px;
+          border: 1px solid #e0e0e0;
+
+          .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4CAF50;
+            margin-bottom: 4px;
+          }
+
+          .stat-label {
+            font-size: 12px;
+            color: #666;
+          }
+        }
+      }
+    }
+
+    // 团队介绍
+    .team-section {
+      .team-content {
+        p {
+          font-size: 14px;
+          line-height: 1.6;
+          color: #666;
+          margin-bottom: 20px;
+        }
+
+        .team-values {
+          .value-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            .value-icon {
+              width: 36px;
+              height: 36px;
+              background: linear-gradient(135deg, #FF9800, #F57C00);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin-right: 12px;
+              flex-shrink: 0;
+
+              i {
+                font-size: 16px;
+                color: #fff;
+              }
+            }
+
+            .value-content {
+              flex: 1;
+
+              h5 {
+                font-size: 15px;
+                font-weight: 600;
+                color: #333;
+                margin: 0 0 2px;
+              }
+
+              p {
+                font-size: 13px;
+                color: #666;
+                margin: 0;
+                line-height: 1.4;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // 联系我们
+    .contact-section {
+      .contact-info {
+        .contact-item {
+          display: flex;
+          align-items: center;
+          padding: 12px 0;
+          border-bottom: 1px solid #f0f0f0;
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          .contact-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+
+            i {
+              font-size: 16px;
+              color: #fff;
+            }
+          }
+
+          .contact-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+
+            .contact-label {
+              font-size: 13px;
+              color: #666;
+              margin-bottom: 2px;
+            }
+
+            .contact-value {
+              font-size: 14px;
+              color: #333;
+              font-weight: 500;
+            }
+          }
+        }
+      }
+    }
+
+    // 社交媒体
+    .social-section {
+      .social-links {
+        display: flex;
+        gap: 12px;
+
+        .social-btn {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 16px 8px;
+          border: none;
+          border-radius: 8px;
+          font-size: 12px;
+          color: #fff;
+          transition: transform 0.2s;
+
+          &:active {
+            transform: scale(0.95);
+          }
+
+          i {
+            font-size: 24px;
+            margin-bottom: 8px;
+          }
+
+          &.wechat {
+            background: linear-gradient(135deg, #1AAD19, #0D7377);
+          }
+
+          &.weibo {
+            background: linear-gradient(135deg, #E6162D, #C41E3A);
+          }
+
+          &.douyin {
+            background: linear-gradient(135deg, #000, #333);
+          }
+        }
+      }
+    }
+
+    // 版权信息
+    .copyright-section {
+      text-align: center;
+      background: #f8f9fa;
+      border: 1px solid #e0e0e0;
+
+      .copyright-content {
+        p {
+          font-size: 12px;
+          color: #666;
+          margin: 0 0 4px;
+          line-height: 1.4;
+
+          &:last-of-type {
+            margin-bottom: 12px;
+          }
+        }
+
+        .legal-links {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 8px;
+
+          .legal-link {
+            background: none;
+            border: none;
+            font-size: 12px;
+            color: #4CAF50;
+            text-decoration: underline;
+            padding: 4px;
+          }
+
+          .separator {
+            font-size: 12px;
+            color: #ccc;
+          }
+        }
+      }
+    }
+
+    // 更新日志
+    .changelog-section {
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+
+        .view-all-btn {
+          background: none;
+          border: 1px solid #4CAF50;
+          color: #4CAF50;
+          font-size: 12px;
+          padding: 6px 12px;
+          border-radius: 16px;
+          transition: all 0.3s;
+
+          &:hover {
+            background: #4CAF50;
+            color: #fff;
+          }
+        }
+      }
+
+      .changelog-list {
+        .changelog-item {
+          margin-bottom: 16px;
+          padding: 16px;
+          background: #f8f9fa;
+          border-radius: 8px;
+          border-left: 4px solid #4CAF50;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          .changelog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+
+            .version {
+              font-size: 14px;
+              font-weight: 600;
+              color: #4CAF50;
+            }
+
+            .date {
+              font-size: 12px;
+              color: #666;
+            }
+          }
+
+          .changelog-content {
+            ul {
+              margin: 0;
+              padding-left: 16px;
+
+              li {
+                font-size: 13px;
+                color: #666;
+                line-height: 1.5;
+                margin-bottom: 4px;
+
+                &:last-child {
+                  margin-bottom: 0;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// 响应式设计
+@media (max-width: 480px) {
+  .about-us-page {
+    .about-content {
+      padding: 0 12px 20px;
+
+      .statistics-section {
+        .stats-grid {
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
+      }
+
+      .social-section {
+        .social-links {
+          flex-direction: column;
+          gap: 8px;
+
+          .social-btn {
+            flex-direction: row;
+            justify-content: center;
+            padding: 12px;
+
+            i {
+              margin-right: 8px;
+              margin-bottom: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+}

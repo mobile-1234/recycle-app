@@ -1,0 +1,159 @@
+<!-- 顶部标题栏 -->
+<div class="header">
+  <div class="back-btn" (click)="goBack()"><i class="fas fa-arrow-left"></i></div>
+  <div class="header-title">我的订单</div>
+</div>
+
+<div class="container">
+  <!-- 订单状态筛选 -->
+  <div class="filter-tabs">
+    <div 
+      *ngFor="let tab of filterTabs" 
+      class="filter-tab" 
+      [class.active]="tab.active"
+      (click)="selectTab(tab)">
+      {{tab.name}}
+      <span class="tab-count" *ngIf="tab.count > 0">({{tab.count}})</span>
+    </div>
+  </div>
+
+  <!-- 订单列表 -->
+  <div class="orders-list">
+    <div 
+      *ngFor="let order of filteredOrders" 
+      class="order-card"
+      (click)="showOrderDetail(order)">
+      
+      <div class="order-header">
+        <div class="order-info">
+          <div class="order-no">订单号：{{order.orderNo}}</div>
+          <div class="order-time">{{order.createTime}}</div>
+        </div>
+        <div class="order-status" [class]="'status-' + order.status">
+          {{getStatusText(order.status)}}
+        </div>
+      </div>
+      
+      <div class="order-content">
+        <div class="waste-info">
+          <div class="waste-icon">
+            <i [class]="order.wasteIcon"></i>
+          </div>
+          <div class="waste-details">
+            <div class="waste-category">{{order.wasteCategory}}</div>
+            <div class="waste-weight">重量：{{order.weight}}kg</div>
+            <div class="waste-address">地址：{{order.address}}</div>
+          </div>
+        </div>
+        
+        <div class="order-earnings">
+          <div class="cash-earning">
+            <span class="label">现金收益</span>
+            <span class="value">¥{{order.cashAmount}}</span>
+          </div>
+          <div class="points-earning">
+            <span class="label">积分收益</span>
+            <span class="value">{{order.pointsAmount}}积分</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="order-actions">
+        <button 
+          *ngIf="order.status === 'pending'" 
+          class="action-btn cancel"
+          (click)="cancelOrder(order, $event)">
+          取消订单
+        </button>
+        <button 
+          *ngIf="order.status === 'completed'" 
+          class="action-btn rate"
+          (click)="rateOrder(order, $event)">
+          评价
+        </button>
+        <button 
+          class="action-btn detail"
+          (click)="showOrderDetail(order)">
+          查看详情
+        </button>
+      </div>
+    </div>
+    
+    <!-- 空状态 -->
+    <div class="empty-state" *ngIf="filteredOrders.length === 0">
+      <div class="empty-icon">
+        <i class="fas fa-clipboard-list"></i>
+      </div>
+      <div class="empty-text">暂无相关订单</div>
+      <button class="empty-action" (click)="goToBooking()">立即预约回收</button>
+    </div>
+  </div>
+</div>
+
+<!-- 订单详情模态框 -->
+<div class="modal" [style.display]="showDetailModal ? 'flex' : 'none'" (click)="closeModal($event)">
+  <div class="modal-content order-detail-modal">
+    <div class="modal-header">
+      <div class="modal-title">订单详情</div>
+      <div class="modal-close" (click)="showDetailModal = false">
+        <i class="fas fa-times"></i>
+      </div>
+    </div>
+    
+    <div class="modal-body" *ngIf="selectedOrder">
+      <div class="detail-section">
+        <div class="section-title">订单信息</div>
+        <div class="detail-item">
+          <span class="label">订单号：</span>
+          <span class="value">{{selectedOrder.orderNo}}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">下单时间：</span>
+          <span class="value">{{selectedOrder.createTime}}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">订单状态：</span>
+          <span class="value status" [class]="'status-' + selectedOrder.status">
+            {{getStatusText(selectedOrder.status)}}
+          </span>
+        </div>
+      </div>
+      
+      <div class="detail-section">
+        <div class="section-title">废品信息</div>
+        <div class="detail-item">
+          <span class="label">废品类型：</span>
+          <span class="value">{{selectedOrder.wasteCategory}}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">重量：</span>
+          <span class="value">{{selectedOrder.weight}}kg</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">回收地址：</span>
+          <span class="value">{{selectedOrder.address}}</span>
+        </div>
+        <div class="detail-item" *ngIf="selectedOrder.collector">
+          <span class="label">回收员：</span>
+          <span class="value">{{selectedOrder.collector}}</span>
+        </div>
+      </div>
+      
+      <div class="detail-section">
+        <div class="section-title">收益明细</div>
+        <div class="detail-item">
+          <span class="label">现金收益：</span>
+          <span class="value cash">¥{{selectedOrder.cashAmount}}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">积分收益：</span>
+          <span class="value points">{{selectedOrder.pointsAmount}}积分</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">碳减排：</span>
+          <span class="value carbon">{{selectedOrder.carbonReduction}}kg</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

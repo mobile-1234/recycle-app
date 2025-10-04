@@ -1,0 +1,389 @@
+<!-- 顶部标题栏 -->
+<div class="header">
+  <button class="back-btn" (click)="goBack()">
+    <i class="fas fa-arrow-left"></i>
+  </button>
+  <div class="header-title">设置</div>
+</div>
+
+<div class="settings-container">
+  <!-- 账户设置 -->
+  <div class="settings-section">
+    <div class="section-title">
+      <i class="fas fa-user-cog"></i>
+      <span>账户设置</span>
+    </div>
+    <div class="settings-list">
+      <div class="setting-item" (click)="editProfile()">
+        <div class="setting-info">
+          <div class="setting-icon user-icon">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="setting-content">
+            <div class="setting-name">个人资料</div>
+            <div class="setting-desc">修改头像、昵称等信息</div>
+          </div>
+        </div>
+        <div class="setting-action">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+      
+      <div class="setting-item" (click)="changePassword()">
+        <div class="setting-info">
+          <div class="setting-icon lock-icon">
+            <i class="fas fa-lock"></i>
+          </div>
+          <div class="setting-content">
+            <div class="setting-name">修改密码</div>
+            <div class="setting-desc">定期修改密码保障账户安全</div>
+          </div>
+        </div>
+        <div class="setting-action">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+      
+      <div class="setting-item" (click)="bindPhone()">
+        <div class="setting-info">
+          <div class="setting-icon phone-icon">
+            <i class="fas fa-mobile-alt"></i>
+          </div>
+          <div class="setting-content">
+            <div class="setting-name">手机绑定</div>
+            <div class="setting-desc">{{userPhone || '未绑定手机号'}}</div>
+          </div>
+        </div>
+        <div class="setting-action">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 通知设置 -->
+  <div class="settings-section">
+    <div class="section-title">
+      <i class="fas fa-bell"></i>
+      <span>通知设置</span>
+    </div>
+    <div class="settings-list">
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-icon notification-icon">
+            <i class="fas fa-bell"></i>
+          </div>
+          <div class="setting-content">
+            <div class="setting-name">推送通知</div>
+            <div class="setting-desc">接收订单状态、活动等通知</div>
+          </div>
+        </div>
+        <div class="setting-action">
+          <label class="switch">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="notificationSettings.push"
+              (change)="updateNotificationSetting('push', $event)">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-icon sms-icon">
+            <i class="fas fa-sms"></i>
+          </div>
+          <div class="setting-content">
+            <div class="setting-name">短信通知</div>
+            <div class="setting-desc">重要消息短信提醒</div>
+          </div>
+        </div>
+        <div class="setting-action">
+          <label class="switch">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="notificationSettings.sms"
+              (change)="updateNotificationSetting('sms', $event)">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-icon email-icon">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div class="setting-content">
+            <div class="setting-name">邮件通知</div>
+            <div class="setting-desc">账单、活动邮件提醒</div>
+          </div>
+        </div>
+        <div class="setting-action">
+          <label class="switch">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="notificationSettings.email"
+              (change)="updateNotificationSetting('email', $event)">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 隐私设置 -->
+  <div class="settings-section">
+    <div class="section-title">
+      <i class="fas fa-shield-alt"></i>
+      <span>隐私设置</span>
+    </div>
+    <div class="settings-list">
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-icon location-icon">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
+          <div class="setting-content">
+            <div class="setting-name">位置服务</div>
+            <div class="setting-desc">允许获取位置信息</div>
+          </div>
+        </div>
+        <div class="setting-action">
+          <label class="switch">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="privacySettings.location"
+              (change)="updatePrivacySetting('location', $event)">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-icon analytics-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="setting-content">
+            <div class="setting-name">数据分析</div>
+            <div class="setting-desc">允许收集使用数据用于改进服务</div>
+          </div>
+        </div>
+        <div class="setting-action">
+          <label class="switch">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="privacySettings.analytics"
+              (change)="updatePrivacySetting('analytics', $event)">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-icon personalization-icon">
+            <i class="fas fa-user-tag"></i>
+          </div>
+          <div class="setting-content">
+            <div class="setting-name">个性化推荐</div>
+            <div class="setting-desc">基于使用习惯推荐内容</div>
+          </div>
+        </div>
+        <div class="setting-action">
+          <label class="switch">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="privacySettings.personalization"
+              (change)="updatePrivacySetting('personalization', $event)">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 应用设置 -->
+  <div class="settings-section">
+    <div class="section-title">
+      <i class="fas fa-cog"></i>
+      <span>应用设置</span>
+    </div>
+    <div class="settings-list">
+      <div class="setting-item" (click)="selectLanguage()">
+        <div class="setting-info">
+          <div class="setting-icon language-icon">
+            <i class="fas fa-language"></i>
+          </div>
+          <div class="setting-content">
+            <div class="setting-name">语言设置</div>
+            <div class="setting-desc">{{currentLanguage}}</div>
+          </div>
+        </div>
+        <div class="setting-action">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+      
+      <div class="setting-item" (click)="clearCache()">
+        <div class="setting-info">
+          <div class="setting-icon cache-icon">
+            <i class="fas fa-broom"></i>
+          </div>
+          <div class="setting-content">
+            <div class="setting-name">清理缓存</div>
+            <div class="setting-desc">清理应用缓存数据 ({{cacheSize}})</div>
+          </div>
+        </div>
+        <div class="setting-action">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+      
+      <div class="setting-item" (click)="checkUpdate()">
+        <div class="setting-info">
+          <div class="setting-icon update-icon">
+            <i class="fas fa-download"></i>
+          </div>
+          <div class="setting-content">
+            <div class="setting-name">版本更新</div>
+            <div class="setting-desc">当前版本 {{appVersion}}</div>
+          </div>
+        </div>
+        <div class="setting-action">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 其他设置 -->
+  <div class="settings-section">
+    <div class="section-title">
+      <i class="fas fa-ellipsis-h"></i>
+      <span>其他</span>
+    </div>
+    <div class="settings-list">
+      <div class="setting-item" (click)="viewAgreement()">
+        <div class="setting-info">
+          <div class="setting-icon agreement-icon">
+            <i class="fas fa-file-contract"></i>
+          </div>
+          <div class="setting-content">
+            <div class="setting-name">用户协议</div>
+            <div class="setting-desc">查看用户服务协议</div>
+          </div>
+        </div>
+        <div class="setting-action">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+      
+      <div class="setting-item" (click)="viewPrivacyPolicy()">
+        <div class="setting-info">
+          <div class="setting-icon privacy-icon">
+            <i class="fas fa-user-shield"></i>
+          </div>
+          <div class="setting-content">
+            <div class="setting-name">隐私政策</div>
+            <div class="setting-desc">查看隐私保护政策</div>
+          </div>
+        </div>
+        <div class="setting-action">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+      
+      <div class="setting-item" (click)="contactSupport()">
+        <div class="setting-info">
+          <div class="setting-icon support-icon">
+            <i class="fas fa-headset"></i>
+          </div>
+          <div class="setting-content">
+            <div class="setting-name">联系客服</div>
+            <div class="setting-desc">获取帮助和技术支持</div>
+          </div>
+        </div>
+        <div class="setting-action">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 退出登录 -->
+  <div class="logout-section">
+    <button class="logout-btn" (click)="logout()">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>退出登录</span>
+    </button>
+  </div>
+</div>
+
+<!-- 语言选择模态框 -->
+<div class="modal" [style.display]="showLanguageModal ? 'flex' : 'none'" (click)="closeLanguageModal($event)">
+  <div class="modal-content language-modal">
+    <div class="modal-header">
+      <div class="modal-title">选择语言</div>
+      <button class="modal-close" (click)="showLanguageModal = false">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="language-list">
+        <div 
+          *ngFor="let lang of languages" 
+          class="language-option"
+          [class.active]="lang.code === selectedLanguage"
+          (click)="selectLanguageOption(lang)">
+          <span class="language-name">{{lang.name}}</span>
+          <i class="fas fa-check" *ngIf="lang.code === selectedLanguage"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 个人资料编辑模态框 -->
+<div class="modal" [style.display]="showProfileModal ? 'flex' : 'none'" (click)="closeProfileModal($event)">
+  <div class="modal-content profile-modal">
+    <div class="modal-header">
+      <div class="modal-title">编辑个人资料</div>
+      <button class="modal-close" (click)="showProfileModal = false">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="profile-form">
+        <div class="form-group">
+          <label class="form-label">头像</label>
+          <div class="avatar-upload">
+            <div class="avatar-preview" *ngIf="avatarPreview || userInfo.avatar">
+              <img [src]="avatarPreview || userInfo.avatar" alt="头像预览">
+            </div>
+            <div class="avatar-placeholder" *ngIf="!avatarPreview && !userInfo.avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <input type="file" accept="image/*" (change)="onAvatarSelected($event)" class="avatar-input">
+            <div class="upload-hint">点击上传头像</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">昵称</label>
+          <input type="text" [(ngModel)]="userInfo.nickname" placeholder="请输入昵称" class="form-input">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="showProfileModal = false">取消</button>
+      <button class="btn btn-primary" (click)="saveProfile()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 提示消息 -->
+<div class="alert" [class]="alertType" [style.display]="showAlert ? 'block' : 'none'">
+  {{alertMessage}}
+</div>

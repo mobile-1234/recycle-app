@@ -60,24 +60,24 @@ export class BookingRecycle implements OnInit {
   
   // 废品分类
   wasteCategories: WasteCategory[] = [
-    { id: 'paper', name: '纸类', icon: 'fas fa-newspaper', active: true },
-    { id: 'plastic', name: '塑料', icon: 'fas fa-bottle-water', active: false },
-    { id: 'glass', name: '玻璃', icon: 'fas fa-wine-glass', active: false },
-    { id: 'electronic', name: '电子', icon: 'fas fa-microchip', active: false },
-    { id: 'textile', name: '衣物', icon: 'fas fa-shirt', active: false },
-    { id: 'other', name: '其他', icon: 'fas fa-box', active: false }
+    { id: 'paper', name: '纸类', icon: 'waste-info', active: true },
+    { id: 'plastic', name: '塑料', icon: 'waste-info', active: false },
+    { id: 'glass', name: '玻璃', icon: 'waste-info', active: false },
+    { id: 'electronic', name: '电子', icon: 'electronics', active: false },
+    { id: 'textile', name: '衣物', icon: 'waste-info', active: false },
+    { id: 'other', name: '其他', icon: 'waste-info', active: false }
   ];
 
   // 回收方式
   recycleMethods: RecycleMethod[] = [
-    { id: 'pickup', name: '上门回收', description: '回收员上门收取', icon: 'fas fa-home', active: true },
-    { id: 'dropoff', name: '自助投递', description: '送至自助点', icon: 'fas fa-location-dot', active: false }
+    { id: 'pickup', name: '上门回收', description: '回收员上门收取', icon: 'recycle-method', active: true },
+    { id: 'dropoff', name: '自助投递', description: '送至自助点', icon: 'address', active: false }
   ];
 
   // 时间选项
   timeOptions: TimeOption[] = [
-    { id: 'immediate', name: '立即上门', description: '最快30分钟', icon: 'fas fa-bolt', active: true },
-    { id: 'scheduled', name: '预约时间', description: '选择日期', icon: 'fas fa-calendar-days', active: false }
+    { id: 'immediate', name: '立即上门', description: '最快30分钟', icon: 'clock', active: true },
+    { id: 'scheduled', name: '预约时间', description: '选择日期', icon: 'clock', active: false }
   ];
 
   // 日期选项
@@ -100,9 +100,9 @@ export class BookingRecycle implements OnInit {
 
   // 附加服务
   additionalServices: AdditionalService[] = [
-    { id: 'carry', name: '搬运服务', description: '协助搬运重物', price: '免费', icon: 'fas fa-dolly', enabled: false },
-    { id: 'clean', name: '清洁服务', description: '清理回收区域', price: '+5元', icon: 'fas fa-broom', enabled: false },
-    { id: 'sort', name: '分类服务', description: '专业分类指导', price: '免费', icon: 'fas fa-sort', enabled: false }
+    { id: 'carry', name: '搬运服务', description: '协助搬运重物', price: '免费', icon: 'service', enabled: false },
+    { id: 'clean', name: '清洁服务', description: '清理回收区域', price: '+5元', icon: 'service', enabled: false },
+    { id: 'sort', name: '分类服务', description: '专业分类指导', price: '免费', icon: 'service', enabled: false }
   ];
 
   // 表单数据

@@ -1,6 +1,96 @@
-<div class="dashboard-container">
-  <div class="dashboard-header">
-    <h1>企业仪表盘</h1>
+<!-- 顶部导航 -->
+<header class="header">
+  <div class="container">
+    <div class="header-content">
+      <div class="logo">
+        <span class="logo-icon">♻️</span>
+        <span>智回回收</span>
+      </div>
+      <div class="user-info">
+        <span>企业管理员</span>
+        <div class="avatar">
+          <span>管</span>
+        </div>
+      </div>
+    </div>
   </div>
-  <!-- 页面内容已清理，保留基本结构 -->
-</div>
+</header>
+
+<!-- 主要内容 -->
+<main class="content">
+  <div class="container">
+    <!-- 工作台首页 -->
+    <section id="dashboard">
+      <h2 class="section-title">工作台首页 <span class="more-link">今日数据</span></h2>
+      
+      <!-- 核心数据看板 -->
+      <div class="data-dashboard">
+        <div class="data-card" *ngFor="let card of dataCards" (click)="onDataCardClick(card)">
+          <div class="data-label">{{card.label}}</div>
+          <div class="data-value">{{card.value}}</div>
+          <div class="data-trend">{{card.trend}}</div>
+        </div>
+      </div>
+      
+      <!-- 预警信息卡片 -->
+      <div class="card alert-card" *ngIf="alertInfo.content.length > 0">
+        <div class="alert-title">
+          <span class="alert-icon">{{alertInfo.icon}}</span>
+          <span>{{alertInfo.title}}</span>
+        </div>
+        <div class="alert-content">
+          <p *ngFor="let content of alertInfo.content">• {{content}}</p>
+        </div>
+      </div>
+      
+      <!-- AI运营助手 -->
+      <div class="ai-assistant" (click)="onAIAssistantClick()">
+        <div class="ai-header">
+          <div class="ai-icon">🤖</div>
+          <div class="ai-title">AI运营助手</div>
+        </div>
+        <div class="ai-suggestions">
+          <div class="ai-suggestion" *ngFor="let suggestion of aiSuggestions" (click)="onAISuggestionClick(suggestion)">
+            {{suggestion.text}}
+          </div>
+        </div>
+      </div>
+      
+      <!-- 快捷操作入口 -->
+      <div class="card">
+        <h3 class="section-title">快捷操作</h3>
+        <div class="quick-actions">
+          <div class="action-item" *ngFor="let action of quickActions" (click)="onQuickActionClick(action)">
+            <div class="action-icon">{{action.icon}}</div>
+            <div class="action-label">{{action.label}}</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 待办事项列表 -->
+      <div class="card">
+        <h3 class="section-title">待办事项 <span class="more-link" (click)="onViewMoreClick('todos')">查看全部</span></h3>
+        <div class="todo-list">
+          <div class="todo-item" *ngFor="let todo of todoItems" (click)="onTodoItemClick(todo)">
+            <div class="todo-info">
+              <div class="todo-icon">{{todo.icon}}</div>
+              <div>
+                <div class="todo-title">{{todo.title}}</div>
+                <div class="todo-desc">{{todo.description}}</div>
+              </div>
+            </div>
+            <div class="todo-count">{{todo.count}}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- 底部导航 -->
+<nav class="bottom-nav">
+  <div class="nav-item" *ngFor="let item of navItems" [class.active]="item.active" (click)="onNavItemClick(item)">
+    <div class="nav-icon">{{item.icon}}</div>
+    <div>{{item.label}}</div>
+  </div>
+</nav>

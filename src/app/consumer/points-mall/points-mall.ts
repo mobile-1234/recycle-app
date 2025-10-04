@@ -74,10 +74,10 @@ export class PointsMall {
   
   // 商品分类
   categories: Category[] = [
-    { id: 'all', name: '全部', icon: 'fas fa-th-large', active: true },
-    { id: 'electronics', name: '数码', icon: 'fas fa-mobile-alt', active: false },
-    { id: 'home', name: '家居', icon: 'fas fa-home', active: false },
-    { id: 'food', name: '食品', icon: 'fas fa-utensils', active: false }
+    { id: 'all', name: '全部', icon: 'grid', active: true },
+    { id: 'electronics', name: '数码', icon: 'electronics', active: false },
+    { id: 'home', name: '家居', icon: 'home', active: false },
+    { id: 'food', name: '食品', icon: 'utensils', active: false }
   ];
   
   // 活动轮播数据
@@ -121,7 +121,7 @@ export class PointsMall {
       description: '支持10W快充，兼容多种设备',
       stock: 50,
       tag: '热销',
-      icon: 'fas fa-mobile-alt'
+      icon: 'electronics'
     },
     {
       id: 2,
@@ -133,7 +133,7 @@ export class PointsMall {
       image: 'data:image/svg+xml;charset=utf-8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="10" fill="%23f5f5f5"/><path d="M25 35h50v45c0 5-5 10-10 10H35c-5 0-10-5-10-10V35z" fill="%234caf50"/><path d="M35 35V25c0-5 5-10 10-10h10c5 0 10 5 10 10v10" stroke="%234caf50" stroke-width="3" fill="none"/></svg>',
       description: '可重复使用，环保材质',
       stock: 100,
-      icon: 'fas fa-shopping-bag'
+      icon: 'cart'
     },
     {
       id: 3,
@@ -145,7 +145,7 @@ export class PointsMall {
       image: 'data:image/svg+xml;charset=utf-8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="10" fill="%23f5f5f5"/><rect x="20" y="20" width="60" height="60" rx="5" fill="%23fff" stroke="%23ddd" stroke-width="2"/><circle cx="35" cy="35" r="4" fill="%23ffc107"/><circle cx="50" cy="40" r="3" fill="%23ffc107"/><circle cx="65" cy="45" r="4" fill="%23ffc107"/><circle cx="40" cy="55" r="3" fill="%23ffc107"/><circle cx="60" cy="60" r="4" fill="%23ffc107"/></svg>',
       description: '营养丰富，健康早餐首选',
       stock: 30,
-      icon: 'fas fa-seedling'
+      icon: 'leaf'
     },
     {
       id: 4,
@@ -158,7 +158,7 @@ export class PointsMall {
       description: '高品质音效，长续航',
       stock: 25,
       tag: '新品',
-      icon: 'fas fa-headphones'
+      icon: 'electronics'
     },
     {
       id: 5,
@@ -170,7 +170,7 @@ export class PointsMall {
       image: 'data:image/svg+xml;charset=utf-8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="10" fill="%23f5f5f5"/><rect x="20" y="30" width="60" height="40" rx="5" fill="%2387ceeb"/><line x1="25" y1="35" x2="75" y2="35" stroke="%235f9ea0" stroke-width="2"/><line x1="25" y1="45" x2="75" y2="45" stroke="%235f9ea0" stroke-width="2"/><line x1="25" y1="55" x2="75" y2="55" stroke="%235f9ea0" stroke-width="2"/><line x1="25" y1="65" x2="75" y2="65" stroke="%235f9ea0" stroke-width="2"/></svg>',
       description: '天然抗菌，柔软舒适',
       stock: 80,
-      icon: 'fas fa-bath'
+      icon: 'home'
     },
     {
       id: 6,
@@ -182,7 +182,7 @@ export class PointsMall {
       image: 'data:image/svg+xml;charset=utf-8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="10" fill="%23f5f5f5"/><rect x="20" y="30" width="60" height="40" rx="5" fill="%23dd6b20"/><rect x="20" y="25" width="60" height="10" rx="5" fill="%23ffd700"/><circle cx="35" cy="45" r="4" fill="%238b4513"/><circle cx="50" cy="50" r="3" fill="%238b4513"/><circle cx="65" cy="55" r="4" fill="%238b4513"/><circle cx="40" cy="60" r="3" fill="%238b4513"/><circle cx="60" cy="40" r="3" fill="%238b4513"/></svg>',
       description: '精选坚果，营养健康',
       stock: 40,
-      icon: 'fas fa-gift'
+      icon: 'utensils'
     }
   ];
   

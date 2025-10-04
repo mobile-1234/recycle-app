@@ -1,0 +1,167 @@
+<!-- 顶部标题栏 -->
+<div class="header">
+  <div class="back-btn" (click)="goBack()"><i class="fas fa-arrow-left"></i></div>
+  <div class="header-title">我的地址</div>
+  <div class="add-btn" (click)="showAddModal()"><i class="fas fa-plus"></i></div>
+</div>
+
+<div class="container">
+  <!-- 地址列表 -->
+  <div class="addresses-list">
+    <div 
+      *ngFor="let address of addresses" 
+      class="address-card"
+      [class.default]="address.isDefault">
+      
+      <div class="address-header">
+        <div class="contact-info">
+          <span class="name">{{address.name}}</span>
+          <span class="phone">{{address.phone}}</span>
+        </div>
+        <div class="default-badge" *ngIf="address.isDefault">默认</div>
+      </div>
+      
+      <div class="address-content">
+        <div class="address-text">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>{{address.fullAddress}}</span>
+        </div>
+        <div class="address-label" *ngIf="address.label">
+          <span class="label-tag" [class]="'label-' + address.label">
+            {{getLabelText(address.label)}}
+          </span>
+        </div>
+      </div>
+      
+      <div class="address-actions">
+        <button 
+          class="action-btn default-btn"
+          *ngIf="!address.isDefault"
+          (click)="setDefault(address)">
+          设为默认
+        </button>
+        <button 
+          class="action-btn edit-btn"
+          (click)="editAddress(address)">
+          <i class="fas fa-edit"></i>
+          编辑
+        </button>
+        <button 
+          class="action-btn delete-btn"
+          (click)="deleteAddress(address)">
+          <i class="fas fa-trash"></i>
+          删除
+        </button>
+      </div>
+    </div>
+    
+    <!-- 空状态 -->
+    <div class="empty-state" *ngIf="addresses.length === 0">
+      <div class="empty-icon">
+        <i class="fas fa-map-marker-alt"></i>
+      </div>
+      <div class="empty-text">暂无收货地址</div>
+      <button class="empty-action" (click)="showAddModal()">添加地址</button>
+    </div>
+  </div>
+</div>
+
+<!-- 添加/编辑地址模态框 -->
+<div class="modal" [style.display]="showModal ? 'flex' : 'none'" (click)="closeModal($event)">
+  <div class="modal-content address-modal">
+    <div class="modal-header">
+      <div class="modal-title">{{isEditing ? '编辑地址' : '添加地址'}}</div>
+      <div class="modal-close" (click)="showModal = false">
+        <i class="fas fa-times"></i>
+      </div>
+    </div>
+    
+    <div class="modal-body">
+      <form class="address-form">
+        <div class="form-group">
+          <label>联系人</label>
+          <input 
+            type="text" 
+            [(ngModel)]="currentAddress.name" 
+            name="name"
+            placeholder="请输入联系人姓名"
+            class="form-input">
+        </div>
+        
+        <div class="form-group">
+          <label>手机号</label>
+          <input 
+            type="tel" 
+            [(ngModel)]="currentAddress.phone" 
+            name="phone"
+            placeholder="请输入手机号"
+            class="form-input">
+        </div>
+        
+        <div class="form-group">
+          <label>所在地区</label>
+          <div class="region-selector">
+            <select [(ngModel)]="currentAddress.province" name="province" class="form-select">
+              <option value="">请选择省份</option>
+              <option value="北京市">北京市</option>
+              <option value="上海市">上海市</option>
+              <option value="广东省">广东省</option>
+              <option value="浙江省">浙江省</option>
+            </select>
+            <select [(ngModel)]="currentAddress.city" name="city" class="form-select">
+              <option value="">请选择城市</option>
+              <option value="北京市">北京市</option>
+              <option value="朝阳区">朝阳区</option>
+              <option value="海淀区">海淀区</option>
+            </select>
+            <select [(ngModel)]="currentAddress.district" name="district" class="form-select">
+              <option value="">请选择区县</option>
+              <option value="朝阳区">朝阳区</option>
+              <option value="建国门">建国门</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>详细地址</label>
+          <textarea 
+            [(ngModel)]="currentAddress.detail" 
+            name="detail"
+            placeholder="请输入详细地址（街道、门牌号等）"
+            class="form-textarea"
+            rows="3"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>地址标签</label>
+          <div class="label-options">
+            <div 
+              *ngFor="let label of labelOptions" 
+              class="label-option"
+              [class.active]="currentAddress.label === label.value"
+              (click)="selectLabel(label.value)">
+              <i [class]="label.icon"></i>
+              <span>{{label.text}}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="currentAddress.isDefault" 
+              name="isDefault">
+            <span class="checkmark"></span>
+            设为默认地址
+          </label>
+        </div>
+      </form>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="showModal = false">取消</button>
+      <button class="btn-save" (click)="saveAddress()">保存</button>
+    </div>
+  </div>
+</div>

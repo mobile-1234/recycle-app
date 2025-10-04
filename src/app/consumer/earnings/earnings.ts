@@ -144,6 +144,146 @@ export class EarningsComponent implements OnInit, AfterViewInit {
       price: '¥8.00/kg',
       address: '北京市朝阳区建国路88号',
       collector: '孙师傅'
+    },
+    {
+      id: '6',
+      category: '玻璃回收',
+      time: '2024-01-10 11:25',
+      orderNo: 'RC202401100006',
+      cashAmount: 15.30,
+      pointsAmount: 76,
+      carbonReduction: 1.5,
+      icon: 'fas fa-wine-glass',
+      weight: '6.8kg',
+      price: '¥2.25/kg',
+      address: '北京市朝阳区建国路88号',
+      collector: '刘师傅'
+    },
+    {
+      id: '7',
+      category: '废纸回收',
+      time: '2024-01-09 15:40',
+      orderNo: 'RC202401090007',
+      cashAmount: 42.80,
+      pointsAmount: 214,
+      carbonReduction: 4.3,
+      icon: 'fas fa-newspaper',
+      weight: '8.7kg',
+      price: '¥4.92/kg',
+      address: '北京市朝阳区建国路88号',
+      collector: '陈师傅'
+    },
+    {
+      id: '8',
+      category: '塑料制品回收',
+      time: '2024-01-08 09:15',
+      orderNo: 'RC202401080008',
+      cashAmount: 28.60,
+      pointsAmount: 143,
+      carbonReduction: 2.9,
+      icon: 'fas fa-bottle-water',
+      weight: '4.3kg',
+      price: '¥6.65/kg',
+      address: '北京市朝阳区建国路88号',
+      collector: '周师傅'
+    },
+    {
+      id: '9',
+      category: '电子设备回收',
+      time: '2024-01-07 14:20',
+      orderNo: 'RC202401070009',
+      cashAmount: 85.00,
+      pointsAmount: 425,
+      carbonReduction: 8.5,
+      icon: 'fas fa-laptop',
+      weight: '2.1kg',
+      price: '¥40.48/kg',
+      address: '北京市朝阳区建国路88号',
+      collector: '吴师傅'
+    },
+    {
+      id: '10',
+      category: '金属回收',
+      time: '2024-01-06 16:30',
+      orderNo: 'RC202401060010',
+      cashAmount: 67.50,
+      pointsAmount: 337,
+      carbonReduction: 6.8,
+      icon: 'fas fa-wrench',
+      weight: '3.5kg',
+      price: '¥19.29/kg',
+      address: '北京市朝阳区建国路88号',
+      collector: '郑师傅'
+    },
+    {
+      id: '11',
+      category: '纺织品回收',
+      time: '2024-01-05 12:45',
+      orderNo: 'RC202401050011',
+      cashAmount: 24.00,
+      pointsAmount: 120,
+      carbonReduction: 2.4,
+      icon: 'fas fa-shirt',
+      weight: '3.0kg',
+      price: '¥8.00/kg',
+      address: '北京市朝阳区建国路88号',
+      collector: '马师傅'
+    },
+    {
+      id: '12',
+      category: '废纸回收',
+      time: '2024-01-04 10:30',
+      orderNo: 'RC202401040012',
+      cashAmount: 36.90,
+      pointsAmount: 184,
+      carbonReduction: 3.7,
+      icon: 'fas fa-file-alt',
+      weight: '7.5kg',
+      price: '¥4.92/kg',
+      address: '北京市朝阳区建国路88号',
+      collector: '黄师傅'
+    },
+    {
+      id: '13',
+      category: '塑料瓶回收',
+      time: '2024-01-03 13:15',
+      orderNo: 'RC202401030013',
+      cashAmount: 21.70,
+      pointsAmount: 108,
+      carbonReduction: 2.2,
+      icon: 'fas fa-wine-bottle',
+      weight: '4.4kg',
+      price: '¥4.93/kg',
+      address: '北京市朝阳区建国路88号',
+      collector: '徐师傅'
+    },
+    {
+      id: '14',
+      category: '电子设备回收',
+      time: '2024-01-02 11:50',
+      orderNo: 'RC202401020014',
+      cashAmount: 95.00,
+      pointsAmount: 475,
+      carbonReduction: 9.5,
+      icon: 'fas fa-tablet-alt',
+      weight: '1.8kg',
+      price: '¥52.78/kg',
+      address: '北京市朝阳区建国路88号',
+      collector: '朱师傅'
+    },
+    {
+      id: '15',
+      category: '玻璃回收',
+      time: '2024-01-01 14:35',
+      orderNo: 'RC202401010015',
+      cashAmount: 18.90,
+      pointsAmount: 94,
+      carbonReduction: 1.9,
+      icon: 'fas fa-wine-glass',
+      weight: '8.4kg',
+      price: '¥2.25/kg',
+      address: '北京市朝阳区建国路88号',
+      collector: '何师傅'
     }
   ];
   
@@ -202,14 +342,13 @@ export class EarningsComponent implements OnInit, AfterViewInit {
 
   // 初始化数据
   initializeData() {
+    // 初始显示全部数据，不启用日期筛选，避免列表为空
     this.filteredEarnings = [...this.earningsData];
-    
-    // 设置默认日期范围（最近30天）
-    const today = new Date();
-    const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-    
-    this.endDate = today.toISOString().split('T')[0];
-    this.startDate = thirtyDaysAgo.toISOString().split('T')[0];
+    this.startDate = '';
+    this.endDate = '';
+
+    // 应用初始筛选
+    this.applyFilter();
   }
 
   // 初始化碳减排图表
@@ -325,36 +464,70 @@ export class EarningsComponent implements OnInit, AfterViewInit {
 
   // 应用筛选条件
   applyFilter() {
+    let filtered = [...this.earningsData];
+    
+    // 首先按类型筛选
     const activeFilter = this.filterOptions.find(f => f.active);
-    if (!activeFilter) return;
-
-    switch (activeFilter.id) {
-      case 'all':
-        this.filteredEarnings = [...this.earningsData];
-        break;
-      case 'cash':
-        this.filteredEarnings = this.earningsData.filter(e => e.cashAmount > 0);
-        break;
-      case 'points':
-        this.filteredEarnings = this.earningsData.filter(e => e.pointsAmount > 0);
-        break;
-      case 'carbon':
-        this.filteredEarnings = this.earningsData.filter(e => e.carbonReduction > 0);
-        break;
+    if (activeFilter) {
+      switch (activeFilter.id) {
+        case 'all':
+          // 显示所有记录
+          break;
+        case 'cash':
+          // 按现金收益排序，优先显示现金收益高的记录
+          filtered = filtered.filter(e => e.cashAmount > 0).sort((a, b) => b.cashAmount - a.cashAmount);
+          break;
+        case 'points':
+          // 按积分收益排序，优先显示积分收益高的记录
+          filtered = filtered.filter(e => e.pointsAmount > 0).sort((a, b) => b.pointsAmount - a.pointsAmount);
+          break;
+        case 'carbon':
+          // 按碳减排排序，优先显示碳减排高的记录
+          filtered = filtered.filter(e => e.carbonReduction > 0).sort((a, b) => b.carbonReduction - a.carbonReduction);
+          break;
+      }
     }
+    
+    // 然后按日期筛选
+    if (this.startDate && this.endDate) {
+      const start = new Date(this.startDate);
+      const end = new Date(this.endDate);
+      end.setHours(23, 59, 59, 999); // 设置为当天的最后一刻
+      
+      filtered = filtered.filter(earning => {
+        const earningDate = new Date(earning.time);
+        return earningDate >= start && earningDate <= end;
+      });
+    } else if (this.startDate) {
+      // 只有开始日期
+      const start = new Date(this.startDate);
+      filtered = filtered.filter(earning => {
+        const earningDate = new Date(earning.time);
+        return earningDate >= start;
+      });
+    } else if (this.endDate) {
+      // 只有结束日期
+      const end = new Date(this.endDate);
+      end.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(earning => {
+        const earningDate = new Date(earning.time);
+        return earningDate <= end;
+      });
+    }
+    
+    this.filteredEarnings = filtered;
   }
 
   // 按日期筛选
   filterByDate() {
-    if (!this.startDate || !this.endDate) return;
+    this.applyFilter(); // 重新应用所有筛选条件
+  }
 
-    const start = new Date(this.startDate);
-    const end = new Date(this.endDate);
-    
-    this.filteredEarnings = this.earningsData.filter(earning => {
-      const earningDate = new Date(earning.time);
-      return earningDate >= start && earningDate <= end;
-    });
+  // 清除日期筛选
+  clearDateFilter() {
+    this.startDate = '';
+    this.endDate = '';
+    this.applyFilter();
   }
 
   // 显示订单详情
@@ -388,40 +561,120 @@ export class EarningsComponent implements OnInit, AfterViewInit {
   // 确认提现
   confirmWithdraw() {
     if (this.withdrawAmount <= 0) {
-      alert('请输入有效的提现金额');
+      this.showAlert('请输入有效的提现金额', 'warning');
       return;
     }
     
     if (this.withdrawAmount > this.totalCashEarnings) {
-      alert('提现金额不能超过可用余额');
+      this.showAlert('提现金额不能超过可用余额', 'error');
+      return;
+    }
+
+    if (this.withdrawAmount < 10) {
+      this.showAlert('最低提现金额为10元', 'warning');
       return;
     }
 
     const selectedOption = this.withdrawOptions.find(o => o.active);
-    console.log(`提现 ¥${this.withdrawAmount} 到 ${selectedOption?.name}`);
+    if (!selectedOption) {
+      this.showAlert('请选择提现方式', 'warning');
+      return;
+    }
+
+    // 显示确认对话框
+    if (confirm(`确认提现 ¥${this.withdrawAmount.toFixed(2)} 到${selectedOption.name}？`)) {
+      this.processWithdraw(selectedOption);
+    }
+  }
+
+  // 处理提现请求
+  private processWithdraw(option: WithdrawOption) {
+    // 模拟API调用
+    this.showAlert('正在处理提现申请...', 'info');
     
-    // 这里应该调用实际的提现API
-    alert(`提现申请已提交，将通过${selectedOption?.name}到账`);
-    this.closeModal('withdraw');
+    setTimeout(() => {
+      // 模拟成功响应
+      this.totalCashEarnings -= this.withdrawAmount;
+      this.showAlert(`提现申请已提交！预计1-3个工作日通过${option.name}到账`, 'success');
+      this.closeModal('withdraw');
+      
+      // 添加提现记录到收益明细
+      const withdrawRecord: EarningRecord = {
+        id: Date.now().toString(),
+        category: '提现',
+        time: new Date().toLocaleString('zh-CN'),
+        orderNo: `WD${Date.now()}`,
+        cashAmount: -this.withdrawAmount,
+        pointsAmount: 0,
+        carbonReduction: 0,
+        icon: 'fas fa-money-bill-wave',
+        weight: '-',
+        price: '-',
+        address: '-',
+        collector: option.name
+      };
+      
+      this.earningsData.unshift(withdrawRecord);
+      this.applyFilter();
+    }, 2000);
   }
 
   // 确认捐赠
   confirmDonation() {
     if (!this.selectedProject) {
-      alert('请选择捐赠项目');
+      this.showAlert('请选择捐赠项目', 'warning');
       return;
     }
     
     if (this.donationAmount <= 0) {
-      alert('请输入有效的捐赠金额');
+      this.showAlert('请输入有效的捐赠金额', 'warning');
       return;
     }
 
-    console.log(`捐赠 ¥${this.donationAmount} 到 ${this.selectedProject.name}`);
+    if (this.donationAmount > this.totalCashEarnings) {
+      this.showAlert('捐赠金额不能超过可用余额', 'error');
+      return;
+    }
+
+    // 显示确认对话框
+    if (confirm(`确认向"${this.selectedProject.name}"捐赠 ¥${this.donationAmount.toFixed(2)}？`)) {
+      this.processDonation();
+    }
+  }
+
+  // 处理捐赠请求
+  private processDonation() {
+    if (!this.selectedProject) return;
     
-    // 这里应该调用实际的捐赠API
-    alert(`感谢您的爱心捐赠！已向${this.selectedProject.name}捐赠 ¥${this.donationAmount}`);
-    this.closeModal('donation');
+    this.showAlert('正在处理捐赠...', 'info');
+    
+    setTimeout(() => {
+      // 模拟成功响应
+      this.totalCashEarnings -= this.donationAmount;
+      this.showAlert(`感谢您的爱心！已成功向"${this.selectedProject!.name}"捐赠 ¥${this.donationAmount.toFixed(2)}`, 'success');
+      this.closeModal('donation');
+      
+      // 添加捐赠记录到收益明细
+      const donationRecord: EarningRecord = {
+        id: Date.now().toString(),
+        category: '公益捐赠',
+        time: new Date().toLocaleString('zh-CN'),
+        orderNo: `DN${Date.now()}`,
+        cashAmount: -this.donationAmount,
+        pointsAmount: Math.floor(this.donationAmount * 2), // 捐赠获得双倍积分
+        carbonReduction: this.donationAmount * 0.1, // 每元捐赠相当于0.1kg碳减排
+        icon: 'fas fa-hand-holding-heart',
+        weight: '-',
+        price: '-',
+        address: '-',
+        collector: this.selectedProject!.name
+      };
+      
+      this.earningsData.unshift(donationRecord);
+      this.totalPointsEarnings += donationRecord.pointsAmount;
+      this.totalCarbonReduction += donationRecord.carbonReduction;
+      this.applyFilter();
+    }, 2000);
   }
 
   // 关闭模态框
@@ -445,15 +698,94 @@ export class EarningsComponent implements OnInit, AfterViewInit {
 
   // 跳转到商城
   goToMall() {
-    console.log('跳转到积分商城');
-    // 这里应该跳转到实际的商城页面
+    this.router.navigate(['/consumer/points-mall']);
   }
 
   // 导出账单
   exportBill() {
-    console.log('导出收益账单');
-    // 这里应该实现实际的账单导出功能
-    alert('账单导出功能开发中...');
+    this.showAlert('正在生成账单...', 'info');
+    
+    setTimeout(() => {
+      this.generateBillReport();
+    }, 1500);
+  }
+
+  // 生成账单报告
+  private generateBillReport() {
+    const billData = {
+      period: `${this.startDate} 至 ${this.endDate}`,
+      totalCash: this.totalCashEarnings,
+      totalPoints: this.totalPointsEarnings,
+      totalCarbon: this.totalCarbonReduction,
+      records: this.filteredEarnings
+    };
+
+    // 创建CSV格式的账单数据
+    let csvContent = "日期,类别,订单号,现金收益,积分收益,碳减排量\n";
+    
+    this.filteredEarnings.forEach(record => {
+      csvContent += `${record.time},${record.category},${record.orderNo},${record.cashAmount},${record.pointsAmount},${record.carbonReduction}\n`;
+    });
+
+    // 创建并下载文件
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `收益账单_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    this.showAlert('账单已导出到下载文件夹', 'success');
+  }
+
+  // 显示提示信息
+  private showAlert(message: string, type: 'success' | 'error' | 'warning' | 'info') {
+    // 创建提示元素
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `custom-alert alert-${type}`;
+    alertDiv.textContent = message;
+    
+    // 添加样式
+    alertDiv.style.cssText = `
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: ${this.getAlertColor(type)};
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      z-index: 10000;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: slideDown 0.3s ease-out;
+    `;
+
+    document.body.appendChild(alertDiv);
+
+    // 3秒后自动移除
+    setTimeout(() => {
+      if (alertDiv.parentNode) {
+        alertDiv.style.animation = 'slideUp 0.3s ease-in';
+        setTimeout(() => {
+          document.body.removeChild(alertDiv);
+        }, 300);
+      }
+    }, 3000);
+  }
+
+  // 获取提示颜色
+  private getAlertColor(type: string): string {
+    switch (type) {
+      case 'success': return '#4caf50';
+      case 'error': return '#f44336';
+      case 'warning': return '#ff9800';
+      case 'info': return '#2196f3';
+      default: return '#6c757d';
+    }
   }
 
   // 组件销毁时清理图表

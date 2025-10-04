@@ -17,7 +17,13 @@
         class="category-item" 
         [class.active]="category.active"
         (click)="selectCategory(category)">
-        <div class="category-icon"><i [class]="category.icon"></i></div>
+        <div class="category-icon">
+          <app-svg-icon 
+            [name]="category.icon" 
+            size="lg" 
+            [color]="category.active ? 'primary' : 'secondary'">
+          </app-svg-icon>
+        </div>
         <div>{{category.name}}</div>
       </div>
     </div>
@@ -50,7 +56,7 @@
   <!-- 回收方式选择 -->
   <div class="form-section">
     <div class="section-title">
-      <i class="fas fa-truck"></i> 回收方式
+      <app-svg-icon name="recycle-method" size="md" color="#2e7d32"></app-svg-icon> 回收方式
     </div>
     
     <div class="recycle-method">
@@ -59,7 +65,13 @@
         class="method-card" 
         [class.active]="method.active"
         (click)="selectMethod(method)">
-        <div class="method-icon"><i [class]="method.icon"></i></div>
+        <div class="method-icon">
+          <app-svg-icon 
+            [name]="method.icon" 
+            size="xl" 
+            [color]="method.active ? 'primary' : 'secondary'">
+          </app-svg-icon>
+        </div>
         <div class="method-title">{{method.name}}</div>
         <div class="method-desc">{{method.description}}</div>
       </div>
@@ -89,7 +101,7 @@
   <!-- 时间选择 -->
   <div class="form-section">
     <div class="section-title">
-      <i class="far fa-clock"></i> 回收时间
+      <app-svg-icon name="clock" size="md" color="#2e7d32"></app-svg-icon> 回收时间
     </div>
     
     <div class="time-options">
@@ -98,7 +110,13 @@
         class="time-option" 
         [class.active]="option.active"
         (click)="selectTimeOption(option)">
-        <div class="method-icon"><i [class]="option.icon"></i></div>
+        <div class="method-icon">
+          <app-svg-icon 
+            [name]="option.icon" 
+            size="xl" 
+            [color]="option.active ? 'primary' : 'secondary'">
+          </app-svg-icon>
+        </div>
         <div class="method-title">{{option.name}}</div>
         <div class="method-desc">{{option.description}}</div>
       </div>
@@ -131,7 +149,7 @@
   <!-- 附加服务 -->
   <div class="form-section">
     <div class="section-title">
-      <i class="fas fa-concierge-bell"></i> 附加服务
+      <app-svg-icon name="service" size="md" color="#2e7d32"></app-svg-icon> 附加服务
     </div>
     
     <div class="additional-services">
@@ -139,7 +157,13 @@
         *ngFor="let service of additionalServices"
         class="service-item">
         <div class="service-info">
-          <div class="service-icon"><i [class]="service.icon"></i></div>
+          <div class="service-icon">
+            <app-svg-icon 
+              [name]="service.icon" 
+              size="lg" 
+              color="secondary">
+            </app-svg-icon>
+          </div>
           <div>
             <div class="service-name">{{service.name}}</div>
             <div class="service-desc">{{service.description}}</div>
@@ -157,7 +181,9 @@
       
       <div class="service-item" style="flex-direction: column; align-items: flex-start;">
         <div class="service-info" style="width: 100%; margin-bottom: 10px;">
-          <div class="service-icon"><i class="fas fa-note-sticky"></i></div>
+          <div class="service-icon">
+            <app-svg-icon name="edit" size="lg" color="secondary"></app-svg-icon>
+          </div>
           <div>
             <div class="service-name">备注</div>
             <div class="service-desc">特殊要求或说明</div>

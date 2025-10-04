@@ -1,0 +1,174 @@
+<!-- 顶部标题栏 -->
+<div class="header">
+  <div class="back-btn" (click)="goBack()"><i class="fas fa-arrow-left"></i></div>
+  <div class="header-title">我的收藏</div>
+</div>
+
+<div class="container">
+  <!-- 分类标签 -->
+  <div class="category-tabs">
+    <div 
+      *ngFor="let tab of categoryTabs" 
+      class="category-tab" 
+      [class.active]="tab.active"
+      (click)="selectTab(tab)">
+      <i [class]="tab.icon"></i>
+      <span>{{tab.name}}</span>
+      <span class="tab-count" *ngIf="tab.count > 0">({{tab.count}})</span>
+    </div>
+  </div>
+
+  <!-- 商品收藏列表 -->
+  <div class="products-section" *ngIf="activeTab === 'products'">
+    <div class="section-header">
+      <div class="section-title">收藏商品</div>
+      <div class="batch-actions" *ngIf="favoriteProducts.length > 0">
+        <button 
+          class="batch-btn" 
+          [class.active]="isEditMode"
+          (click)="toggleEditMode()">
+          {{isEditMode ? '完成' : '编辑'}}
+        </button>
+      </div>
+    </div>
+    
+    <div class="products-grid">
+      <div 
+        *ngFor="let product of favoriteProducts" 
+        class="product-card"
+        [class.edit-mode]="isEditMode">
+        
+        <div class="product-checkbox" *ngIf="isEditMode">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="product.selected"
+            (change)="updateSelection()">
+        </div>
+        
+        <div class="product-image">
+          <img [src]="product.image" [alt]="product.name">
+          <div class="favorite-btn active" (click)="toggleProductFavorite(product)">
+            <i class="fas fa-heart"></i>
+          </div>
+        </div>
+        
+        <div class="product-info">
+          <div class="product-name">{{product.name}}</div>
+          <div class="product-points">{{product.points}}积分</div>
+          <div class="product-stock">库存：{{product.stock}}件</div>
+        </div>
+        
+        <div class="product-actions" *ngIf="!isEditMode">
+          <button class="exchange-btn" (click)="exchangeProduct(product)">
+            立即兑换
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 批量操作栏 -->
+    <div class="batch-toolbar" *ngIf="isEditMode && favoriteProducts.length > 0">
+      <label class="select-all">
+        <input 
+          type="checkbox" 
+          [checked]="isAllSelected"
+          (change)="toggleSelectAll()">
+        <span>全选</span>
+      </label>
+      <button 
+        class="batch-delete-btn" 
+        [disabled]="selectedCount === 0"
+        (click)="batchDeleteProducts()">
+        删除选中 ({{selectedCount}})
+      </button>
+    </div>
+    
+    <!-- 商品空状态 -->
+    <div class="empty-state" *ngIf="favoriteProducts.length === 0">
+      <div class="empty-icon">
+        <i class="fas fa-shopping-bag"></i>
+      </div>
+      <div class="empty-text">暂无收藏商品</div>
+      <button class="empty-action" (click)="goToMall()">去积分商城看看</button>
+    </div>
+  </div>
+
+  <!-- 知识收藏列表 -->
+  <div class="knowledge-section" *ngIf="activeTab === 'knowledge'">
+    <div class="section-header">
+      <div class="section-title">收藏知识</div>
+      <div class="batch-actions" *ngIf="favoriteKnowledge.length > 0">
+        <button 
+          class="batch-btn" 
+          [class.active]="isEditMode"
+          (click)="toggleEditMode()">
+          {{isEditMode ? '完成' : '编辑'}}
+        </button>
+      </div>
+    </div>
+    
+    <div class="knowledge-list">
+      <div 
+        *ngFor="let article of favoriteKnowledge" 
+        class="knowledge-card"
+        [class.edit-mode]="isEditMode"
+        (click)="!isEditMode && viewArticle(article)">
+        
+        <div class="knowledge-checkbox" *ngIf="isEditMode">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="article.selected"
+            (change)="updateSelection()">
+        </div>
+        
+        <div class="knowledge-image">
+          <img [src]="article.image" [alt]="article.title">
+        </div>
+        
+        <div class="knowledge-content">
+          <div class="knowledge-title">{{article.title}}</div>
+          <div class="knowledge-summary">{{article.summary}}</div>
+          <div class="knowledge-meta">
+            <span class="knowledge-category">
+              <i [class]="article.categoryIcon"></i>
+              {{article.category}}
+            </span>
+            <span class="knowledge-time">{{article.collectTime}}</span>
+          </div>
+        </div>
+        
+        <div class="knowledge-actions">
+          <div class="favorite-btn active" (click)="toggleKnowledgeFavorite(article, $event)">
+            <i class="fas fa-heart"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 批量操作栏 -->
+    <div class="batch-toolbar" *ngIf="isEditMode && favoriteKnowledge.length > 0">
+      <label class="select-all">
+        <input 
+          type="checkbox" 
+          [checked]="isAllSelected"
+          (change)="toggleSelectAll()">
+        <span>全选</span>
+      </label>
+      <button 
+        class="batch-delete-btn" 
+        [disabled]="selectedCount === 0"
+        (click)="batchDeleteKnowledge()">
+        删除选中 ({{selectedCount}})
+      </button>
+    </div>
+    
+    <!-- 知识空状态 -->
+    <div class="empty-state" *ngIf="favoriteKnowledge.length === 0">
+      <div class="empty-icon">
+        <i class="fas fa-book"></i>
+      </div>
+      <div class="empty-text">暂无收藏知识</div>
+      <button class="empty-action" (click)="goToKnowledge()">去发现环保知识</button>
+    </div>
+  </div>
+</div>

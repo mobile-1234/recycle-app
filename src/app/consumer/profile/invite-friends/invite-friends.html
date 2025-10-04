@@ -1,0 +1,198 @@
+<div class="invite-friends-page">
+  <!-- 头部 -->
+  <div class="header">
+    <button class="back-btn" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <span class="title">邀请好友</span>
+  </div>
+
+  <div class="invite-content">
+    <!-- 邀请奖励说明 -->
+    <div class="reward-banner">
+      <div class="banner-bg">
+        <div class="reward-info">
+          <h3>邀请好友，共享绿色奖励</h3>
+          <p>邀请好友注册并完成首次回收，您和好友都可获得丰厚奖励</p>
+        </div>
+        <div class="reward-icon">
+          <i class="fas fa-gift"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 我的邀请码 -->
+    <div class="invite-code-section">
+      <div class="section-header">
+        <h4>我的邀请码</h4>
+        <span class="code-desc">分享给好友，双方都有奖励</span>
+      </div>
+      
+      <div class="invite-code-card">
+        <div class="code-display">
+          <span class="code-label">邀请码</span>
+          <span class="code-value">{{ inviteCode }}</span>
+          <button class="copy-btn" (click)="copyInviteCode()">
+            <i class="fas fa-copy"></i>
+            复制
+          </button>
+        </div>
+        
+        <div class="qr-code">
+          <div class="qr-placeholder">
+            <i class="fas fa-qrcode"></i>
+            <span>二维码</span>
+          </div>
+          <button class="save-qr-btn" (click)="saveQRCode()">保存二维码</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 分享方式 -->
+    <div class="share-section">
+      <h4>分享给好友</h4>
+      <div class="share-methods">
+        <button class="share-btn wechat" (click)="shareToWeChat()">
+          <i class="fab fa-weixin"></i>
+          <span>微信</span>
+        </button>
+        <button class="share-btn qq" (click)="shareToQQ()">
+          <i class="fab fa-qq"></i>
+          <span>QQ</span>
+        </button>
+        <button class="share-btn weibo" (click)="shareToWeibo()">
+          <i class="fab fa-weibo"></i>
+          <span>微博</span>
+        </button>
+        <button class="share-btn link" (click)="shareLink()">
+          <i class="fas fa-link"></i>
+          <span>复制链接</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 奖励规则 -->
+    <div class="reward-rules-section">
+      <h4>奖励规则</h4>
+      <div class="rules-list">
+        <div class="rule-item">
+          <div class="rule-icon">
+            <i class="fas fa-user-plus"></i>
+          </div>
+          <div class="rule-content">
+            <h5>好友注册</h5>
+            <p>好友通过您的邀请码注册成功</p>
+            <span class="reward">奖励：10积分</span>
+          </div>
+        </div>
+        
+        <div class="rule-item">
+          <div class="rule-icon">
+            <i class="fas fa-recycle"></i>
+          </div>
+          <div class="rule-content">
+            <h5>首次回收</h5>
+            <p>好友完成首次回收订单</p>
+            <span class="reward">奖励：您和好友各得20积分</span>
+          </div>
+        </div>
+        
+        <div class="rule-item">
+          <div class="rule-icon">
+            <i class="fas fa-coins"></i>
+          </div>
+          <div class="rule-content">
+            <h5>持续回收</h5>
+            <p>好友每完成一次回收，您都可获得奖励</p>
+            <span class="reward">奖励：5积分/次</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 邀请记录 -->
+    <div class="invite-records-section">
+      <div class="section-header">
+        <h4>邀请记录</h4>
+        <span class="total-count">已邀请 {{ totalInvites }} 人</span>
+      </div>
+      
+      <div class="records-tabs">
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'all'"
+          (click)="switchTab('all')">
+          全部 ({{ inviteRecords.length }})
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'success'"
+          (click)="switchTab('success')">
+          成功 ({{ getSuccessCount() }})
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'pending'"
+          (click)="switchTab('pending')">
+          待完成 ({{ getPendingCount() }})
+        </button>
+      </div>
+      
+      <div class="records-list" *ngIf="getFilteredRecords().length > 0">
+        <div 
+          class="record-item" 
+          *ngFor="let record of getFilteredRecords()"
+          [class.success]="record.status === 'success'"
+          [class.pending]="record.status === 'pending'">
+          <div class="record-avatar">
+            <img [src]="record.avatar" [alt]="record.nickname" *ngIf="record.avatar">
+            <div class="default-avatar" *ngIf="!record.avatar">
+              <i class="fas fa-user"></i>
+            </div>
+          </div>
+          
+          <div class="record-info">
+            <div class="record-name">{{ record.nickname }}</div>
+            <div class="record-time">{{ formatDate(record.inviteTime) }}</div>
+            <div class="record-status" [ngClass]="record.status">
+              {{ getStatusText(record.status) }}
+            </div>
+          </div>
+          
+          <div class="record-reward" *ngIf="record.status === 'success'">
+            <span class="reward-points">+{{ record.rewardPoints }}</span>
+            <span class="reward-label">积分</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="empty-state" *ngIf="getFilteredRecords().length === 0">
+        <i class="fas fa-user-friends"></i>
+        <p>{{ getEmptyMessage() }}</p>
+      </div>
+    </div>
+
+    <!-- 我的奖励统计 -->
+    <div class="reward-stats-section">
+      <h4>我的邀请奖励</h4>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value">{{ totalRewardPoints }}</div>
+          <div class="stat-label">累计积分</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ totalRewardCash }}</div>
+          <div class="stat-label">累计现金(元)</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ successfulInvites }}</div>
+          <div class="stat-label">成功邀请</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ thisMonthRewards }}</div>
+          <div class="stat-label">本月奖励</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -76,20 +76,25 @@ export class Profile {
     this.router.navigate(['/auth/login']);
   }
 
-  // 菜单跳转（示例占位）
+  // 菜单跳转（实现实际路由导航）
   goToPage(page: string): void {
-    const pageNames: Record<string, string> = {
-      orders: '我的订单',
-      address: '我的地址',
-      favorites: '我的收藏',
-      invite: '邀请好友',
-      customerService: '客服与反馈',
-      settings: '设置',
-      about: '关于我们',
-      agreement: '用户协议',
-      privacy: '隐私政策'
+    const routeMap: Record<string, string> = {
+      orders: '/consumer/profile/orders',
+      address: '/consumer/profile/addresses',
+      favorites: '/consumer/profile/favorites',
+      invite: '/consumer/profile/invite-friends',
+      customerService: '/consumer/profile/customer-service',
+      settings: '/consumer/profile/settings',
+      about: '/consumer/profile/about-us',
+      agreement: '/consumer/profile/user-agreement',
+      privacy: '/consumer/profile/privacy-policy'
     };
-    alert(`跳转到${pageNames[page] || page}页面`);
+    const target = routeMap[page];
+    if (target) {
+      this.router.navigate([target]);
+    } else {
+      console.warn(`Unknown page key: ${page}`);
+    }
   }
 
   // 显示所有徽章

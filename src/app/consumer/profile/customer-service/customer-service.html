@@ -1,0 +1,225 @@
+<div class="customer-service-page">
+  <!-- 头部 -->
+  <div class="header">
+    <button class="back-btn" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <span class="title">客服与反馈</span>
+  </div>
+
+  <div class="service-content">
+    <!-- 快速联系方式 -->
+    <div class="quick-contact-section">
+      <h4>快速联系我们</h4>
+      <div class="contact-methods">
+        <div class="contact-item" (click)="startOnlineChat()">
+          <div class="contact-icon online-chat">
+            <i class="fas fa-comments"></i>
+          </div>
+          <div class="contact-info">
+            <h5>在线客服</h5>
+            <p>7×24小时在线服务</p>
+            <span class="status online">在线</span>
+          </div>
+          <i class="fas fa-chevron-right arrow"></i>
+        </div>
+        
+        <div class="contact-item" (click)="callService()">
+          <div class="contact-icon phone">
+            <i class="fas fa-phone"></i>
+          </div>
+          <div class="contact-info">
+            <h5>客服热线</h5>
+            <p>400-888-6666</p>
+            <span class="time">工作日 9:00-18:00</span>
+          </div>
+          <i class="fas fa-chevron-right arrow"></i>
+        </div>
+        
+        <div class="contact-item" (click)="sendEmail()">
+          <div class="contact-icon email">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div class="contact-info">
+            <h5>邮件反馈</h5>
+            <p>service@recycle-app.com</p>
+            <span class="time">24小时内回复</span>
+          </div>
+          <i class="fas fa-chevron-right arrow"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 常见问题 -->
+    <div class="faq-section">
+      <div class="section-header">
+        <h4>常见问题</h4>
+        <button class="view-all-btn" (click)="viewAllFAQ()">查看全部</button>
+      </div>
+      
+      <div class="faq-list">
+        <div 
+          class="faq-item" 
+          *ngFor="let faq of faqList"
+          [class.expanded]="faq.expanded"
+          (click)="toggleFAQ(faq)">
+          <div class="faq-question">
+            <span>{{ faq.question }}</span>
+            <i class="fas fa-chevron-down" [class.rotated]="faq.expanded"></i>
+          </div>
+          <div class="faq-answer" *ngIf="faq.expanded">
+            <p>{{ faq.answer }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 意见反馈表单 -->
+    <div class="feedback-section">
+      <h4>意见反馈</h4>
+      <div class="feedback-form">
+        <!-- 反馈类型 -->
+        <div class="form-group">
+          <label>反馈类型</label>
+          <div class="feedback-types">
+            <button 
+              class="type-btn" 
+              *ngFor="let type of feedbackTypes"
+              [class.active]="selectedFeedbackType === type.value"
+              (click)="selectFeedbackType(type.value)">
+              <i [class]="type.icon"></i>
+              <span>{{ type.label }}</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- 问题描述 -->
+        <div class="form-group">
+          <label>问题描述 <span class="required">*</span></label>
+          <textarea 
+            [(ngModel)]="feedbackContent"
+            placeholder="请详细描述您遇到的问题或建议..."
+            rows="4"
+            maxlength="500"></textarea>
+          <div class="char-count">{{ feedbackContent.length }}/500</div>
+        </div>
+        
+        <!-- 联系方式 -->
+        <div class="form-group">
+          <label>联系方式</label>
+          <input 
+            type="text" 
+            [(ngModel)]="contactInfo"
+            placeholder="请留下您的手机号或邮箱，方便我们联系您">
+        </div>
+        
+        <!-- 图片上传 -->
+        <div class="form-group">
+          <label>相关截图</label>
+          <div class="image-upload">
+            <div 
+              class="upload-item" 
+              *ngFor="let image of uploadedImages; let i = index">
+              <img [src]="image.url" [alt]="image.name">
+              <button class="remove-btn" (click)="removeImage(i)">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <button 
+              class="upload-btn" 
+              *ngIf="uploadedImages.length < 3"
+              (click)="uploadImage()">
+              <i class="fas fa-plus"></i>
+              <span>添加图片</span>
+            </button>
+          </div>
+          <div class="upload-tip">最多上传3张图片，支持jpg、png格式</div>
+        </div>
+        
+        <!-- 提交按钮 -->
+        <button 
+          class="submit-btn" 
+          [disabled]="!canSubmit()"
+          (click)="submitFeedback()">
+          提交反馈
+        </button>
+      </div>
+    </div>
+
+    <!-- 我的反馈记录 -->
+    <div class="feedback-history-section">
+      <div class="section-header">
+        <h4>我的反馈</h4>
+        <span class="count">{{ feedbackHistory.length }}条记录</span>
+      </div>
+      
+      <div class="history-list" *ngIf="feedbackHistory.length > 0">
+        <div 
+          class="history-item" 
+          *ngFor="let item of feedbackHistory"
+          (click)="viewFeedbackDetail(item)">
+          <div class="history-header">
+            <span class="feedback-type">{{ getFeedbackTypeLabel(item.type) }}</span>
+            <span class="feedback-status" [ngClass]="item.status">
+              {{ getStatusLabel(item.status) }}
+            </span>
+          </div>
+          <div class="history-content">
+            <p class="feedback-title">{{ item.title }}</p>
+            <p class="feedback-time">{{ formatDate(item.createTime) }}</p>
+          </div>
+          <i class="fas fa-chevron-right arrow"></i>
+        </div>
+      </div>
+      
+      <div class="empty-state" *ngIf="feedbackHistory.length === 0">
+        <i class="fas fa-comment-dots"></i>
+        <p>暂无反馈记录</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 在线客服模态框 -->
+<div class="modal-overlay" *ngIf="showChatModal" (click)="closeModal($event)">
+  <div class="modal-content chat-modal">
+    <div class="modal-header">
+      <span class="modal-title">在线客服</span>
+      <button class="close-btn" (click)="closeChatModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="chat-container">
+      <div class="chat-messages">
+        <div 
+          class="message" 
+          *ngFor="let message of chatMessages"
+          [class.user]="message.sender === 'user'"
+          [class.service]="message.sender === 'service'">
+          <div class="message-avatar" *ngIf="message.sender === 'service'">
+            <i class="fas fa-headset"></i>
+          </div>
+          <div class="message-content">
+            <div class="message-text">{{ message.content }}</div>
+            <div class="message-time">{{ formatTime(message.time) }}</div>
+          </div>
+          <div class="message-avatar" *ngIf="message.sender === 'user'">
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="chat-input">
+        <input 
+          type="text" 
+          [(ngModel)]="chatInputText"
+          placeholder="请输入您的问题..."
+          (keyup.enter)="sendMessage()">
+        <button class="send-btn" (click)="sendMessage()" [disabled]="!chatInputText.trim()">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

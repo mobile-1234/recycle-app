@@ -7,8 +7,9 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   template: `
     <svg 
-      class="recycle-icon" 
-      [class]="size + ' ' + color + ' ' + (hover ? 'icon-hover' : '')"
+      class="recycle-icon"
+      [attr.class]="'recycle-icon ' + size + (hover ? ' icon-hover' : '') + (isPresetColor ? ' ' + color : '')"
+      [style.color]="colorStyle"
       [attr.width]="sizePx" 
       [attr.height]="sizePx"
       viewBox="0 0 24 24"
@@ -39,6 +40,15 @@ import { CommonModule } from '@angular/common';
         <path *ngSwitchCase="'delete'" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
         <path *ngSwitchCase="'edit'" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
         <path *ngSwitchCase="'camera'" d="M12 15.2C13.767 15.2 15.2 13.767 15.2 12 15.2 10.233 13.767 8.8 12 8.8 10.233 8.8 8.8 10.233 8.8 12 8.8 13.767 10.233 15.2 12 15.2zM9 2 7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+        
+        <!-- 新增分类/页面图标 -->
+        <path *ngSwitchCase="'electronics'" d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7V5h10v14zM12 21a1 1 0 100-2 1 1 0 000 2z"/>
+        <path *ngSwitchCase="'utensils'" d="M8.1 13.34l2.83-2.83L3.91 3.5a4.008 4.008 0 000 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.20-1.10-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41-6.88-6.88 1.37-1.37z"/>
+        <path *ngSwitchCase="'waste-info'" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+        <path *ngSwitchCase="'recycle-method'" d="M3 6h11v6h4l2 3v3h-2a2 2 0 11-4 0H9a2 2 0 11-4 0H3V6zm2 9a1 1 0 102 0 1 1 0 00-2 0zm10 0a1 1 0 102 0 1 1 0 00-2 0z"/>
+        <path *ngSwitchCase="'service'" d="M12 2a6 6 0 016 6v3h1a1 1 0 110 2H5a1 1 0 110-2h1V8a6 6 0 016-6zm-4 16h8a2 2 0 01-2 2H10a2 2 0 01-2-2z"/>
+        <path *ngSwitchCase="'address'" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+        <path *ngSwitchCase="'clock'" d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
         
         <!-- 状态图标 -->
         <path *ngSwitchCase="'favorite-filled'" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -90,5 +100,13 @@ export class SvgIconComponent {
   get sizePx(): string {
     const sizes = { sm: '14', md: '18', lg: '24', xl: '32' };
     return sizes[this.size];
+  }
+
+  get isPresetColor(): boolean {
+    return ['primary', 'secondary'].includes(this.color);
+  }
+
+  get colorStyle(): string | null {
+    return this.isPresetColor ? null : this.color;
   }
 }

@@ -1,0 +1,508 @@
+// 全局重置
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+// 顶部标题栏
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  background: #2e7d32;
+  color: white;
+  position: relative;
+  
+  .back-btn {
+    position: absolute;
+    left: 16px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    i {
+      font-size: 18px;
+    }
+  }
+  
+  .header-title {
+    font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+// 容器
+.container {
+  min-height: calc(100vh - 56px);
+  background: #f5f5f5;
+}
+
+// 分类标签
+.category-tabs {
+  display: flex;
+  background: white;
+  padding: 0 16px;
+  
+  .category-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+    color: #666;
+    
+    &.active {
+      color: #2e7d32;
+      border-bottom-color: #2e7d32;
+    }
+    
+    &:hover:not(.active) {
+      color: #333;
+    }
+    
+    i {
+      font-size: 16px;
+    }
+    
+    span {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .tab-count {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+  }
+}
+
+// 区域标题
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: white;
+  border-bottom: 1px solid #eee;
+  
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .batch-actions {
+    .batch-btn {
+      background: none;
+      border: 1px solid #2e7d32;
+      color: #2e7d32;
+      padding: 6px 16px;
+      border-radius: 16px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+      &.active {
+        background: #2e7d32;
+        color: white;
+      }
+      
+      &:hover:not(.active) {
+        background: #e8f5e8;
+      }
+    }
+  }
+}
+
+// 商品网格
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 16px;
+  
+  .product-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    &.edit-mode {
+      .product-checkbox {
+        display: block;
+      }
+    }
+    
+    .product-checkbox {
+      display: none;
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      z-index: 2;
+      
+      input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        accent-color: #2e7d32;
+      }
+    }
+    
+    .product-image {
+      position: relative;
+      height: 120px;
+      overflow: hidden;
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      
+      .favorite-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 32px;
+        height: 32px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        &.active {
+          color: #e91e63;
+        }
+        
+        &:hover {
+          background: white;
+          transform: scale(1.1);
+        }
+        
+        i {
+          font-size: 14px;
+        }
+      }
+    }
+    
+    .product-info {
+      padding: 12px;
+      
+      .product-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      
+      .product-points {
+        font-size: 16px;
+        font-weight: 700;
+        color: #ff9800;
+        margin-bottom: 4px;
+      }
+      
+      .product-stock {
+        font-size: 12px;
+        color: #666;
+      }
+    }
+    
+    .product-actions {
+      padding: 0 12px 12px;
+      
+      .exchange-btn {
+        width: 100%;
+        background: #2e7d32;
+        color: white;
+        border: none;
+        padding: 8px;
+        border-radius: 20px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          background: #1b5e20;
+        }
+      }
+    }
+  }
+}
+
+// 知识列表
+.knowledge-list {
+  padding: 16px;
+  
+  .knowledge-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    &.edit-mode {
+      cursor: default;
+      
+      .knowledge-checkbox {
+        display: block;
+      }
+    }
+    
+    .knowledge-checkbox {
+      display: none;
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 2;
+      
+      input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        accent-color: #2e7d32;
+      }
+    }
+    
+    .knowledge-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      overflow: hidden;
+      flex-shrink: 0;
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    
+    .knowledge-content {
+      flex: 1;
+      
+      .knowledge-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      
+      .knowledge-summary {
+        font-size: 12px;
+        color: #666;
+        line-height: 1.4;
+        margin-bottom: 8px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      
+      .knowledge-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        .knowledge-category {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 12px;
+          color: #2e7d32;
+          
+          i {
+            font-size: 10px;
+          }
+        }
+        
+        .knowledge-time {
+          font-size: 12px;
+          color: #999;
+        }
+      }
+    }
+    
+    .knowledge-actions {
+      display: flex;
+      align-items: flex-start;
+      
+      .favorite-btn {
+        width: 32px;
+        height: 32px;
+        background: #f5f5f5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        &.active {
+          color: #e91e63;
+          background: #fce4ec;
+        }
+        
+        &:hover {
+          transform: scale(1.1);
+        }
+        
+        i {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}
+
+// 批量操作栏
+.batch-toolbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  padding: 16px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  
+  .select-all {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #2e7d32;
+    }
+    
+    span {
+      font-size: 14px;
+      color: #333;
+    }
+  }
+  
+  .batch-delete-btn {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    &:not(:disabled):hover {
+      background: #d32f2f;
+    }
+  }
+}
+
+// 空状态
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  margin: 16px;
+  border-radius: 12px;
+  
+  .empty-icon {
+    margin-bottom: 16px;
+    
+    i {
+      font-size: 64px;
+      color: #ccc;
+    }
+  }
+  
+  .empty-text {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 24px;
+  }
+  
+  .empty-action {
+    background: #2e7d32;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: #1b5e20;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// 响应式设计
+@media (min-width: 768px) {
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .products-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

@@ -47,18 +47,29 @@
       </div>
     </div>
     
+    <!-- 日期筛选 -->
     <div class="date-filter">
-      <input 
-        type="date" 
-        class="date-input" 
-        [(ngModel)]="startDate"
-        (change)="filterByDate()">
-      <span>至</span>
-      <input 
-        type="date" 
-        class="date-input" 
-        [(ngModel)]="endDate"
-        (change)="filterByDate()">
+      <div class="date-input-group">
+        <label>开始日期:</label>
+        <input 
+          type="date" 
+          class="date-input" 
+          [(ngModel)]="startDate"
+          (change)="filterByDate()"
+          placeholder="选择开始日期">
+      </div>
+      <div class="date-input-group">
+        <label>结束日期:</label>
+        <input 
+          type="date" 
+          class="date-input" 
+          [(ngModel)]="endDate"
+          (change)="filterByDate()"
+          placeholder="选择结束日期">
+      </div>
+      <button class="clear-date-btn" (click)="clearDateFilter()">
+        <i class="fas fa-times"></i> 清除
+      </button>
     </div>
     
     <!-- 收益列表 -->
