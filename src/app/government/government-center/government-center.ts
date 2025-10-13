@@ -1,15 +1,40 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+
+interface GovernmentInfo {
+  name: string;
+  department: string;
+  position: string;
+  phone: string;
+  email: string;
+  region: string;
+  avatar: string;
+}
 
 @Component({
   selector: 'app-government-center',
-  imports: [CommonModule, RouterModule],
+  standalone: true,
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './government-center.html',
   styleUrl: './government-center.scss'
 })
 export class GovernmentCenter {
-  activeTab: 'region' | 'user' | 'notice' | 'log' | 'settings' = 'region';
+  activeTab: 'region' | 'user' | 'notice' | 'log' | 'settings' | 'profile' = 'profile';
+  showProfileModal = false;
+  showAvatarModal = false;
+  
+  // 政府信息
+  governmentInfo: GovernmentInfo = {
+    name: '政府管理员',
+    department: '环保监管局',
+    position: '局长',
+    phone: '010-12345678',
+    email: 'admin@gov.cn',
+    region: '全市',
+    avatar: ''
+  };
 
   regions = [
     { name: '朝阳区', manager: '张主任', contact: '138****1234', status: 'active' },
@@ -33,7 +58,7 @@ export class GovernmentCenter {
     { user: '李主任', action: '发布政策公告', time: '2023-05-20 09:15' }
   ];
 
-  switchTab(tab: 'region' | 'user' | 'notice' | 'log' | 'settings'): void {
+  switchTab(tab: 'region' | 'user' | 'notice' | 'log' | 'settings' | 'profile'): void {
     this.activeTab = tab;
   }
 
@@ -51,9 +76,69 @@ export class GovernmentCenter {
 
   logout(): void {
     if (confirm('确定要退出登录吗？')) {
+      // 清除用户信息
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('governmentInfo');
       alert('已退出登录');
+      // 跳转到登录页
+      this.router.navigate(['/auth/login']);
     }
   }
 
-  constructor() {}
+  // 打开个人信息编辑弹窗
+  openProfileModal(): void {
+    this.showProfileModal = true;
+  }
+
+  // 关闭个人信息编辑弹窗
+  closeProfileModal(): void {
+    this.showProfileModal = false;
+  }
+
+  // 保存个人信息
+  saveProfile(): void {
+    // 保存到localStorage
+    localStorage.setItem('governmentInfo', JSON.stringify(this.governmentInfo));
+    alert('信息保存成功！');
+    this.closeProfileModal();
+  }
+
+  // 打开头像上传弹窗
+  openAvatarModal(): void {
+    this.showAvatarModal = true;
+  }
+
+  // 关闭头像上传弹窗
+  closeAvatarModal(): void {
+    this.showAvatarModal = false;
+  }
+
+  // 选择头像
+  onAvatarSelect(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        this.governmentInfo.avatar = e.target?.result as string;
+        localStorage.setItem('governmentInfo', JSON.stringify(this.governmentInfo));
+        this.closeAvatarModal();
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  // 使用默认头像
+  useDefaultAvatar(avatar: string): void {
+    this.governmentInfo.avatar = avatar;
+    localStorage.setItem('governmentInfo', JSON.stringify(this.governmentInfo));
+    this.closeAvatarModal();
+  }
+
+  constructor(private router: Router) {
+    // 从localStorage加载政府信息
+    const savedInfo = localStorage.getItem('governmentInfo');
+    if (savedInfo) {
+      this.governmentInfo = JSON.parse(savedInfo);
+    }
+  }
 }

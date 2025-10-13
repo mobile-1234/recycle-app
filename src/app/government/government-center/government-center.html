@@ -11,11 +11,61 @@
       <h2 class="section-title">政务中心</h2>
 
       <div class="tab-navigation">
+        <div class="tab-item" [class.active]="activeTab === 'profile'" (click)="switchTab('profile')">个人信息</div>
         <div class="tab-item" [class.active]="activeTab === 'region'" (click)="switchTab('region')">辖区管理</div>
         <div class="tab-item" [class.active]="activeTab === 'user'" (click)="switchTab('user')">用户权限</div>
         <div class="tab-item" [class.active]="activeTab === 'notice'" (click)="switchTab('notice')">公告发布</div>
         <div class="tab-item" [class.active]="activeTab === 'log'" (click)="switchTab('log')">操作日志</div>
         <div class="tab-item" [class.active]="activeTab === 'settings'" (click)="switchTab('settings')">系统设置</div>
+      </div>
+
+      <!-- 个人信息 -->
+      <div *ngIf="activeTab === 'profile'" class="profile-section">
+        <div class="profile-card">
+          <div class="avatar-section" (click)="openAvatarModal()">
+            <div class="avatar-wrapper">
+              <img *ngIf="governmentInfo.avatar" [src]="governmentInfo.avatar" alt="头像" class="avatar-img">
+              <div *ngIf="!governmentInfo.avatar" class="avatar-placeholder">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="avatar-edit-icon">
+                <i class="fas fa-camera"></i>
+              </div>
+            </div>
+            <div class="avatar-tip">点击更换头像</div>
+          </div>
+
+          <div class="info-list">
+            <div class="info-item">
+              <div class="info-label"><i class="fas fa-user"></i> 姓名</div>
+              <div class="info-value">{{ governmentInfo.name }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label"><i class="fas fa-building"></i> 部门</div>
+              <div class="info-value">{{ governmentInfo.department }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label"><i class="fas fa-briefcase"></i> 职位</div>
+              <div class="info-value">{{ governmentInfo.position }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label"><i class="fas fa-phone"></i> 电话</div>
+              <div class="info-value">{{ governmentInfo.phone }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label"><i class="fas fa-envelope"></i> 邮箱</div>
+              <div class="info-value">{{ governmentInfo.email }}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label"><i class="fas fa-map-marker-alt"></i> 管辖区域</div>
+              <div class="info-value">{{ governmentInfo.region }}</div>
+            </div>
+          </div>
+
+          <button class="edit-profile-btn" (click)="openProfileModal()">
+            <i class="fas fa-edit"></i> 编辑信息
+          </button>
+        </div>
       </div>
 
       <!-- 辖区管理 -->
@@ -73,6 +123,73 @@
       </div>
     </div>
   </main>
+
+  <!-- 个人信息编辑弹窗 -->
+  <div class="modal-overlay" [class.show]="showProfileModal" (click)="closeProfileModal()">
+    <div class="modal-content profile-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">编辑个人信息</h3>
+        <button class="close-btn" (click)="closeProfileModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-user"></i> 姓名</label>
+          <input type="text" class="form-input" [(ngModel)]="governmentInfo.name" placeholder="请输入姓名">
+        </div>
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-building"></i> 部门</label>
+          <input type="text" class="form-input" [(ngModel)]="governmentInfo.department" placeholder="请输入部门">
+        </div>
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-briefcase"></i> 职位</label>
+          <input type="text" class="form-input" [(ngModel)]="governmentInfo.position" placeholder="请输入职位">
+        </div>
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-phone"></i> 电话</label>
+          <input type="tel" class="form-input" [(ngModel)]="governmentInfo.phone" placeholder="请输入电话">
+        </div>
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-envelope"></i> 邮箱</label>
+          <input type="email" class="form-input" [(ngModel)]="governmentInfo.email" placeholder="请输入邮箱">
+        </div>
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-map-marker-alt"></i> 管辖区域</label>
+          <input type="text" class="form-input" [(ngModel)]="governmentInfo.region" placeholder="请输入管辖区域">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-cancel" (click)="closeProfileModal()">取消</button>
+        <button class="btn btn-save" (click)="saveProfile()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 头像上传弹窗 -->
+  <div class="modal-overlay" [class.show]="showAvatarModal" (click)="closeAvatarModal()">
+    <div class="modal-content avatar-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">更换头像</h3>
+        <button class="close-btn" (click)="closeAvatarModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="upload-section">
+          <label class="upload-btn">
+            <i class="fas fa-upload"></i> 上传本地图片
+            <input type="file" accept="image/*" (change)="onAvatarSelect($event)" style="display: none;">
+          </label>
+        </div>
+        <div class="divider">或选择默认头像</div>
+        <div class="default-avatars">
+          <div class="default-avatar" (click)="useDefaultAvatar('👨‍💼')">👨‍💼</div>
+          <div class="default-avatar" (click)="useDefaultAvatar('👩‍💼')">👩‍💼</div>
+          <div class="default-avatar" (click)="useDefaultAvatar('👨‍⚖️')">👨‍⚖️</div>
+          <div class="default-avatar" (click)="useDefaultAvatar('👩‍⚖️')">👩‍⚖️</div>
+          <div class="default-avatar" (click)="useDefaultAvatar('🏛️')">🏛️</div>
+          <div class="default-avatar" (click)="useDefaultAvatar('⚖️')">⚖️</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <nav class="bottom-nav">
     <div class="nav-item" routerLink="/government/supervision-overview"><div class="nav-icon">📊</div><div>监管</div></div>

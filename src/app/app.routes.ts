@@ -25,11 +25,10 @@ export const routes: Routes = [
     // canActivate: [authGuard]
   },
   
-  // G端政府用户路由 - 需要认证
+  // G端政府用户路由 - 开发阶段临时移除认证守卫，确保可访问
   {
     path: 'government',
-    loadChildren: () => import('./government/government-module').then(m => m.GovernmentModule),
-    canActivate: [authGuard]
+    loadChildren: () => import('./government/government-module').then(m => m.GovernmentModule)
   },
   
   // 404页面

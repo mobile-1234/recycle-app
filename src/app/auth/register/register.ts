@@ -8,6 +8,19 @@ interface RegisterForm {
   account: string;
   password: string;
   confirmPassword: string;
+  // C端用户字段
+  name?: string;
+  phone?: string;
+  // B端企业字段
+  companyName?: string;
+  companyCode?: string;
+  contactPerson?: string;
+  contactPhone?: string;
+  // G端政府字段
+  departmentName?: string;
+  position?: string;
+  govPhone?: string;
+  govEmail?: string;
 }
 
 interface FormErrors {
@@ -29,7 +42,20 @@ export class Register {
     identity: 'user',
     account: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    // C端
+    name: '',
+    phone: '',
+    // B端
+    companyName: '',
+    companyCode: '',
+    contactPerson: '',
+    contactPhone: '',
+    // G端
+    departmentName: '',
+    position: '',
+    govPhone: '',
+    govEmail: ''
   };
 
   // 错误状态
@@ -57,6 +83,23 @@ export class Register {
   selectIdentity(identity: string) {
     this.registerForm.identity = identity;
     this.formErrors.identity = false;
+    // 清空其他类型的字段
+    if (identity !== 'user') {
+      this.registerForm.name = '';
+      this.registerForm.phone = '';
+    }
+    if (identity !== 'business') {
+      this.registerForm.companyName = '';
+      this.registerForm.companyCode = '';
+      this.registerForm.contactPerson = '';
+      this.registerForm.contactPhone = '';
+    }
+    if (identity !== 'government') {
+      this.registerForm.departmentName = '';
+      this.registerForm.position = '';
+      this.registerForm.govPhone = '';
+      this.registerForm.govEmail = '';
+    }
   }
 
   // 切换密码显示
@@ -143,13 +186,19 @@ export class Register {
         }
       };
 
+      // 构建完整的用户信息
+      const completeUserInfo = {
+        ...mockResponse.user,
+        ...this.registerForm
+      };
+
       FmodeParse.User.signUp(this.registerForm.account, this.registerForm.password).then(user => {
         console.log('FmodeParse 注册成功:', user);
         console.log('Mock 注册响应:', mockResponse);
         
-        // 保存用户信息到localStorage，包含注册时的身份信息
+        // 保存用户信息到localStorage，包含注册时的身份信息和完整资料
         const userInfo = {
-          ...mockResponse.user,
+          ...completeUserInfo,
           fmodeUser: user
         };
         localStorage.setItem('registeredUser', JSON.stringify(userInfo));
@@ -166,8 +215,8 @@ export class Register {
         // 即使FmodeParse失败，也使用Mock数据继续流程
         console.log('使用Mock数据继续注册流程');
         
-        // 保存用户信息到localStorage，包含注册时的身份信息
-        localStorage.setItem('registeredUser', JSON.stringify(mockResponse.user));
+        // 保存用户信息到localStorage，包含注册时的身份信息和完整资料
+        localStorage.setItem('registeredUser', JSON.stringify(completeUserInfo));
         
         // 显示成功消息
         alert('注册成功！请使用刚注册的账号登录。');

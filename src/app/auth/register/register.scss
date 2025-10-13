@@ -1,17 +1,17 @@
 // 注册页面样式
 .register-page {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 20px 40px;
+
   * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
   }
-  
-  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  padding: 20px 20px 40px;
   
   .header {
     display: flex;

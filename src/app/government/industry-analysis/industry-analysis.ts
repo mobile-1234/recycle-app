@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-industry-analysis',
+  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './industry-analysis.html',
   styleUrl: './industry-analysis.scss'

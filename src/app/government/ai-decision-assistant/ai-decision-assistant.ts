@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-ai-decision-assistant',
+  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './ai-decision-assistant.html',
   styleUrl: './ai-decision-assistant.scss'

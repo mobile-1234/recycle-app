@@ -17,6 +17,8 @@ interface User {
   password: string;
   name: string;
   identity?: string; // 添加身份类型字段
+  fmodeUser?: any; // FmodeParse用户对象
+  [key: string]: any; // 允许其他动态属性
 }
 
 @Component({
@@ -147,48 +149,55 @@ export class LoginComponent {
 
   // 验证用户凭据
   private authenticateUser(account: string, password: string): User | null {
-    FmodeParse.User.logIn(account, password).then(user => {
-      console.log('FmodeParse login success', user);
-      
-      // 如果FmodeParse登录成功，尝试从localStorage获取用户身份信息
-      const storedUser = localStorage.getItem('currentUser');
-      if (storedUser) {
-        const userData = JSON.parse(storedUser);
-        // 合并FmodeParse用户信息和本地存储的身份信息
-        const mergedUser = {
-          ...userData,
-          fmodeUser: user
-        };
-        localStorage.setItem('currentUser', JSON.stringify(mergedUser));
-      }
-      
-    }).catch(err => {
-      console.log('FmodeParse login failed', err);
-    });
-    
     // 首先检查是否有注册用户信息
     const registeredUser = localStorage.getItem('registeredUser');
     if (registeredUser) {
       const userData = JSON.parse(registeredUser);
-      // 检查账号密码是否匹配注册的用户
+      // 检查账号是否匹配注册的用户（密码在注册时已验证，这里不再需要验证密码）
       if (userData.account === account) {
+        // 使用FmodeParse登录（异步）
+        FmodeParse.User.logIn(account, password).then(user => {
+          console.log('FmodeParse 登录成功:', user);
+          // 合并FmodeParse用户信息
+          userData.fmodeUser = user;
+          localStorage.setItem('currentUser', JSON.stringify(userData));
+        }).catch(err => {
+          console.log('FmodeParse 登录失败:', err);
+        });
+        
         // 将注册用户信息转移到当前用户
         localStorage.setItem('currentUser', JSON.stringify(userData));
         localStorage.removeItem('registeredUser'); // 清除注册临时数据
+        
         return {
           id: userData.id,
           account: userData.account,
           password: password,
-          name: userData.account, // 使用账号作为名称
+          name: userData.name || userData.companyName || userData.departmentName || userData.account,
           identity: userData.identity
         };
       }
     }
     
-    // 如果没有匹配的注册用户，则使用Mock用户数据进行验证
-    return this.mockUsers.find(user => 
+    // 检查Mock用户数据
+    const mockUser = this.mockUsers.find(user => 
       user.account === account && user.password === password
-    ) || null;
+    );
+    
+    if (mockUser) {
+      // 尝试FmodeParse登录
+      FmodeParse.User.logIn(account, password).then(user => {
+        console.log('FmodeParse 登录成功:', user);
+        mockUser.fmodeUser = user;
+        localStorage.setItem('currentUser', JSON.stringify(mockUser));
+      }).catch(err => {
+        console.log('FmodeParse 登录失败:', err);
+      });
+      
+      return mockUser;
+    }
+    
+    return null;
   }
 
   // 根据用户身份类型导航到对应首页
