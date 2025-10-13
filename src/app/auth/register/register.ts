@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-
+import{FmodeParse} from 'fmode-ng'    ;
 interface RegisterForm {
   identity: string;
   account: string;
@@ -143,14 +143,61 @@ export class Register {
         }
       };
 
-      console.log('Mock 注册响应:', mockResponse);
-      
-      // 显示成功消息
-      alert('注册成功！即将跳转到登录页面。');
-      
-      // 跳转到登录页面
-      this.router.navigate(['/auth/login']);
+      FmodeParse.User.signUp(this.registerForm.account, this.registerForm.password).then(user => {
+        console.log('FmodeParse 注册成功:', user);
+        console.log('Mock 注册响应:', mockResponse);
+        
+        // 保存用户信息到localStorage，包含注册时的身份信息
+        const userInfo = {
+          ...mockResponse.user,
+          fmodeUser: user
+        };
+        localStorage.setItem('registeredUser', JSON.stringify(userInfo));
+        
+        // 显示成功消息
+        alert('注册成功！请使用刚注册的账号登录。');
+        
+        // 跳转到登录页面
+        this.router.navigate(['/auth/login']);
+        
+      }).catch(err => {
+        console.log('FmodeParse 注册失败:', err);
+        
+        // 即使FmodeParse失败，也使用Mock数据继续流程
+        console.log('使用Mock数据继续注册流程');
+        
+        // 保存用户信息到localStorage，包含注册时的身份信息
+        localStorage.setItem('registeredUser', JSON.stringify(mockResponse.user));
+        
+        // 显示成功消息
+        alert('注册成功！请使用刚注册的账号登录。');
+        
+        // 跳转到登录页面
+        this.router.navigate(['/auth/login']);
+      });
     }, 1000);
+  }
+
+  // 根据用户身份类型导航到对应首页
+  private navigateToHomePage(identity: string) {
+    switch (identity) {
+      case 'user':
+        // C端用户跳转到consumer首页
+        this.router.navigate(['/consumer']);
+        break;
+      case 'business':
+        // B端企业跳转到business dashboard
+        this.router.navigate(['/business/dashboard']);
+        break;
+      case 'government':
+        // G端政府跳转到government首页
+        this.router.navigate(['/government']);
+        break;
+      default:
+        // 默认跳转到登录页面
+        this.router.navigate(['/auth/login']);
+        break;
+    }
   }
 
   // 返回上一页

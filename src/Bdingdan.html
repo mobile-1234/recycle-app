@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智回回收 - 订单管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2ecc71;
+            --primary-dark: #27ae60;
+            --primary-light: #a9dfbf;
+            --secondary-color: #3498db;
+            --accent-color: #f39c12;
+            --warning-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --dark-text: #2c3e50;
+            --light-text: #7f8c8d;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --border-radius: 12px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* 顶部导航 */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        
+        .logo-icon {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            color: var(--light-text);
+            flex: 1;
+        }
+        
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+        
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        /* 内容区域 */
+        .content {
+            padding: 20px 0 80px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .more-link {
+            font-size: 14px;
+            color: var(--primary-color);
+            font-weight: normal;
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        /* 筛选和搜索栏 */
+        .filter-search-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .search-box {
+            flex: 1;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 40px 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            background-color: white;
+        }
+        
+        .search-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--light-text);
+        }
+        
+        .filter-btn {
+            padding: 12px 16px;
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--dark-text);
+        }
+        
+        /* 订单状态标签 */
+        .order-tabs {
+            display: flex;
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 16px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .order-tab {
+            flex: 1;
+            text-align: center;
+            padding: 14px 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--light-text);
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .order-tab.active {
+            color: var(--primary-color);
+        }
+        
+        .order-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+        
+        .order-count {
+            background-color: #f0f0f0;
+            color: var(--dark-text);
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+        
+        .order-tab.active .order-count {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+        }
+        
+        /* 订单列表 */
+        .order-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .order-item {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 16px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .order-id {
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+        
+        .order-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background-color: #fff8e6;
+            color: #e6a700;
+        }
+        
+        .status-in-progress {
+            background-color: #e6f7ff;
+            color: var(--secondary-color);
+        }
+        
+        .status-completed {
+            background-color: #e6f7e6;
+            color: var(--primary-dark);
+        }
+        
+        .status-cancelled {
+            background-color: #ffe6e6;
+            color: var(--warning-color);
+        }
+        
+        .order-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .order-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .info-label {
+            color: var(--light-text);
+            min-width: 60px;
+        }
+        
+        .info-value {
+            color: var(--dark-text);
+            font-weight: 500;
+        }
+        
+        .order-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: var(--dark-text);
+        }
+        
+        .btn-warning {
+            background-color: #fff8e6;
+            color: #e6a700;
+        }
+        
+        /* 订单详情弹层 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            display: none;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--light-text);
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .detail-section {
+            margin-bottom: 24px;
+        }
+        
+        .detail-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .detail-label {
+            font-size: 14px;
+            color: var(--light-text);
+        }
+        
+        .detail-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        
+        .photo-item {
+            aspect-ratio: 1;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--light-text);
+        }
+        
+        .map-container {
+            height: 150px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--light-text);
+            margin-top: 8px;
+        }
+        
+        /* 响应式调整 */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 750px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">♻️</span>
+                    <span>智回回收</span>
+                </div>
+                <div class="user-info">
+                    <span>企业管理员</span>
+                    <div class="avatar">
+                        <span>管</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- 主要内容 -->
+    <main class="content">
+        <div class="container">
+            <!-- 订单管理页 -->
+            <section id="order-management">
+                <h2 class="section-title">订单管理</h2>
+                
+                <!-- 筛选和搜索栏 -->
+                <div class="filter-search-bar">
+                    <div class="search-box">
+                        <input type="text" class="search-input" placeholder="搜索订单编号、客户姓名...">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                    <button class="filter-btn">
+                        <i class="fas fa-filter"></i>
+                        <span>筛选</span>
+                    </button>
+                </div>
+                
+                <!-- 订单状态标签 -->
+                <div class="order-tabs">
+                    <div class="order-tab active">
+                        待分配 <span class="order-count">5</span>
+                    </div>
+                    <div class="order-tab">
+                        回收中 <span class="order-count">12</span>
+                    </div>
+                    <div class="order-tab">
+                        已完成 <span class="order-count">28</span>
+                    </div>
+                    <div class="order-tab">
+                        已取消 <span class="order-count">3</span>
+                    </div>
+                </div>
+                
+                <!-- 订单列表 -->
+                <div class="order-list">
+                    <!-- 订单项1 -->
+                    <div class="order-item" onclick="openOrderDetail()">
+                        <div class="order-header">
+                            <div class="order-id">ORD-20230520-001</div>
+                            <div class="order-status status-pending">待分配</div>
+                        </div>
+                        <div class="order-content">
+                            <div class="order-info">
+                                <div class="info-item">
+                                    <span class="info-label">品类:</span>
+                                    <span class="info-value">废纸</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">重量:</span>
+                                    <span class="info-value">45 kg</span>
+                                </div>
+                            </div>
+                            <div class="order-info">
+                                <div class="info-item">
+                                    <span class="info-label">客户:</span>
+                                    <span class="info-value">张先生</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">电话:</span>
+                                    <span class="info-value">138****5678</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="order-actions">
+                            <button class="action-btn btn-primary">分配</button>
+                            <button class="action-btn btn-secondary">查看</button>
+                            <button class="action-btn btn-warning">取消</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 订单项2 -->
+                    <div class="order-item" onclick="openOrderDetail()">
+                        <div class="order-header">
+                            <div class="order-id">ORD-20230520-002</div>
+                            <div class="order-status status-pending">待分配</div>
+                        </div>
+                        <div class="order-content">
+                            <div class="order-info">
+                                <div class="info-item">
+                                    <span class="info-label">品类:</span>
+                                    <span class="info-value">塑料瓶</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">重量:</span>
+                                    <span class="info-value">32 kg</span>
+                                </div>
+                            </div>
+                            <div class="order-info">
+                                <div class="info-item">
+                                    <span class="info-label">客户:</span>
+                                    <span class="info-value">李女士</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">电话:</span>
+                                    <span class="info-value">139****1234</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="order-actions">
+                            <button class="action-btn btn-primary">分配</button>
+                            <button class="action-btn btn-secondary">查看</button>
+                            <button class="action-btn btn-warning">取消</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 订单项3 -->
+                    <div class="order-item" onclick="openOrderDetail()">
+                        <div class="order-header">
+                            <div class="order-id">ORD-20230520-003</div>
+                            <div class="order-status status-pending">待分配</div>
+                        </div>
+                        <div class="order-content">
+                            <div class="order-info">
+                                <div class="info-item">
+                                    <span class="info-label">品类:</span>
+                                    <span class="info-value">金属</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">重量:</span>
+                                    <span class="info-value">68 kg</span>
+                                </div>
+                            </div>
+                            <div class="order-info">
+                                <div class="info-item">
+                                    <span class="info-label">客户:</span>
+                                    <span class="info-value">王先生</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">电话:</span>
+                                    <span class="info-value">137****8765</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="order-actions">
+                            <button class="action-btn btn-primary">分配</button>
+                            <button class="action-btn btn-secondary">查看</button>
+                            <button class="action-btn btn-warning">取消</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <!-- 订单详情弹层 -->
+    <div class="modal-overlay" id="orderDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">订单详情</h3>
+                <button class="close-btn" onclick="closeOrderDetail()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 订单基本信息 -->
+                <div class="detail-section">
+                    <h4 class="detail-title">订单信息</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">订单编号</span>
+                            <span class="detail-value">ORD-20230520-001</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">创建时间</span>
+                            <span class="detail-value">2023-05-20 09:30</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">回收品类</span>
+                            <span class="detail-value">废纸</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">回收重量</span>
+                            <span class="detail-value">45 kg</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">订单状态</span>
+                            <span class="detail-value">待分配</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">预计产值</span>
+                            <span class="detail-value">¥ 135.00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 客户信息 -->
+                <div class="detail-section">
+                    <h4 class="detail-title">客户信息</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">客户姓名</span>
+                            <span class="detail-value">张先生</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">联系电话</span>
+                            <span class="detail-value">138****5678</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">所在区域</span>
+                            <span class="detail-value">朝阳区</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">详细地址</span>
+                            <span class="detail-value">朝阳区建国路88号SOHO现代城A座1506室</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 废品照片 -->
+                <div class="detail-section">
+                    <h4 class="detail-title">废品照片</h4>
+                    <div class="photo-gallery">
+                        <div class="photo-item">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div class="photo-item">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div class="photo-item">
+                            <i class="fas fa-image"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 回收员信息 -->
+                <div class="detail-section">
+                    <h4 class="detail-title">回收员信息</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">回收员</span>
+                            <span class="detail-value">未分配</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">联系电话</span>
+                            <span class="detail-value">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 回收轨迹 -->
+                <div class="detail-section">
+                    <h4 class="detail-title">回收轨迹</h4>
+                    <div class="map-container">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>暂无轨迹信息</span>
+                    </div>
+                </div>
+                
+                <!-- 结算信息 -->
+                <div class="detail-section">
+                    <h4 class="detail-title">结算信息</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">结算金额</span>
+                            <span class="detail-value">¥ 0.00</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">结算状态</span>
+                            <span class="detail-value">未结算</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部导航 -->
+    <nav class="bottom-nav">
+        <div class="nav-item">
+            <div class="nav-icon">🏠</div>
+            <div>工作台</div>
+        </div>
+        <div class="nav-item active">
+            <div class="nav-icon">📦</div>
+            <div>订单</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">⚙️</div>
+            <div>设备</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">📊</div>
+            <div>报表</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">👤</div>
+            <div>我的</div>
+        </div>
+    </nav>
+    
+    <script>
+        // 打开订单详情弹层
+        function openOrderDetail() {
+            document.getElementById('orderDetailModal').style.display = 'flex';
+        }
+        
+        // 关闭订单详情弹层
+        function closeOrderDetail() {
+            document.getElementById('orderDetailModal').style.display = 'none';
+        }
+        
+        // 点击弹层外部关闭弹层
+        document.getElementById('orderDetailModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeOrderDetail();
+            }
+        });
+        
+        // 切换订单状态标签
+        document.querySelectorAll('.order-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.order-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

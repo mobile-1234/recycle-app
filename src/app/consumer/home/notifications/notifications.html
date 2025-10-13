@@ -1,16 +1,14 @@
 <div class="notifications-container">
-  <!-- Header -->
   <div class="header">
-    <div class="header-left" (click)="goBack()">
-      <app-svg-icon name="arrow-left" class="back-icon"></app-svg-icon>
+    <div class="header-left">
+      <button class="back-icon" (click)="goBack()">←</button>
     </div>
     <div class="header-title">消息通知</div>
-    <div class="header-right" (click)="markAllAsRead()">
-      <span class="mark-all-read">全部已读</span>
+    <div class="header-right top-actions">
+      <button class="mark-all-read" (click)="markAllAsRead()">全部已读</button>
     </div>
   </div>
 
-  <!-- Notifications List -->
   <div class="notifications-list">
     <div 
       class="notification-item" 

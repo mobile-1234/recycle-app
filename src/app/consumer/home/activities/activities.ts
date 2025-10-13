@@ -104,7 +104,31 @@ export class ActivitiesComponent implements OnInit {
 
   constructor(private router: Router) {}
 
-  ngOnInit() {}
+  // 新增：当前选中的活动详情
+  selectedActivity: any | null = null;
+
+  ngOnInit() {
+    // 读取查询参数id，若存在则定位到对应活动并展示详情
+    const url = new URL(window.location.href);
+    const id = url.searchParams.get('id');
+    if (id) {
+      this.findAndShowDetail(id);
+    }
+  }
+
+  private findAndShowDetail(id: string) {
+    const all = [
+      ...this.activities.ongoing,
+      ...this.activities.upcoming,
+      ...this.activities.completed
+    ];
+    const found = all.find(a => String(a.id) === String(id));
+    if (found) {
+      this.selectedActivity = found;
+      // 切换到该活动所在tab
+      this.selectedTab = found.status as 'ongoing' | 'upcoming' | 'completed';
+    }
+  }
 
   goBack() {
     this.router.navigate(['/consumer/home']);
@@ -144,8 +168,9 @@ export class ActivitiesComponent implements OnInit {
   }
 
   viewActivityDetails(activity: any) {
-    // 可以导航到活动详情页面
-    console.log('查看活动详情:', activity);
+    // 导航到活动详情（本页），带上id参数
+    this.router.navigate(['/consumer/activities'], { queryParams: { id: activity.id } });
+    this.selectedActivity = activity;
   }
 
   shareActivity(activity: any) {
@@ -192,17 +217,17 @@ export class ActivitiesComponent implements OnInit {
   getCategoryIcon(category: string): string {
     switch (category) {
       case 'challenge':
-        return 'challenge';
+        return 'leaf';
       case 'community':
-        return 'community';
+        return 'location';
       case 'special':
-        return 'special';
+        return 'star';
       case 'contest':
-        return 'contest';
+        return 'star-filled';
       case 'goal':
-        return 'goal';
+        return 'energy';
       default:
-        return 'activity';
+        return 'eco';
     }
   }
 

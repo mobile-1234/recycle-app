@@ -75,12 +75,28 @@
       <a (click)="viewMoreActivities()" class="more-link">查看更多</a>
     </div>
     <div class="activity-carousel">
-      <div class="activity-card" *ngFor="let activity of activities">
+      <div class="activity-card" *ngFor="let activity of activities" (click)="openActivity(activity)">
         <div class="activity-tag">{{ activity.tag }}</div>
         <div class="activity-title">{{ activity.title }}</div>
         <div class="activity-desc">{{ activity.description }}</div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- 新增：活动详情模态框 -->
+<div class="activity-modal-overlay" *ngIf="selectedActivity" (click)="closeActivityModal()"></div>
+<div class="activity-modal" *ngIf="selectedActivity">
+  <div class="modal-header">
+    <div class="title">{{ selectedActivity?.title }}</div>
+    <div class="actions">
+      <button class="view-more" (click)="viewFullActivity()">查看更多</button>
+      <button class="close" (click)="closeActivityModal()">关闭</button>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="tag">{{ selectedActivity?.tag }}</div>
+    <div class="description">{{ selectedActivity?.description }}</div>
   </div>
 </div>
 

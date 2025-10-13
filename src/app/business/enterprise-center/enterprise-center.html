@@ -1,6 +1,427 @@
 <div class="enterprise-center-container">
-  <div class="enterprise-header">
-    <h1>企业中心</h1>
+  <!-- 顶部导航 -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <span class="logo-icon">♻️</span>
+        <span>智回回收</span>
+      </div>
+      <div class="user-info">
+        <span>企业管理员</span>
+        <div class="avatar">
+          <span>管</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主要内容 -->
+  <main class="content">
+    <div class="container">
+      <section id="enterprise-center">
+        <h2 class="section-title">企业中心</h2>
+
+        <!-- 功能卡片 -->
+        <div class="quick-stats">
+          <div class="quick-stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ getEmployeeCount() }}</div>
+              <div class="stat-label">在职员工</div>
+            </div>
+          </div>
+          <div class="quick-stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-file-contract"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ getActiveContractCount() }}</div>
+              <div class="stat-label">活跃合同</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 功能导航标签 -->
+        <div class="function-tabs">
+          <div 
+            class="function-tab" 
+            [class.active]="activeTab === 'info'"
+            (click)="switchTab('info')">
+            <i class="fas fa-building"></i>
+            <span>企业信息</span>
+          </div>
+          <div 
+            class="function-tab" 
+            [class.active]="activeTab === 'employee'"
+            (click)="switchTab('employee')">
+            <i class="fas fa-users"></i>
+            <span>员工管理</span>
+          </div>
+          <div 
+            class="function-tab" 
+            [class.active]="activeTab === 'contract'"
+            (click)="switchTab('contract')">
+            <i class="fas fa-file-contract"></i>
+            <span>合同发票</span>
+          </div>
+          <div 
+            class="function-tab" 
+            [class.active]="activeTab === 'subscription'"
+            (click)="switchTab('subscription')">
+            <i class="fas fa-crown"></i>
+            <span>订阅付费</span>
+          </div>
+          <div 
+            class="function-tab" 
+            [class.active]="activeTab === 'settings'"
+            (click)="switchTab('settings')">
+            <i class="fas fa-cog"></i>
+            <span>系统设置</span>
+          </div>
+        </div>
+
+        <!-- 企业信息 -->
+        <div *ngIf="activeTab === 'info'" class="tab-content">
+          <div class="info-card">
+            <div class="card-header">
+              <h3>企业基本信息</h3>
+              <button class="edit-btn" (click)="editInfo()">
+                <i class="fas fa-edit"></i> 编辑
+              </button>
+            </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">企业名称</span>
+                <span class="info-value">{{ enterpriseInfo.name }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">统一社会信用代码</span>
+                <span class="info-value">{{ enterpriseInfo.code }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">企业类型</span>
+                <span class="info-value">{{ enterpriseInfo.type }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">法定代表人</span>
+                <span class="info-value">{{ enterpriseInfo.legalPerson }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">联系电话</span>
+                <span class="info-value">{{ enterpriseInfo.phone }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">企业邮箱</span>
+                <span class="info-value">{{ enterpriseInfo.email }}</span>
+              </div>
+              <div class="info-item full-width">
+                <span class="info-label">企业地址</span>
+                <span class="info-value">{{ enterpriseInfo.address }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">注册资本</span>
+                <span class="info-value">{{ enterpriseInfo.registeredCapital }}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">成立日期</span>
+                <span class="info-value">{{ enterpriseInfo.establishDate }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 员工管理 -->
+        <div *ngIf="activeTab === 'employee'" class="tab-content">
+          <div class="employee-section">
+            <div class="section-header">
+              <h3>员工列表</h3>
+              <button class="add-btn" (click)="addEmployee()">
+                <i class="fas fa-plus"></i> 添加员工
+              </button>
+            </div>
+            <div class="employee-list">
+              <div *ngFor="let employee of employees" class="employee-item">
+                <div class="employee-info">
+                  <div class="employee-avatar">
+                    {{ employee.name.charAt(0) }}
+                  </div>
+                  <div class="employee-details">
+                    <div class="employee-name">{{ employee.name }}</div>
+                    <div class="employee-meta">
+                      {{ employee.id }} · {{ employee.role }} · {{ employee.phone }}
+                    </div>
+                  </div>
+                </div>
+                <div class="employee-actions">
+                  <span class="employee-status" [ngClass]="getStatusClass(employee.status)">
+                    {{ getStatusText(employee.status) }}
+                  </span>
+                  <button class="icon-btn" (click)="editEmployee(employee)">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="icon-btn danger" (click)="deleteEmployee(employee)">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 合同发票 -->
+        <div *ngIf="activeTab === 'contract'" class="tab-content">
+          <div class="contract-section">
+            <div class="section-header">
+              <h3>合同列表</h3>
+            </div>
+            <div class="contract-list">
+              <div *ngFor="let contract of contracts" class="contract-item">
+                <div class="contract-header">
+                  <div class="contract-title">{{ contract.title }}</div>
+                  <div class="contract-status" [ngClass]="getStatusClass(contract.status)">
+                    {{ getStatusText(contract.status) }}
+                  </div>
+                </div>
+                <div class="contract-details">
+                  <div class="detail-row">
+                    <span class="detail-label">合同编号:</span>
+                    <span class="detail-value">{{ contract.id }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">合同金额:</span>
+                    <span class="detail-value">¥{{ contract.amount.toLocaleString() }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">合同期限:</span>
+                    <span class="detail-value">{{ contract.startDate }} 至 {{ contract.endDate }}</span>
+                  </div>
+                </div>
+                <div class="contract-actions">
+                  <button class="action-btn btn-primary" (click)="viewContract(contract)">
+                    <i class="fas fa-eye"></i> 查看
+                  </button>
+                  <button 
+                    *ngIf="contract.status === 'active'" 
+                    class="action-btn btn-secondary"
+                    (click)="renewContract(contract)">
+                    <i class="fas fa-redo"></i> 续签
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 发票管理 -->
+            <div class="invoice-section">
+              <h3>发票管理</h3>
+              <div class="invoice-card">
+                <div class="invoice-info">
+                  <i class="fas fa-receipt"></i>
+                  <span>查看和管理企业发票</span>
+                </div>
+                <button class="view-invoice-btn">
+                  查看发票 <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 订阅付费 -->
+        <div *ngIf="activeTab === 'subscription'" class="tab-content">
+          <div class="subscription-section">
+            <div class="subscription-card">
+              <div class="subscription-header">
+                <div class="plan-badge">
+                  <i class="fas fa-crown"></i>
+                  {{ subscription.plan }}
+                </div>
+                <div class="expire-info">
+                  到期时间: {{ subscription.expireDate }}
+                </div>
+              </div>
+              
+              <div class="usage-stats">
+                <div class="usage-item">
+                  <div class="usage-header">
+                    <span class="usage-label">用户数</span>
+                    <span class="usage-value">{{ subscription.usedUsers }}/{{ subscription.users }}</span>
+                  </div>
+                  <div class="usage-bar">
+                    <div 
+                      class="usage-fill" 
+                      [style.width.%]="(subscription.usedUsers / subscription.users) * 100">
+                    </div>
+                  </div>
+                </div>
+                <div class="usage-item">
+                  <div class="usage-header">
+                    <span class="usage-label">存储空间</span>
+                    <span class="usage-value">{{ subscription.usedStorage }}/{{ subscription.storage }}</span>
+                  </div>
+                  <div class="usage-bar">
+                    <div class="usage-fill" style="width: 25%"></div>
+                  </div>
+                </div>
+              </div>
+
+              <button class="upgrade-btn" (click)="upgradePlan()">
+                <i class="fas fa-arrow-up"></i> 升级套餐
+              </button>
+            </div>
+
+            <!-- 套餐对比 -->
+            <div class="plan-comparison">
+              <h3>套餐对比</h3>
+              <div class="plan-cards">
+                <div class="plan-card">
+                  <div class="plan-name">基础版</div>
+                  <div class="plan-price">¥999<span>/月</span></div>
+                  <ul class="plan-features">
+                    <li><i class="fas fa-check"></i> 10个用户</li>
+                    <li><i class="fas fa-check"></i> 100GB存储</li>
+                    <li><i class="fas fa-check"></i> 基础功能</li>
+                  </ul>
+                </div>
+                <div class="plan-card featured">
+                  <div class="plan-badge">当前</div>
+                  <div class="plan-name">专业版</div>
+                  <div class="plan-price">¥2999<span>/月</span></div>
+                  <ul class="plan-features">
+                    <li><i class="fas fa-check"></i> 50个用户</li>
+                    <li><i class="fas fa-check"></i> 500GB存储</li>
+                    <li><i class="fas fa-check"></i> 高级功能</li>
+                    <li><i class="fas fa-check"></i> AI助手</li>
+                  </ul>
+                </div>
+                <div class="plan-card">
+                  <div class="plan-name">企业版</div>
+                  <div class="plan-price">¥9999<span>/月</span></div>
+                  <ul class="plan-features">
+                    <li><i class="fas fa-check"></i> 不限用户</li>
+                    <li><i class="fas fa-check"></i> 2TB存储</li>
+                    <li><i class="fas fa-check"></i> 全部功能</li>
+                    <li><i class="fas fa-check"></i> 专属服务</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 系统设置 -->
+        <div *ngIf="activeTab === 'settings'" class="tab-content">
+          <div class="settings-section">
+            <div class="settings-group">
+              <h3>账号设置</h3>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <i class="fas fa-key"></i>
+                  <span>修改密码</span>
+                </div>
+                <button class="setting-action">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <i class="fas fa-shield-alt"></i>
+                  <span>安全设置</span>
+                </div>
+                <button class="setting-action">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h3>通知设置</h3>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <i class="fas fa-bell"></i>
+                  <span>订单通知</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <i class="fas fa-exclamation-circle"></i>
+                  <span>预警通知</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <i class="fas fa-envelope"></i>
+                  <span>邮件通知</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="settings-group">
+              <h3>其他</h3>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <i class="fas fa-question-circle"></i>
+                  <span>帮助中心</span>
+                </div>
+                <button class="setting-action">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+              <div class="setting-item">
+                <div class="setting-info">
+                  <i class="fas fa-info-circle"></i>
+                  <span>关于我们</span>
+                </div>
+                <button class="setting-action">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+
+            <button class="logout-btn" (click)="logout()">
+              <i class="fas fa-sign-out-alt"></i>
+              退出登录
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- 底部导航 -->
+  <nav class="bottom-nav">
+    <div class="nav-item" routerLink="/business/dashboard">
+      <div class="nav-icon">🏠</div>
+      <div>工作台</div>
+    </div>
+    <div class="nav-item" routerLink="/business/order-management">
+      <div class="nav-icon">📦</div>
+      <div>订单</div>
+    </div>
+    <div class="nav-item" routerLink="/business/device-management">
+      <div class="nav-icon">⚙️</div>
+      <div>设备</div>
+    </div>
+    <div class="nav-item" routerLink="/business/data-reports">
+      <div class="nav-icon">📊</div>
+      <div>报表</div>
+    </div>
+    <div class="nav-item active">
+      <div class="nav-icon">👤</div>
+      <div>我的</div>
   </div>
-  <!-- 页面内容已清理，保留基本结构 -->
+  </nav>
 </div>

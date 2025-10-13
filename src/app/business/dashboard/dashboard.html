@@ -8,7 +8,7 @@
       </div>
       <div class="user-info">
         <span>企业管理员</span>
-        <div class="avatar">
+        <div class="avatar" (click)="onUserAvatarClick()" title="查看企业中心">
           <span>管</span>
         </div>
       </div>
@@ -35,8 +35,11 @@
       <!-- 预警信息卡片 -->
       <div class="card alert-card" *ngIf="alertInfo.content.length > 0">
         <div class="alert-title">
-          <span class="alert-icon">{{alertInfo.icon}}</span>
-          <span>{{alertInfo.title}}</span>
+          <div>
+            <span class="alert-icon">{{alertInfo.icon}}</span>
+            <span>{{alertInfo.title}}</span>
+          </div>
+          <span class="more-link" (click)="onViewMoreClick('alerts')">查看全部</span>
         </div>
         <div class="alert-content">
           <p *ngFor="let content of alertInfo.content">• {{content}}</p>

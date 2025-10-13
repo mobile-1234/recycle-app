@@ -41,6 +41,8 @@ export class HomeComponent implements OnInit {
   // 当前选中的底部导航标签
   currentTab: string = 'home';
   
+  // 新增：首页活动详情模态框所选活动
+  selectedActivity: Activity | null = null;
   // 附近回收员数据
   nearbyCollectors: Collector[] = [
     {
@@ -175,6 +177,25 @@ export class HomeComponent implements OnInit {
   viewMoreActivities(): void {
     console.log('Viewing more activities...');
     this.router.navigate(['/consumer/activities']);
+  }
+  
+  // 新增：点击首页活动卡片打开活动详情（弹框）
+  openActivity(activity: Activity): void {
+    console.log('Opening activity detail (modal)...', activity);
+    this.selectedActivity = activity;
+  }
+  
+  // 新增：关闭活动详情模态框
+  closeActivityModal(): void {
+    this.selectedActivity = null;
+  }
+  
+  // 新增：在弹框中跳转到活动列表的详情
+  viewFullActivity(): void {
+    if (this.selectedActivity) {
+      this.router.navigate(['/consumer/activities'], { queryParams: { id: this.selectedActivity.id } });
+      this.selectedActivity = null;
+    }
   }
 
   // 打开AI助手

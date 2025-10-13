@@ -1,6 +1,282 @@
 <div class="order-management-container">
-  <div class="order-header">
-    <h1>订单管理</h1>
+  <!-- 顶部导航 -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <span class="logo-icon">♻️</span>
+        <span>智回回收</span>
+      </div>
+      <div class="user-info">
+        <span>企业管理员</span>
+        <div class="avatar">
+          <span>管</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主要内容 -->
+  <main class="content">
+    <div class="container">
+      <section id="order-management">
+        <h2 class="section-title">订单管理</h2>
+        
+        <!-- 筛选和搜索栏 -->
+        <div class="filter-search-bar">
+          <div class="search-box">
+            <input 
+              type="text" 
+              class="search-input" 
+              placeholder="搜索订单编号、客户姓名..."
+              [(ngModel)]="searchQuery">
+            <i class="fas fa-search search-icon"></i>
+          </div>
+          <button class="filter-btn">
+            <i class="fas fa-filter"></i>
+            <span>筛选</span>
+          </button>
+        </div>
+        
+        <!-- 订单状态标签 -->
+        <div class="order-tabs">
+          <div 
+            class="order-tab" 
+            [class.active]="currentTab === 'pending'"
+            (click)="switchTab('pending')">
+            待分配 <span class="order-count">{{ getOrderCount('pending') }}</span>
+          </div>
+          <div 
+            class="order-tab" 
+            [class.active]="currentTab === 'in-progress'"
+            (click)="switchTab('in-progress')">
+            回收中 <span class="order-count">{{ getOrderCount('in-progress') }}</span>
+          </div>
+          <div 
+            class="order-tab" 
+            [class.active]="currentTab === 'completed'"
+            (click)="switchTab('completed')">
+            已完成 <span class="order-count">{{ getOrderCount('completed') }}</span>
+          </div>
+          <div 
+            class="order-tab" 
+            [class.active]="currentTab === 'cancelled'"
+            (click)="switchTab('cancelled')">
+            已取消 <span class="order-count">{{ getOrderCount('cancelled') }}</span>
+          </div>
+        </div>
+        
+        <!-- 订单列表 -->
+        <div class="order-list">
+          <div 
+            *ngFor="let order of filteredOrders" 
+            class="order-item"
+            (click)="openOrderDetail(order)">
+            <div class="order-header">
+              <div class="order-id">{{ order.id }}</div>
+              <div class="order-status" [ngClass]="getStatusClass(order.status)">
+                {{ getStatusText(order.status) }}
+              </div>
+            </div>
+            <div class="order-content">
+              <div class="order-info">
+                <div class="info-item">
+                  <span class="info-label">品类:</span>
+                  <span class="info-value">{{ order.category }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">重量:</span>
+                  <span class="info-value">{{ order.weight }} kg</span>
+                </div>
+              </div>
+              <div class="order-info">
+                <div class="info-item">
+                  <span class="info-label">客户:</span>
+                  <span class="info-value">{{ order.customerName }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">电话:</span>
+                  <span class="info-value">{{ order.customerPhone }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="order-actions">
+              <button 
+                *ngIf="order.status === 'pending'" 
+                class="action-btn btn-primary"
+                (click)="assignOrder(order, $event)">
+                分配
+              </button>
+              <button 
+                *ngIf="order.status === 'in-progress'" 
+                class="action-btn btn-primary"
+                (click)="completeOrder(order, $event)">
+                完成
+              </button>
+              <button 
+                class="action-btn btn-secondary"
+                (click)="viewOrder(order, $event)">
+                查看
+              </button>
+              <button 
+                *ngIf="order.status !== 'completed' && order.status !== 'cancelled'" 
+                class="action-btn btn-warning"
+                (click)="cancelOrder(order, $event)">
+                取消
+              </button>
+            </div>
+          </div>
+
+          <!-- 空状态 -->
+          <div *ngIf="filteredOrders.length === 0" class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>暂无订单</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- 订单详情弹层 -->
+  <div class="modal-overlay" [class.show]="showDetailModal" (click)="closeOrderDetail()">
+    <div class="modal-content" (click)="$event.stopPropagation()" *ngIf="selectedOrder">
+      <div class="modal-header">
+        <h3 class="modal-title">订单详情</h3>
+        <button class="close-btn" (click)="closeOrderDetail()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- 订单基本信息 -->
+        <div class="detail-section">
+          <h4 class="detail-title">订单信息</h4>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-label">订单编号</span>
+              <span class="detail-value">{{ selectedOrder.id }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">创建时间</span>
+              <span class="detail-value">{{ selectedOrder.createTime }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">回收品类</span>
+              <span class="detail-value">{{ selectedOrder.category }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">回收重量</span>
+              <span class="detail-value">{{ selectedOrder.weight }} kg</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">订单状态</span>
+              <span class="detail-value">{{ getStatusText(selectedOrder.status) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">预计产值</span>
+              <span class="detail-value">¥ {{ selectedOrder.estimatedValue.toFixed(2) }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 客户信息 -->
+        <div class="detail-section">
+          <h4 class="detail-title">客户信息</h4>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-label">客户姓名</span>
+              <span class="detail-value">{{ selectedOrder.customerName }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">联系电话</span>
+              <span class="detail-value">{{ selectedOrder.customerPhone }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">所在区域</span>
+              <span class="detail-value">{{ selectedOrder.area }}</span>
+            </div>
+            <div class="detail-item full-width">
+              <span class="detail-label">详细地址</span>
+              <span class="detail-value">{{ selectedOrder.address }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 废品照片 -->
+        <div class="detail-section">
+          <h4 class="detail-title">废品照片</h4>
+          <div class="photo-gallery">
+            <div class="photo-item">
+              <i class="fas fa-image"></i>
+            </div>
+            <div class="photo-item">
+              <i class="fas fa-image"></i>
+            </div>
+            <div class="photo-item">
+              <i class="fas fa-image"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 回收员信息 -->
+        <div class="detail-section">
+          <h4 class="detail-title">回收员信息</h4>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-label">回收员</span>
+              <span class="detail-value">{{ selectedOrder.collectorName || '未分配' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">联系电话</span>
+              <span class="detail-value">{{ selectedOrder.collectorPhone || '-' }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 回收轨迹 -->
+        <div class="detail-section">
+          <h4 class="detail-title">回收轨迹</h4>
+          <div class="map-container">
+            <i class="fas fa-map-marked-alt"></i>
+            <span>{{ selectedOrder.collectorName ? '查看轨迹' : '暂无轨迹信息' }}</span>
+          </div>
+        </div>
+        
+        <!-- 结算信息 -->
+        <div class="detail-section">
+          <h4 class="detail-title">结算信息</h4>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-label">结算金额</span>
+              <span class="detail-value">¥ {{ (selectedOrder.settlementAmount || 0).toFixed(2) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">结算状态</span>
+              <span class="detail-value">{{ selectedOrder.settlementStatus || '未结算' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <!-- 页面内容已清理，保留基本结构 -->
+
+  <!-- 底部导航 -->
+  <nav class="bottom-nav">
+    <div class="nav-item" routerLink="/business/dashboard">
+      <div class="nav-icon">🏠</div>
+      <div>工作台</div>
+    </div>
+    <div class="nav-item active">
+      <div class="nav-icon">📦</div>
+      <div>订单</div>
+    </div>
+    <div class="nav-item" routerLink="/business/device-management">
+      <div class="nav-icon">⚙️</div>
+      <div>设备</div>
+    </div>
+    <div class="nav-item" routerLink="/business/data-reports">
+      <div class="nav-icon">📊</div>
+      <div>报表</div>
+    </div>
+    <div class="nav-item" routerLink="/business/enterprise-center">
+      <div class="nav-icon">👤</div>
+      <div>我的</div>
+    </div>
+  </nav>
 </div>

@@ -60,12 +60,12 @@ export class BookingRecycle implements OnInit {
   
   // 废品分类
   wasteCategories: WasteCategory[] = [
-    { id: 'paper', name: '纸类', icon: 'waste-info', active: true },
-    { id: 'plastic', name: '塑料', icon: 'waste-info', active: false },
-    { id: 'glass', name: '玻璃', icon: 'waste-info', active: false },
+    { id: 'paper', name: '纸类', icon: 'eco', active: true },
+    { id: 'plastic', name: '塑料', icon: 'utensils', active: false },
+    { id: 'glass', name: '玻璃', icon: 'recycle', active: false },
     { id: 'electronic', name: '电子', icon: 'electronics', active: false },
-    { id: 'textile', name: '衣物', icon: 'waste-info', active: false },
-    { id: 'other', name: '其他', icon: 'waste-info', active: false }
+    { id: 'textile', name: '衣物', icon: 'user', active: false },
+    { id: 'other', name: '其他', icon: 'trash', active: false }
   ];
 
   // 回收方式
@@ -200,8 +200,23 @@ export class BookingRecycle implements OnInit {
 
   // 更改地址
   changeAddress(): void {
-    // 跳转到地址选择页面
-    console.log('更改地址');
+    // 打开地址选择面板（复用 profile/addresses 模态）
+    this.showAddressPanel = true;
+  }
+
+  // 新增：地址面板状态与选择回调
+  showAddressPanel: boolean = false;
+  selectedAddressOption: { address: string; name: string; phone: string } | null = null;
+
+  onAddressChosen(addr: { address: string; name: string; phone: string }): void {
+    this.address = addr.address;
+    this.contactName = addr.name;
+    this.contactPhone = addr.phone;
+    this.showAddressPanel = false;
+  }
+
+  closeAddressPanel(): void {
+    this.showAddressPanel = false;
   }
 
   // 导航到投递点

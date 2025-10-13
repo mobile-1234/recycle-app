@@ -1,6 +1,82 @@
 <div class="industry-analysis-container">
-  <div class="analysis-header">
-    <h1>行业分析</h1>
-  </div>
-  <!-- 页面内容已清理，保留基本结构 -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo"><span class="logo-icon">🏛️</span><span>智回监管</span></div>
+      <div class="user-info"><span>政府管理员</span><div class="avatar"><span>政</span></div></div>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="container">
+      <h2 class="section-title">行业分析</h2>
+
+      <div class="tab-navigation">
+        <div class="tab-item" [class.active]="activeTab === 'chain'" (click)="switchTab('chain')">产业链</div>
+        <div class="tab-item" [class.active]="activeTab === 'region'" (click)="switchTab('region')">区域对比</div>
+        <div class="tab-item" [class.active]="activeTab === 'category'" (click)="switchTab('category')">品类分析</div>
+        <div class="tab-item" [class.active]="activeTab === 'risk'" (click)="switchTab('risk')">风险预警</div>
+      </div>
+
+      <!-- 产业链分析 -->
+      <div *ngIf="activeTab === 'chain'" class="chain-analysis">
+        <h3>全产业链数据流</h3>
+        <div class="chain-flow">
+          <div *ngFor="let item of chainData; let i = index" class="chain-item">
+            <div class="chain-stage">{{ item.stage }}</div>
+            <div class="chain-volume">{{ item.volume }}kg</div>
+            <div class="chain-efficiency">效率: {{ item.efficiency }}%</div>
+            <div *ngIf="i < chainData.length - 1" class="chain-arrow"><i class="fas fa-arrow-right"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 区域对比 -->
+      <div *ngIf="activeTab === 'region'" class="region-comparison">
+        <div *ngFor="let region of regionData" class="region-card">
+          <h4>{{ region.region }}</h4>
+          <div class="region-stats">
+            <div class="stat-item"><span>回收率</span><span>{{ region.recycleRate }}%</span></div>
+            <div class="stat-item"><span>再生率</span><span>{{ region.regenerationRate }}%</span></div>
+            <div class="stat-item"><span>市场价</span><span>¥{{ region.marketPrice }}/kg</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 品类分析 -->
+      <div *ngIf="activeTab === 'category'" class="category-analysis">
+        <div *ngFor="let cat of categoryData" class="category-card">
+          <div class="category-header">
+            <span class="category-name">{{ cat.category }}</span>
+            <span class="category-trend" [ngClass]="getTrendClass(cat.trend)">
+              <i class="fas" [ngClass]="getTrendIcon(cat.trend)"></i>
+            </span>
+          </div>
+          <div class="category-stats">
+            <div class="stat-row"><span>回收率</span><span>{{ cat.recycleRate }}%</span></div>
+            <div class="stat-row"><span>再生率</span><span>{{ cat.regenerationRate }}%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 风险预警 -->
+      <div *ngIf="activeTab === 'risk'" class="risk-warnings">
+        <div *ngFor="let risk of risks" class="risk-item" [ngClass]="getRiskClass(risk.level)">
+          <div class="risk-header">
+            <span class="risk-type">{{ risk.type }}</span>
+            <span class="risk-level">{{ risk.level === 'high' ? '高' : risk.level === 'medium' ? '中' : '低' }}</span>
+          </div>
+          <div class="risk-content">{{ risk.content }}</div>
+          <div class="risk-strategy">应对策略: {{ risk.strategy }}</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <div class="nav-item" routerLink="/government/supervision-overview"><div class="nav-icon">📊</div><div>监管</div></div>
+    <div class="nav-item" routerLink="/government/subsidy-management"><div class="nav-icon">💰</div><div>补贴</div></div>
+    <div class="nav-item active"><div class="nav-icon">📈</div><div>分析</div></div>
+    <div class="nav-item" routerLink="/government/ai-decision-assistant"><div class="nav-icon">🤖</div><div>AI助手</div></div>
+    <div class="nav-item" routerLink="/government/government-center"><div class="nav-icon">⚙️</div><div>政务</div></div>
+  </nav>
 </div>

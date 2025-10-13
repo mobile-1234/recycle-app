@@ -423,3 +423,42 @@
     }
   }
 }
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f5fff5 0%, #eaffea 100%);
+}
+
+.notifications-container {
+  // 移除紫色背景，采用与首页一致的浅绿色风格
+  background: transparent;
+  padding: 12px;
+}
+
+.top-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 8px;
+
+  .mark-all-read-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    max-width: 160px;
+    border-radius: 20px;
+    background: #4CAF50;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    &:active { transform: scale(0.98); }
+  }
+}
+
+.notification-list {
+  // 保持列表卡片样式
+}

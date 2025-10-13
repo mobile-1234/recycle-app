@@ -212,3 +212,23 @@
 
 <!-- 底部导航栏 -->
 <app-bottom-nav [activeTab]="'booking'"></app-bottom-nav>
+
+
+<!-- 地址选择弹层（简版） -->
+<div class="address-panel-overlay" *ngIf="showAddressPanel" (click)="closeAddressPanel()"></div>
+<div class="address-panel" *ngIf="showAddressPanel">
+  <div class="panel-header">选择地址</div>
+  <div class="panel-body">
+    <div class="addr-item" (click)="onAddressChosen({address: '北京市朝阳区建国路88号SOHO现代城', name: '张三', phone: '138****8888'})">
+      <div class="addr-main">北京市朝阳区建国路88号SOHO现代城</div>
+      <div class="addr-sub">张三 138****8888</div>
+    </div>
+    <div class="addr-item" (click)="onAddressChosen({address: '海淀区中关村大街1号', name: '李四', phone: '139****9999'})">
+      <div class="addr-main">海淀区中关村大街1号</div>
+      <div class="addr-sub">李四 139****9999</div>
+    </div>
+  </div>
+  <div class="panel-footer">
+    <button class="close-btn" (click)="closeAddressPanel()">取消</button>
+  </div>
+</div>

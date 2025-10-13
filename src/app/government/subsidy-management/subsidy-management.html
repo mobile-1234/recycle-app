@@ -1,6 +1,201 @@
 <div class="subsidy-management-container">
-  <div class="subsidy-header">
-    <h1>补贴管理</h1>
+  <!-- 顶部导航 -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <span class="logo-icon">🏛️</span>
+        <span>智回监管</span>
+      </div>
+      <div class="user-info">
+        <span>政府管理员</span>
+        <div class="avatar"><span>政</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="container">
+      <h2 class="section-title">补贴管理</h2>
+
+      <!-- 统计卡片 -->
+      <div class="stats-cards">
+        <div class="stat-card"><div class="stat-value">{{ stats.pending }}</div><div class="stat-label">待审核</div></div>
+        <div class="stat-card"><div class="stat-value">{{ stats.approved }}</div><div class="stat-label">已通过</div></div>
+        <div class="stat-card"><div class="stat-value">¥{{ (stats.totalAmount / 10000).toFixed(1) }}万</div><div class="stat-label">总发放</div></div>
+      </div>
+
+      <!-- 标签页 -->
+      <div class="tab-navigation">
+        <div class="tab-item" [class.active]="activeTab === 'applications'" (click)="switchTab('applications')">申请审核</div>
+        <div class="tab-item" [class.active]="activeTab === 'payments'" (click)="switchTab('payments')">发放记录</div>
+        <div class="tab-item" [class.active]="activeTab === 'evaluation'" (click)="switchTab('evaluation')">效果评估</div>
+      </div>
+
+      <!-- 申请审核列表 -->
+      <div *ngIf="activeTab === 'applications'">
+        <div class="filter-bar">
+          <button class="filter-btn" [class.active]="filterStatus === 'all'" (click)="setFilter('all')">全部</button>
+          <button class="filter-btn" [class.active]="filterStatus === 'pending'" (click)="setFilter('pending')">待审核</button>
+          <button class="filter-btn" [class.active]="filterStatus === 'approved'" (click)="setFilter('approved')">已通过</button>
+          <button class="filter-btn" [class.active]="filterStatus === 'rejected'" (click)="setFilter('rejected')">已驳回</button>
+        </div>
+
+        <div class="application-list">
+          <div *ngFor="let app of filteredApplications" class="application-item" (click)="viewApplicationDetail(app)">
+            <div class="app-header">
+              <div class="app-name">{{ app.enterpriseName }}</div>
+              <div class="app-status" [ngClass]="getStatusClass(app.status)">{{ getStatusText(app.status) }}</div>
+            </div>
+            <div class="app-details">
+              <div class="detail-row"><span>申请编号:</span><span>{{ app.id }}</span></div>
+              <div class="detail-row"><span>申请类型:</span><span>{{ app.type }}</span></div>
+              <div class="detail-row"><span>申请金额:</span><span class="amount">¥{{ app.amount.toLocaleString() }}</span></div>
+              <div class="detail-row"><span>申请日期:</span><span>{{ app.applyDate }}</span></div>
+              <div class="detail-row"><span>区块链状态:</span><span class="blockchain-status" [ngClass]="getStatusClass(app.blockchainStatus)">{{ getStatusText(app.blockchainStatus) }}</span></div>
+            </div>
+            <div class="app-actions" *ngIf="app.status === 'pending'">
+              <button class="action-btn btn-approve" (click)="approveApplication(app, $event)">通过</button>
+              <button class="action-btn btn-reject" (click)="rejectApplication(app, $event)">驳回</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 发放记录 -->
+      <div *ngIf="activeTab === 'payments'">
+        <div class="payment-list">
+          <div *ngFor="let payment of payments" class="payment-item" (click)="viewPaymentDetail(payment)">
+            <div class="payment-header">
+              <div class="payment-name">{{ payment.enterpriseName }}</div>
+              <div class="payment-amount">¥{{ payment.amount.toLocaleString() }}</div>
+            </div>
+            <div class="payment-details">
+              <div class="detail-row"><span>发放编号:</span><span>{{ payment.id }}</span></div>
+              <div class="detail-row"><span>发放日期:</span><span>{{ payment.date }}</span></div>
+              <div class="detail-row"><span>资金用途:</span><span>{{ payment.purpose }}</span></div>
+              <div class="detail-row"><span>效果评分:</span><span class="effectiveness">{{ payment.effectiveness }}分</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 效果评估 -->
+      <div *ngIf="activeTab === 'evaluation'">
+        <div class="evaluation-card">
+          <h3>补贴效果总体评估</h3>
+          <div class="evaluation-metric">
+            <div class="metric-item"><div class="metric-label">回收量增长</div><div class="metric-value">+25%</div></div>
+            <div class="metric-item"><div class="metric-label">企业参与度</div><div class="metric-value">89%</div></div>
+            <div class="metric-item"><div class="metric-label">环保效益</div><div class="metric-value">优秀</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 申请详情弹窗 -->
+  <div class="modal-overlay" [class.show]="showDetailModal" (click)="closeDetail()">
+    <div class="modal-content" (click)="$event.stopPropagation()" *ngIf="selectedApplication">
+      <div class="modal-header">
+        <h3 class="modal-title">补贴申请详情</h3>
+        <button class="close-btn" (click)="closeDetail()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-section">
+          <h4 class="detail-title">基本信息</h4>
+          <div class="detail-grid">
+            <div class="detail-item"><span class="detail-label">申请编号</span><span class="detail-value">{{ selectedApplication.id }}</span></div>
+            <div class="detail-item"><span class="detail-label">企业名称</span><span class="detail-value">{{ selectedApplication.enterpriseName }}</span></div>
+            <div class="detail-item"><span class="detail-label">申请类型</span><span class="detail-value">{{ selectedApplication.type }}</span></div>
+            <div class="detail-item"><span class="detail-label">申请日期</span><span class="detail-value">{{ selectedApplication.applyDate }}</span></div>
+            <div class="detail-item full-width">
+              <span class="detail-label">申请金额</span>
+              <span class="detail-value amount-large">¥{{ selectedApplication.amount.toLocaleString() }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="detail-section">
+          <h4 class="detail-title">审核状态</h4>
+          <div class="status-info">
+            <div class="status-badge" [ngClass]="getStatusClass(selectedApplication.status)">
+              {{ getStatusText(selectedApplication.status) }}
+            </div>
+            <div class="blockchain-info">
+              <span class="blockchain-label">区块链验证:</span>
+              <span class="blockchain-badge" [ngClass]="getStatusClass(selectedApplication.blockchainStatus)">
+                {{ getStatusText(selectedApplication.blockchainStatus) }}
+              </span>
+              <button class="verify-btn" *ngIf="selectedApplication.blockchainStatus === 'verifying'" (click)="verifyBlockchain(selectedApplication)">
+                <i class="fas fa-sync-alt"></i> 验证
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions" *ngIf="selectedApplication.status === 'pending'">
+          <button class="action-btn btn-approve" (click)="approveApplication(selectedApplication)">
+            <i class="fas fa-check"></i> 通过申请
+          </button>
+          <button class="action-btn btn-reject" (click)="rejectApplication(selectedApplication)">
+            <i class="fas fa-times"></i> 驳回申请
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
-  <!-- 页面内容已清理，保留基本结构 -->
+
+  <!-- 付款详情弹窗 -->
+  <div class="modal-overlay" [class.show]="showPaymentModal" (click)="closePaymentDetail()">
+    <div class="modal-content" (click)="$event.stopPropagation()" *ngIf="selectedPayment">
+      <div class="modal-header">
+        <h3 class="modal-title">发放记录详情</h3>
+        <button class="close-btn" (click)="closePaymentDetail()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-section">
+          <h4 class="detail-title">发放信息</h4>
+          <div class="detail-grid">
+            <div class="detail-item"><span class="detail-label">发放编号</span><span class="detail-value">{{ selectedPayment.id }}</span></div>
+            <div class="detail-item"><span class="detail-label">企业名称</span><span class="detail-value">{{ selectedPayment.enterpriseName }}</span></div>
+            <div class="detail-item"><span class="detail-label">发放日期</span><span class="detail-value">{{ selectedPayment.date }}</span></div>
+            <div class="detail-item"><span class="detail-label">资金用途</span><span class="detail-value">{{ selectedPayment.purpose }}</span></div>
+            <div class="detail-item full-width">
+              <span class="detail-label">发放金额</span>
+              <span class="detail-value amount-large">¥{{ selectedPayment.amount.toLocaleString() }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="detail-section">
+          <h4 class="detail-title">效果评估</h4>
+          <div class="effectiveness-display">
+            <div class="effectiveness-score">
+              <span class="score-value">{{ selectedPayment.effectiveness }}</span>
+              <span class="score-label">分</span>
+            </div>
+            <div class="effectiveness-bar">
+              <div class="bar-fill" [style.width.%]="selectedPayment.effectiveness"></div>
+            </div>
+            <div class="effectiveness-text" [class.excellent]="selectedPayment.effectiveness >= 90" 
+                 [class.good]="selectedPayment.effectiveness >= 80 && selectedPayment.effectiveness < 90"
+                 [class.average]="selectedPayment.effectiveness < 80">
+              {{ selectedPayment.effectiveness >= 90 ? '优秀' : selectedPayment.effectiveness >= 80 ? '良好' : '一般' }}
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="action-btn btn-primary" (click)="exportPaymentReport(selectedPayment)">
+            <i class="fas fa-download"></i> 导出报告
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部导航 -->
+  <nav class="bottom-nav">
+    <div class="nav-item" routerLink="/government/supervision-overview"><div class="nav-icon">📊</div><div>监管</div></div>
+    <div class="nav-item active"><div class="nav-icon">💰</div><div>补贴</div></div>
+    <div class="nav-item" routerLink="/government/industry-analysis"><div class="nav-icon">📈</div><div>分析</div></div>
+    <div class="nav-item" routerLink="/government/ai-decision-assistant"><div class="nav-icon">🤖</div><div>AI助手</div></div>
+    <div class="nav-item" routerLink="/government/government-center"><div class="nav-icon">⚙️</div><div>政务</div></div>
+  </nav>
 </div>

@@ -1,6 +1,98 @@
-<div class="ai-decision-assistant-container">
-  <div class="decision-header">
-    <h1>AI决策助手</h1>
-  </div>
-  <!-- 页面内容已清理，保留基本结构 -->
+<div class="ai-assistant-container">
+  <header class="header">
+    <div class="header-content">
+      <div class="logo"><span class="logo-icon">🏛️</span><span>智回监管</span></div>
+      <div class="user-info"><span>政府管理员</span><div class="avatar"><span>政</span></div></div>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="container">
+      <h2 class="section-title">AI决策助手</h2>
+
+      <div class="tab-navigation">
+        <div class="tab-item" [class.active]="activeTab === 'simulator'" (click)="switchTab('simulator')">政策模拟</div>
+        <div class="tab-item" [class.active]="activeTab === 'qa'" (click)="switchTab('qa')">数据问答</div>
+        <div class="tab-item" [class.active]="activeTab === 'compliance'" (click)="switchTab('compliance')">合规洞察</div>
+        <div class="tab-item" [class.active]="activeTab === 'report'" (click)="switchTab('report')">报告生成</div>
+      </div>
+
+      <!-- 政策模拟器 -->
+      <div *ngIf="activeTab === 'simulator'" class="simulator-panel">
+        <div class="input-group">
+          <label>补贴金额(元/kg)</label>
+          <input type="number" [(ngModel)]="subsidyAmount" class="input-field">
+        </div>
+        <div class="input-group">
+          <label>模拟时间(月)</label>
+          <select [(ngModel)]="timeRange" class="input-field">
+            <option value="3">3个月</option>
+            <option value="6">6个月</option>
+            <option value="12">12个月</option>
+          </select>
+        </div>
+        <button class="run-btn" (click)="runSimulation()">运行模拟</button>
+        
+        <div *ngIf="simulationResult" class="result-panel">
+          <h4>预测结果</h4>
+          <div class="result-grid">
+            <div class="result-item"><span>回收量增长</span><span class="result-value">+{{ simulationResult.recycleIncrease }}%</span></div>
+            <div class="result-item"><span>财政支出</span><span class="result-value">¥{{ simulationResult.budgetCost.toLocaleString() }}</span></div>
+            <div class="result-item"><span>碳减排</span><span class="result-value">{{ simulationResult.carbonReduction }}kg</span></div>
+            <div class="result-item"><span>企业参与度</span><span class="result-value">{{ simulationResult.participation }}%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 数据问答 -->
+      <div *ngIf="activeTab === 'qa'" class="qa-panel">
+        <div class="qa-input">
+          <textarea [(ngModel)]="question" placeholder="请输入您的问题，例如：展示各区准确率排名" class="qa-textarea"></textarea>
+          <button class="ask-btn" (click)="askQuestion()">提问</button>
+        </div>
+        <div *ngIf="qaResult" class="qa-result">
+          <h4>AI回答</h4>
+          <p>{{ qaResult }}</p>
+        </div>
+      </div>
+
+      <!-- 合规监管洞察 -->
+      <div *ngIf="activeTab === 'compliance'" class="compliance-panel">
+        <div *ngFor="let item of complianceResults" class="compliance-item" [ngClass]="getRiskClass(item.risk)">
+          <div class="compliance-header">
+            <span>{{ item.company }}</span>
+            <span class="risk-badge">{{ item.risk === 'high' ? '高风险' : '中风险' }}</span>
+          </div>
+          <div class="compliance-pattern">识别模式: {{ item.pattern }}</div>
+          <div class="compliance-suggestion">建议: {{ item.suggestion }}</div>
+        </div>
+      </div>
+
+      <!-- 报告生成 -->
+      <div *ngIf="activeTab === 'report'" class="report-panel">
+        <div class="report-template">
+          <div class="template-item" (click)="generateReport()">
+            <i class="fas fa-file-alt"></i>
+            <span>月度监管分析报告</span>
+          </div>
+          <div class="template-item" (click)="generateReport()">
+            <i class="fas fa-chart-bar"></i>
+            <span>产业发展评估报告</span>
+          </div>
+          <div class="template-item" (click)="generateReport()">
+            <i class="fas fa-clipboard-check"></i>
+            <span>政策效果评估报告</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <div class="nav-item" routerLink="/government/supervision-overview"><div class="nav-icon">📊</div><div>监管</div></div>
+    <div class="nav-item" routerLink="/government/subsidy-management"><div class="nav-icon">💰</div><div>补贴</div></div>
+    <div class="nav-item" routerLink="/government/industry-analysis"><div class="nav-icon">📈</div><div>分析</div></div>
+    <div class="nav-item active"><div class="nav-icon">🤖</div><div>AI助手</div></div>
+    <div class="nav-item" routerLink="/government/government-center"><div class="nav-icon">⚙️</div><div>政务</div></div>
+  </nav>
 </div>

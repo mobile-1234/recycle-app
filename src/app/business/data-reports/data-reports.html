@@ -1,6 +1,383 @@
 <div class="data-reports-container">
-  <div class="reports-header">
-    <h1>数据报表</h1>
+  <!-- 顶部导航 -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <span class="logo-icon">♻️</span>
+        <span>智回回收</span>
+      </div>
+      <div class="user-info">
+        <span>企业管理员</span>
+        <div class="avatar">
+          <span>管</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主要内容 -->
+  <main class="content">
+    <div class="container">
+      <section id="data-reports">
+        <h2 class="section-title">数据报表</h2>
+
+        <!-- 预警通知栏 -->
+        <div class="alert-banner" *ngIf="criticalLocations.length > 0 || warningLocations.length > 0">
+          <div class="alert-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <div class="alert-content">
+            <div class="alert-title">垃圾量预警</div>
+            <div class="alert-desc">
+              {{ criticalLocations.length }}个地点严重，{{ warningLocations.length }}个地点预警
+            </div>
+          </div>
+          <button class="alert-btn" (click)="openMonitorView()">
+            查看详情 <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <!-- 报表类型选择器 -->
+        <div class="report-tabs">
+          <div 
+            class="report-tab" 
+            [class.active]="reportType === 'business'"
+            (click)="reportType = 'business'">
+            <i class="fas fa-chart-line"></i>
+            经营报表
+          </div>
+          <div 
+            class="report-tab" 
+            [class.active]="reportType === 'environmental'"
+            (click)="reportType = 'environmental'">
+            <i class="fas fa-leaf"></i>
+            环保报表
+          </div>
+          <div 
+            class="report-tab" 
+            [class.active]="reportType === 'government'"
+            (click)="reportType = 'government'">
+            <i class="fas fa-file-alt"></i>
+            政府申报
+          </div>
+        </div>
+
+        <!-- 时间范围选择器 -->
+        <div class="time-range-selector">
+          <button 
+            class="time-btn" 
+            [class.active]="timeRange === 'today'"
+            (click)="timeRange = 'today'">
+            今日
+          </button>
+          <button 
+            class="time-btn" 
+            [class.active]="timeRange === 'week'"
+            (click)="timeRange = 'week'">
+            本周
+          </button>
+          <button 
+            class="time-btn" 
+            [class.active]="timeRange === 'month'"
+            (click)="timeRange = 'month'">
+            本月
+          </button>
+          <button 
+            class="time-btn" 
+            [class.active]="timeRange === 'year'"
+            (click)="timeRange = 'year'">
+            本年
+          </button>
+        </div>
+
+        <!-- 数据可视化图表区 - 经营报表 -->
+        <div *ngIf="reportType === 'business'" class="chart-section">
+          <div class="chart-card">
+            <h3 class="chart-title">回收品类分布</h3>
+            <div class="chart-content">
+              <div class="pie-chart">
+                <div class="chart-legend">
+                  <div *ngFor="let item of businessData" class="legend-item">
+                    <span class="legend-color" [style.background-color]="item.color"></span>
+                    <span class="legend-label">{{ item.label }}</span>
+                    <span class="legend-value">{{ item.value }}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <h3 class="chart-title">月度回收趋势</h3>
+            <div class="trend-chart">
+              <div class="chart-bars">
+                <div class="bar-item" *ngFor="let month of [1,2,3,4,5,6]">
+                  <div class="bar" [style.height.%]="month * 15"></div>
+                  <span class="bar-label">{{ month }}月</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stats-row">
+            <div class="stat-box">
+              <div class="stat-value">15,680</div>
+              <div class="stat-label">总回收量(kg)</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">¥47,040</div>
+              <div class="stat-label">营收金额</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 数据可视化图表区 - 环保报表 -->
+        <div *ngIf="reportType === 'environmental'" class="chart-section">
+          <div class="env-cards">
+            <div *ngFor="let item of environmentalData" class="env-card">
+              <div class="env-icon" [style.background-color]="item.color">
+                <i class="fas" 
+                   [ngClass]="{
+                     'fa-cloud': item.label === '碳减排',
+                     'fa-tint': item.label === '节水量',
+                     'fa-bolt': item.label === '节电量'
+                   }"></i>
+              </div>
+              <div class="env-info">
+                <div class="env-value">{{ item.value }}</div>
+                <div class="env-label">{{ item.label }}(kg)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <h3 class="chart-title">环保贡献趋势</h3>
+            <div class="line-chart">
+              <div class="chart-placeholder">
+                <i class="fas fa-chart-area"></i>
+                <p>环保数据趋势图</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 数据可视化图表区 - 政府申报 -->
+        <div *ngIf="reportType === 'government'" class="chart-section">
+          <div class="gov-report-card">
+            <div class="report-info">
+              <div class="info-row">
+                <span class="info-label">报告周期:</span>
+                <span class="info-value">2023年5月</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">企业名称:</span>
+                <span class="info-value">智回环保科技有限公司</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">回收总量:</span>
+                <span class="info-value">15,680 kg</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">环保贡献:</span>
+                <span class="info-value">碳减排 1250kg</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 地点垃圾量监控卡片 -->
+        <div class="monitor-section">
+          <div class="section-header">
+            <h3>地点监控</h3>
+            <button class="view-all-btn" (click)="openMonitorView()">
+              查看全部 <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+          
+          <div class="location-cards">
+            <div 
+              *ngFor="let location of locations.slice(0, 4)" 
+              class="location-card"
+              [class.critical]="location.status === 'critical'"
+              [class.warning]="location.status === 'warning'">
+              <div class="location-header">
+                <div class="location-icon">{{ getLocationIcon(location.type) }}</div>
+                <div class="location-info">
+                  <div class="location-name">{{ location.name }}</div>
+                  <div class="location-update">{{ location.lastUpdate }}</div>
+                </div>
+                <div class="location-status" [ngClass]="getStatusClass(location.status)">
+                  {{ getStatusText(location.status) }}
+                </div>
+              </div>
+              
+              <div class="location-progress">
+                <div class="progress-bar">
+                  <div 
+                    class="progress-fill" 
+                    [style.width.%]="getCapacityPercent(location)"
+                    [ngClass]="getStatusClass(location.status)">
+                  </div>
+                </div>
+                <div class="progress-text">
+                  {{ location.wasteVolume }}/{{ location.capacity }}kg
+                  ({{ getCapacityPercent(location) }}%)
+                </div>
+              </div>
+
+              <div class="location-stats">
+                <div class="stat-item">
+                  <span class="stat-label">垃圾量</span>
+                  <span class="stat-value">{{ location.wasteVolume }}kg</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-label">已回收</span>
+                  <span class="stat-value">{{ location.recycleVolume }}kg</span>
+                </div>
+              </div>
+
+              <button 
+                *ngIf="location.status === 'critical'" 
+                class="dispatch-btn"
+                (click)="dispatchWorkers(location)">
+                <i class="fas fa-user-plus"></i> 急派人手
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 报表生成与导出区 -->
+        <div class="export-section">
+          <h3 class="section-subtitle">报表导出</h3>
+          <div class="export-buttons">
+            <button class="export-btn" (click)="exportReport('pdf')">
+              <i class="fas fa-file-pdf"></i>
+              导出PDF
+            </button>
+            <button class="export-btn" (click)="exportReport('excel')">
+              <i class="fas fa-file-excel"></i>
+              导出Excel
+            </button>
+            <button 
+              *ngIf="reportType === 'government'" 
+              class="submit-btn"
+              (click)="submitToGov()">
+              <i class="fas fa-paper-plane"></i>
+              一键申报
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- 监控详情弹层 -->
+  <div class="modal-overlay" [class.show]="showMonitorModal" (click)="closeMonitorView()">
+    <div class="modal-content monitor-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">实时监控 - 全部地点</h3>
+        <button class="close-btn" (click)="closeMonitorView()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- 严重预警 -->
+        <div *ngIf="criticalLocations.length > 0" class="alert-section critical">
+          <h4 class="alert-section-title">
+            <i class="fas fa-exclamation-circle"></i>
+            严重预警 ({{ criticalLocations.length }})
+          </h4>
+          <div class="location-list">
+            <div *ngFor="let location of criticalLocations" class="location-item critical">
+              <div class="location-main">
+                <div class="location-icon">{{ getLocationIcon(location.type) }}</div>
+                <div class="location-details">
+                  <div class="location-name">{{ location.name }}</div>
+                  <div class="location-meta">
+                    {{ location.wasteVolume }}/{{ location.capacity }}kg 
+                    ({{ getCapacityPercent(location) }}%)
+                  </div>
+                </div>
+              </div>
+              <button class="action-btn critical" (click)="dispatchWorkers(location)">
+                急派
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 一般预警 -->
+        <div *ngIf="warningLocations.length > 0" class="alert-section warning">
+          <h4 class="alert-section-title">
+            <i class="fas fa-exclamation-triangle"></i>
+            一般预警 ({{ warningLocations.length }})
+          </h4>
+          <div class="location-list">
+            <div *ngFor="let location of warningLocations" class="location-item warning">
+              <div class="location-main">
+                <div class="location-icon">{{ getLocationIcon(location.type) }}</div>
+                <div class="location-details">
+                  <div class="location-name">{{ location.name }}</div>
+                  <div class="location-meta">
+                    {{ location.wasteVolume }}/{{ location.capacity }}kg 
+                    ({{ getCapacityPercent(location) }}%)
+                  </div>
+                </div>
+              </div>
+              <button class="action-btn warning" (click)="dispatchWorkers(location)">
+                派遣
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 全部地点 -->
+        <div class="alert-section">
+          <h4 class="alert-section-title">
+            <i class="fas fa-map-marker-alt"></i>
+            全部地点 ({{ locations.length }})
+          </h4>
+          <div class="location-list">
+            <div *ngFor="let location of locations" class="location-item" [ngClass]="getStatusClass(location.status)">
+              <div class="location-main">
+                <div class="location-icon">{{ getLocationIcon(location.type) }}</div>
+                <div class="location-details">
+                  <div class="location-name">{{ location.name }}</div>
+                  <div class="location-meta">
+                    {{ location.wasteVolume }}/{{ location.capacity }}kg 
+                    · {{ location.lastUpdate }}
+                  </div>
+                </div>
+              </div>
+              <div class="location-status-badge" [ngClass]="getStatusClass(location.status)">
+                {{ getStatusText(location.status) }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <!-- 页面内容已清理，保留基本结构 -->
+
+  <!-- 底部导航 -->
+  <nav class="bottom-nav">
+    <div class="nav-item" routerLink="/business/dashboard">
+      <div class="nav-icon">🏠</div>
+      <div>工作台</div>
+    </div>
+    <div class="nav-item" routerLink="/business/order-management">
+      <div class="nav-icon">📦</div>
+      <div>订单</div>
+    </div>
+    <div class="nav-item" routerLink="/business/device-management">
+      <div class="nav-icon">⚙️</div>
+      <div>设备</div>
+    </div>
+    <div class="nav-item active">
+      <div class="nav-icon">📊</div>
+      <div>报表</div>
+    </div>
+    <div class="nav-item" routerLink="/business/enterprise-center">
+      <div class="nav-icon">👤</div>
+      <div>我的</div>
+    </div>
+  </nav>
 </div>

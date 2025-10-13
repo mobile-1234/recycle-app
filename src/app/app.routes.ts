@@ -18,11 +18,11 @@ export const routes: Routes = [
     // canActivate: [authGuard] // 临时注释掉用于测试
   },
   
-  // B端企业用户路由 - 需要认证
+  // B端企业用户路由 - 开发阶段临时移除认证守卫
   {
     path: 'business',
-    loadChildren: () => import('./business/business-module').then(m => m.BusinessModule),
-    canActivate: [authGuard]
+    loadChildren: () => import('./business/business-module').then(m => m.BusinessModule)
+    // canActivate: [authGuard]
   },
   
   // G端政府用户路由 - 需要认证

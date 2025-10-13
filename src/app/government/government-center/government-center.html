@@ -1,6 +1,84 @@
 <div class="government-center-container">
-  <div class="government-header">
-    <h1>政府中心</h1>
-  </div>
-  <!-- 页面内容已清理，保留基本结构 -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo"><span class="logo-icon">🏛️</span><span>智回监管</span></div>
+      <div class="user-info"><span>政府管理员</span><div class="avatar"><span>政</span></div></div>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="container">
+      <h2 class="section-title">政务中心</h2>
+
+      <div class="tab-navigation">
+        <div class="tab-item" [class.active]="activeTab === 'region'" (click)="switchTab('region')">辖区管理</div>
+        <div class="tab-item" [class.active]="activeTab === 'user'" (click)="switchTab('user')">用户权限</div>
+        <div class="tab-item" [class.active]="activeTab === 'notice'" (click)="switchTab('notice')">公告发布</div>
+        <div class="tab-item" [class.active]="activeTab === 'log'" (click)="switchTab('log')">操作日志</div>
+        <div class="tab-item" [class.active]="activeTab === 'settings'" (click)="switchTab('settings')">系统设置</div>
+      </div>
+
+      <!-- 辖区管理 -->
+      <div *ngIf="activeTab === 'region'" class="region-list">
+        <div *ngFor="let region of regions" class="region-item" (click)="manageRegion(region)">
+          <div class="region-info">
+            <div class="region-name">{{ region.name }}</div>
+            <div class="region-manager">负责人: {{ region.manager }}</div>
+            <div class="region-contact">{{ region.contact }}</div>
+          </div>
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+
+      <!-- 用户权限管理 -->
+      <div *ngIf="activeTab === 'user'" class="user-list">
+        <div *ngFor="let user of users" class="user-item" (click)="manageUser(user)">
+          <div class="user-avatar">{{ user.name.charAt(0) }}</div>
+          <div class="user-info">
+            <div class="user-name">{{ user.name }}</div>
+            <div class="user-role">{{ user.role }}</div>
+          </div>
+          <span class="user-status" [class.active]="user.status === 'active'">{{ user.status === 'active' ? '在职' : '离职' }}</span>
+        </div>
+      </div>
+
+      <!-- 公告发布 -->
+      <div *ngIf="activeTab === 'notice'" class="notice-list">
+        <div *ngFor="let notice of notices" class="notice-item" (click)="publishNotice(notice)">
+          <div class="notice-title">{{ notice.title }}</div>
+          <div class="notice-meta">
+            <span>{{ notice.date }}</span>
+            <span class="notice-status" [class.published]="notice.status === 'published'">{{ notice.status === 'published' ? '已发布' : '草稿' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 操作日志 -->
+      <div *ngIf="activeTab === 'log'" class="log-list">
+        <div *ngFor="let log of logs" class="log-item">
+          <div class="log-content">
+            <div class="log-user">{{ log.user }}</div>
+            <div class="log-action">{{ log.action }}</div>
+          </div>
+          <div class="log-time">{{ log.time }}</div>
+        </div>
+      </div>
+
+      <!-- 系统设置 -->
+      <div *ngIf="activeTab === 'settings'" class="settings-list">
+        <div class="setting-item"><i class="fas fa-key"></i><span>修改密码</span><i class="fas fa-chevron-right"></i></div>
+        <div class="setting-item"><i class="fas fa-bell"></i><span>通知设置</span><i class="fas fa-chevron-right"></i></div>
+        <div class="setting-item"><i class="fas fa-question-circle"></i><span>帮助中心</span><i class="fas fa-chevron-right"></i></div>
+        <button class="logout-btn" (click)="logout()"><i class="fas fa-sign-out-alt"></i>退出登录</button>
+      </div>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <div class="nav-item" routerLink="/government/supervision-overview"><div class="nav-icon">📊</div><div>监管</div></div>
+    <div class="nav-item" routerLink="/government/subsidy-management"><div class="nav-icon">💰</div><div>补贴</div></div>
+    <div class="nav-item" routerLink="/government/industry-analysis"><div class="nav-icon">📈</div><div>分析</div></div>
+    <div class="nav-item" routerLink="/government/ai-decision-assistant"><div class="nav-icon">🤖</div><div>AI助手</div></div>
+    <div class="nav-item active"><div class="nav-icon">⚙️</div><div>政务</div></div>
+  </nav>
 </div>

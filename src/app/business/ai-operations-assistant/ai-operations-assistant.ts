@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-ai-operations-assistant',
+  standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './ai-operations-assistant.html',
   styleUrl: './ai-operations-assistant.scss'

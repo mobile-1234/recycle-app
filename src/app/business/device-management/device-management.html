@@ -1,6 +1,314 @@
 <div class="device-management-container">
-  <div class="device-header">
-    <h1>设备管理</h1>
+  <!-- 顶部导航 -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <span class="logo-icon">♻️</span>
+        <span>智回回收</span>
+      </div>
+      <div class="user-info">
+        <span>企业管理员</span>
+        <div class="avatar">
+          <span>管</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主要内容 -->
+  <main class="content">
+    <div class="container">
+      <section id="device-management">
+        <h2 class="section-title">设备管理</h2>
+
+        <!-- 设备总览状态卡片 -->
+        <div class="stats-cards">
+          <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
+              <i class="fas fa-cogs"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-value">{{ deviceStats.total }}</div>
+              <div class="stat-label">设备总数</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+              <i class="fas fa-play-circle"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-value">{{ deviceStats.online }}</div>
+              <div class="stat-label">运行中</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #f39c12, #e67e22);">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-value">{{ deviceStats.warning }}</div>
+              <div class="stat-label">预警</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #95a5a6, #7f8c8d);">
+              <i class="fas fa-wrench"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-value">{{ deviceStats.maintenance }}</div>
+              <div class="stat-label">维护中</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 搜索和筛选栏 -->
+        <div class="filter-search-bar">
+          <div class="search-box">
+            <input 
+              type="text" 
+              class="search-input" 
+              placeholder="搜索设备名称、编号、位置..."
+              [(ngModel)]="searchQuery">
+            <i class="fas fa-search search-icon"></i>
+          </div>
+          <div class="filter-dropdown">
+            <select class="filter-select" [(ngModel)]="filterStatus">
+              <option value="all">全部状态</option>
+              <option value="online">运行中</option>
+              <option value="offline">离线</option>
+              <option value="maintenance">维护中</option>
+              <option value="warning">预警</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 设备列表 -->
+        <div class="device-list">
+          <div 
+            *ngFor="let device of filteredDevices" 
+            class="device-item"
+            (click)="openDeviceDetail(device)">
+            <div class="device-header">
+              <div class="device-info-main">
+                <div class="device-name">{{ device.name }}</div>
+                <div class="device-meta">
+                  <span class="device-id">{{ device.id }}</span>
+                  <span class="device-type">{{ device.type }}</span>
+                </div>
+              </div>
+              <div class="device-status" [ngClass]="getStatusClass(device.status)">
+                {{ getStatusText(device.status) }}
+              </div>
+            </div>
+            
+            <div class="device-body">
+              <div class="device-stats-row">
+                <div class="device-stat">
+                  <i class="fas fa-clock"></i>
+                  <span>{{ device.runningTime }}h</span>
+                </div>
+                <div class="device-stat">
+                  <i class="fas fa-box"></i>
+                  <span>{{ device.processedVolume }}kg</span>
+                </div>
+                <div class="device-stat">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>{{ device.location }}</span>
+                </div>
+                <div class="device-stat">
+                  <i class="fas fa-chart-line"></i>
+                  <span>{{ device.efficiency }}%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="device-actions">
+              <button class="action-btn btn-primary" (click)="openDeviceDetail(device)">
+                <i class="fas fa-info-circle"></i> 详情
+              </button>
+              <button 
+                class="action-btn btn-secondary" 
+                (click)="startMaintenance(device, $event)"
+                *ngIf="device.status === 'online' || device.status === 'warning'">
+                <i class="fas fa-tools"></i> 维护
+              </button>
+              <button 
+                class="action-btn btn-warning" 
+                (click)="reportIssue(device, $event)">
+                <i class="fas fa-bug"></i> 报修
+              </button>
+              <button 
+                class="action-btn btn-ar" 
+                (click)="viewARGuide(device, $event)"
+                *ngIf="device.status !== 'offline'">
+                <i class="fas fa-cube"></i> AR
+              </button>
+            </div>
+          </div>
+
+          <!-- 空状态 -->
+          <div *ngIf="filteredDevices.length === 0" class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>暂无设备</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- 设备详情弹层 -->
+  <div class="modal-overlay" [class.show]="showDetailModal" (click)="closeDeviceDetail()">
+    <div class="modal-content" (click)="$event.stopPropagation()" *ngIf="selectedDevice">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ selectedDevice.name }}</h3>
+        <button class="close-btn" (click)="closeDeviceDetail()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- 设备基本信息 -->
+        <div class="detail-section">
+          <h4 class="detail-title">设备信息</h4>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-label">设备编号</span>
+              <span class="detail-value">{{ selectedDevice.id }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">设备类型</span>
+              <span class="detail-value">{{ selectedDevice.type }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">所在位置</span>
+              <span class="detail-value">{{ selectedDevice.location }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">设备状态</span>
+              <span class="detail-value" [ngClass]="getStatusClass(selectedDevice.status)">
+                {{ getStatusText(selectedDevice.status) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 实时运行参数监控 -->
+        <div class="detail-section">
+          <h4 class="detail-title">实时运行参数</h4>
+          <div class="params-monitor">
+            <div class="param-card">
+              <div class="param-icon">🌡️</div>
+              <div class="param-info">
+                <div class="param-label">温度</div>
+                <div class="param-value">{{ selectedDevice.temperature }}°C</div>
+              </div>
+              <div class="param-status" [class.normal]="selectedDevice.temperature! < 60" [class.warning]="selectedDevice.temperature! >= 60">
+                {{ selectedDevice.temperature! < 60 ? '正常' : '偏高' }}
+              </div>
+            </div>
+            <div class="param-card">
+              <div class="param-icon">⚡</div>
+              <div class="param-info">
+                <div class="param-label">压力</div>
+                <div class="param-value">{{ selectedDevice.pressure }} MPa</div>
+              </div>
+              <div class="param-status normal">正常</div>
+            </div>
+            <div class="param-card">
+              <div class="param-icon">📊</div>
+              <div class="param-info">
+                <div class="param-label">效率</div>
+                <div class="param-value">{{ selectedDevice.efficiency }}%</div>
+              </div>
+              <div class="param-status" [class.normal]="selectedDevice.efficiency >= 80" [class.warning]="selectedDevice.efficiency < 80">
+                {{ selectedDevice.efficiency >= 80 ? '良好' : '待优化' }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 运行统计 -->
+        <div class="detail-section">
+          <h4 class="detail-title">运行统计</h4>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-label">运行时长</span>
+              <span class="detail-value">{{ selectedDevice.runningTime }} 小时</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">处理总量</span>
+              <span class="detail-value">{{ selectedDevice.processedVolume }} kg</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 维护保养记录 -->
+        <div class="detail-section">
+          <h4 class="detail-title">维护保养</h4>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-label">上次维护</span>
+              <span class="detail-value">{{ selectedDevice.lastMaintenance }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">下次维护</span>
+              <span class="detail-value">{{ selectedDevice.nextMaintenance }}</span>
+            </div>
+          </div>
+          <div class="maintenance-history">
+            <div class="history-item">
+              <div class="history-date">2023-05-10</div>
+              <div class="history-content">定期保养 - 更换滤芯</div>
+              <div class="history-operator">张师傅</div>
+            </div>
+            <div class="history-item">
+              <div class="history-date">2023-04-10</div>
+              <div class="history-content">故障维修 - 电机异响</div>
+              <div class="history-operator">李师傅</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AR参数调节指引 -->
+        <div class="detail-section">
+          <h4 class="detail-title">AR参数调节</h4>
+          <div class="ar-guide-card" (click)="viewARGuide(selectedDevice)">
+            <i class="fas fa-cube"></i>
+            <span>启动AR调节指引</span>
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </div>
+
+        <!-- 报修申请 -->
+        <div class="detail-section">
+          <h4 class="detail-title">报修申请</h4>
+          <button class="report-btn" (click)="reportIssue(selectedDevice)">
+            <i class="fas fa-wrench"></i>
+            提交报修申请
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
-  <!-- 页面内容已清理，保留基本结构 -->
+
+  <!-- 底部导航 -->
+  <nav class="bottom-nav">
+    <div class="nav-item" routerLink="/business/dashboard">
+      <div class="nav-icon">🏠</div>
+      <div>工作台</div>
+    </div>
+    <div class="nav-item" routerLink="/business/order-management">
+      <div class="nav-icon">📦</div>
+      <div>订单</div>
+    </div>
+    <div class="nav-item active">
+      <div class="nav-icon">⚙️</div>
+      <div>设备</div>
+    </div>
+    <div class="nav-item" routerLink="/business/data-reports">
+      <div class="nav-icon">📊</div>
+      <div>报表</div>
+    </div>
+    <div class="nav-item" routerLink="/business/enterprise-center">
+      <div class="nav-icon">👤</div>
+      <div>我的</div>
+    </div>
+  </nav>
 </div>

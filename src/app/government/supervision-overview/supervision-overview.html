@@ -1,6 +1,253 @@
 <div class="supervision-overview-container">
-  <div class="supervision-header">
-    <h1>监管概览</h1>
+  <!-- 顶部导航 -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <span class="logo-icon">🏛️</span>
+        <span>智回监管</span>
+      </div>
+      <div class="user-info">
+        <span>政府管理员</span>
+        <div class="avatar">
+          <span>政</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主要内容 -->
+  <main class="content">
+    <div class="container">
+      <section id="supervision-overview">
+        <h2 class="section-title">监管总览</h2>
+
+        <!-- 全域核心指标仪表盘 -->
+        <div class="indicators-dashboard">
+          <div class="indicator-card">
+            <div class="indicator-icon" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
+              <i class="fas fa-recycle"></i>
+            </div>
+            <div class="indicator-content">
+              <div class="indicator-label">当日回收总量</div>
+              <div class="indicator-value">{{ indicators.todayRecycle.toLocaleString() }}</div>
+              <div class="indicator-unit">kg</div>
+              <div class="indicator-trend up">{{ indicators.trend.recycle }}</div>
+            </div>
+          </div>
+          
+          <div class="indicator-card">
+            <div class="indicator-icon" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+              <i class="fas fa-bullseye"></i>
+            </div>
+            <div class="indicator-content">
+              <div class="indicator-label">分类准确率</div>
+              <div class="indicator-value">{{ indicators.accuracyRate }}</div>
+              <div class="indicator-unit">%</div>
+              <div class="indicator-trend up">{{ indicators.trend.accuracy }}</div>
+            </div>
+          </div>
+          
+          <div class="indicator-card">
+            <div class="indicator-icon" style="background: linear-gradient(135deg, #27ae60, #229954);">
+              <i class="fas fa-leaf"></i>
+            </div>
+            <div class="indicator-content">
+              <div class="indicator-label">碳减排总量</div>
+              <div class="indicator-value">{{ indicators.carbonReduction }}</div>
+              <div class="indicator-unit">kg</div>
+              <div class="indicator-trend up">{{ indicators.trend.carbon }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 多维度监管地图 -->
+        <div class="map-section">
+          <div class="section-header">
+            <h3>区域监管地图</h3>
+          </div>
+          
+          <!-- 图层切换 -->
+          <div class="map-layer-tabs">
+            <button 
+              class="layer-tab" 
+              [class.active]="mapLayer === 'sites'"
+              (click)="switchMapLayer('sites')">
+              <i class="fas fa-map-marker-alt"></i>
+              网点分布
+            </button>
+            <button 
+              class="layer-tab" 
+              [class.active]="mapLayer === 'compliance'"
+              (click)="switchMapLayer('compliance')">
+              <i class="fas fa-shield-alt"></i>
+              合规状态
+            </button>
+            <button 
+              class="layer-tab" 
+              [class.active]="mapLayer === 'policy'"
+              (click)="switchMapLayer('policy')">
+              <i class="fas fa-gavel"></i>
+              政策覆盖
+            </button>
+          </div>
+
+          <!-- 区域列表（模拟地图） -->
+          <div class="area-map">
+            <div 
+              *ngFor="let area of areas" 
+              class="area-item"
+              [ngClass]="getAreaStatusClass(area.status)"
+              (click)="viewAreaDetail(area)">
+              <div class="area-header">
+                <div class="area-name">{{ area.name }}</div>
+                <div class="area-indicator">
+                  <i class="fas fa-circle"></i>
+                </div>
+              </div>
+              <div class="area-stats">
+                <div class="area-stat">
+                  <span class="stat-label">回收量</span>
+                  <span class="stat-value">{{ area.recycleVolume }}kg</span>
+                </div>
+                <div class="area-stat">
+                  <span class="stat-label">准确率</span>
+                  <span class="stat-value">{{ area.accuracy }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 实时预警列表 -->
+        <div class="warning-section">
+          <div class="section-header">
+            <h3>实时预警</h3>
+            <div class="warning-badge">
+              <span class="badge-item high">{{ highLevelWarnings }}</span>
+              <span class="badge-item total">{{ pendingWarnings }}</span>
+            </div>
+          </div>
+
+          <div class="warning-list">
+            <div 
+              *ngFor="let warning of warnings" 
+              class="warning-item"
+              [ngClass]="getLevelClass(warning.level)"
+              (click)="viewWarningDetail(warning)">
+              <div class="warning-icon">
+                <i class="fas" [ngClass]="getWarningIcon(warning.type)"></i>
+              </div>
+              <div class="warning-content">
+                <div class="warning-header">
+                  <div class="warning-type">{{ getWarningTypeText(warning.type) }}</div>
+                  <div class="warning-time">{{ warning.time }}</div>
+                </div>
+                <div class="warning-title">{{ warning.title }}</div>
+                <div class="warning-meta">
+                  <span class="warning-area">{{ warning.area }}</span>
+                  <span class="warning-status" [ngClass]="getStatusClass(warning.status)">
+                    {{ getStatusText(warning.status) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI决策助手入口 -->
+        <div class="ai-assistant-entry">
+          <div class="ai-card" (click)="goToAIAssistant()">
+            <div class="ai-icon">
+              <i class="fas fa-robot"></i>
+            </div>
+            <div class="ai-content">
+              <div class="ai-title">AI决策助手</div>
+              <div class="ai-desc">政策模拟 · 数据问答 · 智能分析</div>
+            </div>
+            <div class="ai-arrow">
+              <i class="fas fa-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- 预警详情弹窗 -->
+  <div class="modal-overlay" [class.show]="showWarningDetailModal" (click)="closeWarningDetail()">
+    <div class="modal-content" (click)="$event.stopPropagation()" *ngIf="selectedWarning">
+      <div class="modal-header">
+        <h3 class="modal-title">预警详情</h3>
+        <button class="close-btn" (click)="closeWarningDetail()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-section">
+          <h4 class="detail-title">基本信息</h4>
+          <div class="detail-grid">
+            <div class="detail-item"><span class="detail-label">预警编号</span><span class="detail-value">{{ selectedWarning.id }}</span></div>
+            <div class="detail-item"><span class="detail-label">预警类型</span><span class="detail-value">{{ getWarningTypeText(selectedWarning.type) }}</span></div>
+            <div class="detail-item"><span class="detail-label">所属区域</span><span class="detail-value">{{ selectedWarning.area }}</span></div>
+            <div class="detail-item"><span class="detail-label">预警时间</span><span class="detail-value">{{ selectedWarning.time }}</span></div>
+            <div class="detail-item full-width"><span class="detail-label">预警内容</span><span class="detail-value">{{ selectedWarning.title }}</span></div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="action-btn btn-primary" (click)="handleWarning(selectedWarning)" *ngIf="selectedWarning.status === 'pending'">开始处理</button>
+          <button class="action-btn btn-success" (click)="resolveWarning(selectedWarning)" *ngIf="selectedWarning.status === 'processing'">标记解决</button>
+        </div>
+      </div>
+    </div>
   </div>
-  <!-- 页面内容已清理，保留基本结构 -->
+
+  <!-- 区域详情弹窗 -->
+  <div class="modal-overlay" [class.show]="showAreaDetailModal" (click)="closeAreaDetail()">
+    <div class="modal-content" (click)="$event.stopPropagation()" *ngIf="selectedArea">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ selectedArea.name }} - 详细数据</h3>
+        <button class="close-btn" (click)="closeAreaDetail()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-section">
+          <h4 class="detail-title">区域概况</h4>
+          <div class="area-overview">
+            <div class="overview-item">
+              <div class="overview-icon" [ngClass]="getAreaStatusClass(selectedArea.status)"><i class="fas fa-circle"></i></div>
+              <div class="overview-text">{{ selectedArea.status === 'good' ? '状态良好' : selectedArea.status === 'warning' ? '需要关注' : '需要重点整改' }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="detail-section">
+          <h4 class="detail-title">关键指标</h4>
+          <div class="metrics-grid">
+            <div class="metric-card"><div class="metric-label">回收量</div><div class="metric-value">{{ selectedArea.recycleVolume }}kg</div></div>
+            <div class="metric-card"><div class="metric-label">准确率</div><div class="metric-value">{{ selectedArea.accuracy }}%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部导航 -->
+  <nav class="bottom-nav">
+    <div class="nav-item active">
+      <div class="nav-icon">📊</div>
+      <div>监管</div>
+    </div>
+    <div class="nav-item" routerLink="/government/subsidy-management">
+      <div class="nav-icon">💰</div>
+      <div>补贴</div>
+    </div>
+    <div class="nav-item" routerLink="/government/industry-analysis">
+      <div class="nav-icon">📈</div>
+      <div>分析</div>
+    </div>
+    <div class="nav-item" routerLink="/government/ai-decision-assistant">
+      <div class="nav-icon">🤖</div>
+      <div>AI助手</div>
+    </div>
+    <div class="nav-item" routerLink="/government/government-center">
+      <div class="nav-icon">⚙️</div>
+      <div>政务</div>
+  </div>
+  </nav>
 </div>

@@ -25,7 +25,7 @@
 
   <!-- Activities List -->
   <div class="activities-list">
-    <div class="activity-item" *ngFor="let activity of getCurrentActivities()">
+    <div class="activity-item" *ngFor="let activity of getCurrentActivities()" (click)="viewActivityDetails(activity)">
       <div class="activity-header">
         <div class="activity-image">
           <div class="image-placeholder">
@@ -52,7 +52,7 @@
           <span>{{ formatDate(activity.startDate) }} - {{ formatDate(activity.endDate) }}</span>
         </div>
         <div class="meta-item">
-          <app-svg-icon name="users" class="meta-icon"></app-svg-icon>
+          <app-svg-icon name="user" class="meta-icon"></app-svg-icon>
           <span>{{ activity.participants }}/{{ activity.maxParticipants }} 人参与</span>
         </div>
       </div>
@@ -91,12 +91,12 @@
 
       <div class="activity-rewards">
         <div class="rewards-title">
-          <app-svg-icon name="gift" class="gift-icon"></app-svg-icon>
+          <app-svg-icon name="star" class="gift-icon"></app-svg-icon>
           <span>活动奖励</span>
         </div>
         <div class="rewards-list">
           <div class="reward-item" *ngFor="let reward of activity.rewards">
-            <app-svg-icon name="check" class="check-icon"></app-svg-icon>
+            <app-svg-icon name="success" class="check-icon"></app-svg-icon>
             <span>{{ reward }}</span>
           </div>
         </div>
@@ -130,9 +130,31 @@
 
     <!-- Empty State -->
     <div class="empty-state" *ngIf="getCurrentActivities().length === 0">
-      <app-svg-icon name="empty-activity" class="empty-icon"></app-svg-icon>
+      <app-svg-icon name="eco" class="empty-icon"></app-svg-icon>
       <div class="empty-text">暂无{{ getTabTitle(selectedTab) }}的活动</div>
       <div class="empty-sub-text">请关注其他类型的活动或稍后再来查看</div>
+    </div>
+  </div>
+
+  <!-- 详情面板 -->
+  <div class="activity-detail" *ngIf="selectedActivity">
+    <div class="detail-header">
+      <h3>{{ selectedActivity.title }}</h3>
+      <span class="status" [style.background]="getStatusColor(selectedActivity.status)">{{ getStatusText(selectedActivity.status) }}</span>
+    </div>
+    <p class="subtitle">{{ selectedActivity.subtitle }}</p>
+    <p class="description">{{ selectedActivity.description }}</p>
+    <div class="dates">
+      <span>开始：{{ selectedActivity.startDate }}</span>
+      <span>结束：{{ selectedActivity.endDate }}</span>
+    </div>
+    <div class="rewards">
+      <span *ngFor="let r of selectedActivity.rewards" class="reward">{{ r }}</span>
+    </div>
+    <div class="detail-actions">
+      <button class="join" (click)="joinActivity(selectedActivity)">立即参与</button>
+      <button class="share" (click)="shareActivity(selectedActivity)">分享</button>
+      <button class="back" (click)="goBack()">返回首页</button>
     </div>
   </div>
 </div>
