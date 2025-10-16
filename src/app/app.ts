@@ -1,13 +1,17 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { FmodeParse } from 'fmode-ng'
-FmodeParse.initialize('dev');
+
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
-export class App {
+export class App implements OnInit {
   protected readonly title = signal('recycle-app');
+  
+  ngOnInit() {
+    FmodeParse.initialize('dev');
+  }
 }

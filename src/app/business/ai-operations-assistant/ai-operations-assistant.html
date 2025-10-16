@@ -1,6 +1,305 @@
-<div class="ai-operations-assistant-container">
+<div class="ai-assistant-container">
+  <!-- 头部 -->
   <div class="assistant-header">
-    <h1>AI运营助手</h1>
+    <div class="header-left">
+      <button class="back-btn" routerLink="/business/dashboard" title="返回Dashboard">
+        <span class="back-icon">←</span>
+        <span class="back-text">返回</span>
+      </button>
+      <div class="icon-wrapper">
+        <span class="robot-icon">🤖</span>
+      </div>
+      <div class="header-info">
+        <h1>AI运营助手</h1>
+        <p class="subtitle">智能分析 · 精准预测 · 高效决策</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" (click)="clearChat()" title="清空对话">
+        <span>🗑️</span>
+      </button>
+    </div>
   </div>
-  <!-- 页面内容已清理，保留基本结构 -->
+
+  <!-- 模块切换标签 -->
+  <div class="module-tabs">
+    <button 
+      class="tab-btn" 
+      [class.active]="activeModule === 'chat'"
+      (click)="switchModule('chat')">
+      <span class="tab-icon">💬</span>
+      <span class="tab-label">智能对话</span>
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeModule === 'insights'"
+      (click)="switchModule('insights')">
+      <span class="tab-icon">💡</span>
+      <span class="tab-label">智能洞察</span>
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeModule === 'policies'"
+      (click)="switchModule('policies')">
+      <span class="tab-icon">🎁</span>
+      <span class="tab-label">政策推荐</span>
+    </button>
+  </div>
+
+  <!-- 主内容区域 -->
+  <div class="assistant-content">
+    
+    <!-- 智能对话模块 -->
+    <div class="chat-module" *ngIf="activeModule === 'chat'">
+      <!-- 快捷问题 -->
+      <div class="quick-questions" *ngIf="messages.length <= 1">
+        <h3 class="section-title">
+          <span class="title-icon">⚡</span>
+          快速开始
+        </h3>
+        <div class="questions-grid">
+          <button 
+            class="question-card" 
+            *ngFor="let q of quickQuestions"
+            (click)="askQuickQuestion(q.text)">
+            <span class="question-icon">{{q.icon}}</span>
+            <span class="question-text">{{q.text}}</span>
+            <span class="question-category">{{q.category}}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 消息列表 -->
+      <div class="messages-container" #messageContainer>
+        <div 
+          class="message" 
+          *ngFor="let msg of messages"
+          [class.user-message]="msg.sender === 'user'"
+          [class.ai-message]="msg.sender === 'ai'">
+          
+          <!-- AI消息 -->
+          <div class="message-wrapper" *ngIf="msg.sender === 'ai'">
+            <div class="avatar ai-avatar">
+              <span>🤖</span>
+            </div>
+            <div class="message-content">
+              <div class="message-bubble">
+                <div class="message-text" [innerHTML]="msg.content | nl2br"></div>
+              </div>
+              <!-- AI建议按钮 -->
+              <div class="suggestions" *ngIf="msg.suggestions && msg.suggestions.length > 0">
+                <button 
+                  class="suggestion-btn" 
+                  *ngFor="let suggestion of msg.suggestions"
+                  (click)="clickSuggestion(suggestion)">
+                  {{suggestion}}
+                </button>
+              </div>
+              <div class="message-time">{{msg.timestamp | date:'HH:mm'}}</div>
+            </div>
+          </div>
+
+          <!-- 用户消息 -->
+          <div class="message-wrapper" *ngIf="msg.sender === 'user'">
+            <div class="message-content">
+              <div class="message-bubble">
+                <div class="message-text">{{msg.content}}</div>
+                <!-- 附件 -->
+                <div class="attachments" *ngIf="msg.attachments && msg.attachments.length > 0">
+                  <div class="attachment-item" *ngFor="let file of msg.attachments">
+                    <span class="file-icon">{{getFileIcon(file.type)}}</span>
+                    <div class="file-info">
+                      <div class="file-name">{{file.name}}</div>
+                      <div class="file-size">{{formatFileSize(file.size)}}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="message-time">{{msg.timestamp | date:'HH:mm'}}</div>
+            </div>
+            <div class="avatar user-avatar">
+              <span>👤</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 打字指示器 -->
+        <div class="message ai-message" *ngIf="isTyping">
+          <div class="message-wrapper">
+            <div class="avatar ai-avatar">
+              <span>🤖</span>
+            </div>
+            <div class="message-content">
+              <div class="message-bubble">
+                <div class="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 输入区域 -->
+      <div class="input-area">
+        <!-- 附件预览 -->
+        <div class="attached-files" *ngIf="attachedFiles.length > 0">
+          <div class="file-preview" *ngFor="let file of attachedFiles; let i = index">
+            <span class="file-icon">{{getFileIcon(file.type)}}</span>
+            <div class="file-info">
+              <div class="file-name">{{file.name}}</div>
+              <div class="file-size">{{formatFileSize(file.size)}}</div>
+            </div>
+            <button class="remove-file" (click)="removeFile(i)">❌</button>
+          </div>
+        </div>
+
+        <!-- 输入框 -->
+        <div class="input-wrapper">
+          <button class="action-btn" (click)="triggerFileUpload()" title="上传附件">
+            <span>📎</span>
+          </button>
+          <input 
+            type="file" 
+            #fileInput 
+            (change)="onFileSelected($event)" 
+            multiple 
+            style="display: none;"
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
+          
+          <input 
+            type="text" 
+            class="message-input" 
+            [(ngModel)]="userInput"
+            (keyup.enter)="sendMessage()"
+            placeholder="输入您的问题，或点击快捷问题开始对话..."
+            [disabled]="isRecording">
+          
+          <button 
+            class="action-btn voice-btn" 
+            [class.recording]="isRecording"
+            (click)="isRecording ? stopRecording() : startRecording()"
+            title="语音输入">
+            <span *ngIf="!isRecording">🎤</span>
+            <span *ngIf="isRecording" class="recording-indicator">
+              <span class="pulse"></span>
+              {{recordingTime}}s
+            </span>
+          </button>
+          
+          <button 
+            class="send-btn" 
+            (click)="sendMessage()"
+            [disabled]="!userInput.trim() && attachedFiles.length === 0">
+            <span>发送</span>
+            <span class="send-icon">📤</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 智能洞察模块 -->
+    <div class="insights-module" *ngIf="activeModule === 'insights'">
+      <div class="module-header">
+        <h2>
+          <span class="header-icon">💡</span>
+          智能洞察
+        </h2>
+        <p class="header-desc">基于数据分析的智能预警与优化建议</p>
+      </div>
+
+      <div class="insights-grid">
+        <div 
+          class="insight-card" 
+          *ngFor="let insight of insights"
+          [class.warning]="insight.type === 'warning'"
+          [class.info]="insight.type === 'info'"
+          [class.success]="insight.type === 'success'">
+          <div class="insight-header">
+            <span class="insight-icon">{{insight.icon}}</span>
+            <span class="insight-type">{{insight.type === 'warning' ? '预警' : insight.type === 'info' ? '提醒' : '建议'}}</span>
+          </div>
+          <h3 class="insight-title">{{insight.title}}</h3>
+          <p class="insight-description">{{insight.description}}</p>
+          <div class="insight-actions">
+            <button class="insight-btn primary" (click)="handleInsightAction(insight)">
+              查看详情
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="insights-footer">
+        <button class="consult-btn" (click)="switchModule('chat')">
+          <span>🤖</span>
+          向AI咨询更多建议
+        </button>
+      </div>
+    </div>
+
+    <!-- 政策推荐模块 -->
+    <div class="policies-module" *ngIf="activeModule === 'policies'">
+      <div class="module-header">
+        <h2>
+          <span class="header-icon">🎁</span>
+          政策推荐
+        </h2>
+        <p class="header-desc">为您匹配适合的补贴政策和资金支持</p>
+      </div>
+
+      <div class="policies-grid">
+        <div class="policy-card" *ngFor="let policy of policies">
+          <div class="policy-header">
+            <h3 class="policy-title">{{policy.title}}</h3>
+            <span class="policy-status" [ngClass]="getPolicyStatusClass(policy.status)">
+              {{getPolicyStatusText(policy.status)}}
+            </span>
+          </div>
+          <p class="policy-description">{{policy.description}}</p>
+          
+          <div class="policy-details">
+            <div class="detail-item">
+              <span class="detail-label">💰 补贴金额</span>
+              <span class="detail-value">{{policy.amount}}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">⏰ 申请截止</span>
+              <span class="detail-value">{{policy.deadline}}</span>
+            </div>
+          </div>
+
+          <div class="policy-requirements">
+            <div class="requirements-title">申请条件：</div>
+            <ul class="requirements-list">
+              <li *ngFor="let req of policy.requirements">{{req}}</li>
+            </ul>
+          </div>
+
+          <div class="policy-actions">
+            <button class="policy-btn secondary" (click)="viewPolicyDetails(policy)">
+              <span>ℹ️</span>
+              查看详情
+            </button>
+            <button 
+              class="policy-btn primary" 
+              (click)="applyPolicy(policy)"
+              [disabled]="policy.status !== 'available'">
+              <span>✅</span>
+              {{policy.status === 'available' ? '立即申请' : '已申请'}}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="policies-footer">
+        <button class="consult-btn" (click)="switchModule('chat')">
+          <span>💬</span>
+          咨询更多政策信息
+        </button>
+      </div>
+    </div>
+
+  </div>
 </div>
