@@ -1,8 +1,11 @@
 .ai-assistant-container {
   min-height: 100vh;
+  height: auto; // 允许内容自动扩展
   background: linear-gradient(135deg, #f5f7fa 0%, #e8f5e9 100%);
-  padding: 20px;
+  padding: 20px 20px 80px; // 底部留出空间
   font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  overflow-y: visible; // 改为visible，让页面自然滚动
+  position: relative; // 确保定位上下文
 }
 
 // 头部样式
@@ -170,7 +173,8 @@
 .chat-module {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 280px);
+  min-height: 600px; // 改为最小高度，确保内容可见
+  height: auto; // 自动高度，允许内容扩展
 }
 
 // 快捷问题
@@ -992,7 +996,11 @@
 // ========== 响应式 ==========
 @media (max-width: 768px) {
   .ai-assistant-container {
-    padding: 12px;
+    padding: 12px 12px 80px; // 底部留出空间
+  }
+  
+  .chat-module {
+    min-height: 500px; // 移动端最小高度调整
   }
 
   .assistant-header {

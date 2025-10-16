@@ -1,0 +1,234 @@
+<div class="help-center-container">
+  <!-- 顶部导航 -->
+  <header class="header">
+    <div class="header-content">
+      <button class="back-btn" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1 class="page-title">帮助中心</h1>
+      <div class="header-spacer"></div>
+    </div>
+  </header>
+
+  <!-- 主要内容 -->
+  <main class="content">
+    <div class="container">
+      <!-- 搜索框 -->
+      <div class="search-section">
+        <div class="search-wrapper">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="搜索帮助文档..." [(ngModel)]="searchQuery">
+        </div>
+      </div>
+
+      <!-- 标签页 -->
+      <div class="tabs-section">
+        <div class="tabs">
+          <div class="tab" [class.active]="activeTab === 'faq'" (click)="switchTab('faq')">
+            <i class="fas fa-list-ul"></i>
+            <span>常见问题</span>
+          </div>
+          <div class="tab" [class.active]="activeTab === 'tutorial'" (click)="switchTab('tutorial')">
+            <i class="fas fa-graduation-cap"></i>
+            <span>使用教程</span>
+          </div>
+          <div class="tab" [class.active]="activeTab === 'contact'" (click)="switchTab('contact')">
+            <i class="fas fa-headset"></i>
+            <span>联系我们</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 常见问题 -->
+      <div class="content-section" *ngIf="activeTab === 'faq'">
+        <div class="faq-list">
+          <div class="faq-item" *ngFor="let faq of filteredFaqs; let i = index">
+            <div class="faq-question" (click)="toggleFaq(faq)">
+              <i class="fas" [class.fa-chevron-right]="!faq.expanded" [class.fa-chevron-down]="faq.expanded"></i>
+              <span class="question-number">{{ i + 1 }}.</span>
+              <span class="question-text">{{ faq.question }}</span>
+            </div>
+            <div class="faq-answer" [class.show]="faq.expanded">
+              <p>{{ faq.answer }}</p>
+            </div>
+          </div>
+          
+          <div class="no-results" *ngIf="filteredFaqs.length === 0">
+            <i class="fas fa-search"></i>
+            <p>未找到相关问题</p>
+            <span>尝试使用其他关键词搜索</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 使用教程 -->
+      <div class="content-section" *ngIf="activeTab === 'tutorial'">
+        <div class="tutorial-grid">
+          <div class="tutorial-card" *ngFor="let tutorial of tutorials">
+            <div class="tutorial-icon">
+              <i [class]="tutorial.icon"></i>
+            </div>
+            <div class="tutorial-info">
+              <h3>{{ tutorial.title }}</h3>
+              <p>{{ tutorial.description }}</p>
+              <div class="tutorial-meta">
+                <span class="meta-item">
+                  <i class="fas fa-clock"></i>
+                  {{ tutorial.duration }}
+                </span>
+                <span class="meta-item level" [class.beginner]="tutorial.level === '入门'" 
+                      [class.intermediate]="tutorial.level === '中级'"
+                      [class.advanced]="tutorial.level === '进阶'">
+                  <i class="fas fa-signal"></i>
+                  {{ tutorial.level }}
+                </span>
+              </div>
+              <button class="btn-view" (click)="openVideoModal(tutorial)">
+                <i class="fas fa-play"></i> 观看视频
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 联系我们 -->
+      <div class="content-section" *ngIf="activeTab === 'contact'">
+        <div class="contact-grid">
+          <div class="contact-card phone">
+            <div class="card-icon">
+              <i class="fas fa-phone-alt"></i>
+            </div>
+            <h3>客服热线</h3>
+            <p class="contact-value">400-123-4567</p>
+            <span class="contact-time">工作日 9:00-18:00</span>
+            <button class="btn-contact">
+              <i class="fas fa-phone"></i> 立即拨打
+            </button>
+          </div>
+          
+          <div class="contact-card email">
+            <div class="card-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <h3>邮箱支持</h3>
+            <p class="contact-value">support@zhihui-gov.com</p>
+            <span class="contact-time">24小时内回复</span>
+            <button class="btn-contact">
+              <i class="fas fa-paper-plane"></i> 发送邮件
+            </button>
+          </div>
+          
+          <div class="contact-card chat">
+            <div class="card-icon">
+              <i class="fas fa-comments"></i>
+            </div>
+            <h3>在线客服</h3>
+            <p class="contact-value">即时沟通</p>
+            <span class="contact-time">工作日 9:00-18:00</span>
+            <button class="btn-contact primary">
+              <i class="fas fa-comment-dots"></i> 立即咨询
+            </button>
+          </div>
+          
+          <div class="contact-card location">
+            <div class="card-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <h3>办公地址</h3>
+            <p class="contact-value">北京市朝阳区XXX大厦15层</p>
+            <span class="contact-time">工作日 9:00-17:30</span>
+            <button class="btn-contact">
+              <i class="fas fa-map"></i> 查看地图
+            </button>
+          </div>
+        </div>
+        
+        <!-- 反馈表单 -->
+        <div class="feedback-section">
+          <h3>
+            <i class="fas fa-comment-medical"></i>
+            问题反馈
+          </h3>
+          <p class="feedback-desc">如果您有任何问题或建议，请填写下面的表单，我们会尽快回复您。</p>
+          <form class="feedback-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>姓名</label>
+                <input type="text" placeholder="请输入您的姓名">
+              </div>
+              <div class="form-group">
+                <label>联系方式</label>
+                <input type="text" placeholder="手机号或邮箱">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>问题类型</label>
+              <select>
+                <option>功能咨询</option>
+                <option>技术问题</option>
+                <option>功能建议</option>
+                <option>其他</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>详细描述</label>
+              <textarea rows="5" placeholder="请详细描述您的问题或建议..."></textarea>
+            </div>
+            <button type="submit" class="btn-submit">
+              <i class="fas fa-paper-plane"></i> 提交反馈
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <!-- 视频播放弹窗 -->
+  <div class="video-modal-overlay" [class.show]="showVideoModal" (click)="closeVideoModal()">
+    <div class="video-modal-content" (click)="$event.stopPropagation()">
+      <div class="video-modal-header">
+        <h3>{{ selectedVideo?.title }}</h3>
+        <button class="video-modal-close" (click)="closeVideoModal()">×</button>
+      </div>
+      <div class="video-modal-body">
+        <div class="video-preview">
+          <div class="douyin-icon">
+            <i class="fas fa-play-circle"></i>
+          </div>
+          <div class="preview-overlay">
+            <p class="preview-title">{{ selectedVideo?.title }}</p>
+            <p class="preview-desc">{{ selectedVideo?.description }}</p>
+          </div>
+        </div>
+        <div class="video-info">
+          <div class="video-meta">
+            <span class="meta-badge">
+              <i class="fas fa-clock"></i> {{ selectedVideo?.duration }}
+            </span>
+            <span class="meta-badge level" 
+                  [class.beginner]="selectedVideo?.level === '入门'"
+                  [class.intermediate]="selectedVideo?.level === '中级'"
+                  [class.advanced]="selectedVideo?.level === '进阶'">
+              <i class="fas fa-signal"></i> {{ selectedVideo?.level }}
+            </span>
+          </div>
+          <div class="video-actions">
+            <a [href]="selectedVideo?.videoUrl" target="_blank" class="btn-watch-douyin">
+              <i class="fas fa-external-link-alt"></i>
+              在抖音中观看
+            </a>
+            <button class="btn-copy-link" (click)="copyVideoLink()">
+              <i class="fas fa-copy"></i>
+              复制链接
+            </button>
+          </div>
+          <div class="video-tips">
+            <i class="fas fa-info-circle"></i>
+            <span>点击"在抖音中观看"按钮将在新窗口打开抖音，如已安装抖音APP将自动打开</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

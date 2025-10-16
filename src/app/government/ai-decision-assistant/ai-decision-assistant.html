@@ -70,23 +70,295 @@
 
       <!-- 报告生成 -->
       <div *ngIf="activeTab === 'report'" class="report-panel">
+        <h3 class="panel-title">选择报告类型</h3>
         <div class="report-template">
-          <div class="template-item" (click)="generateReport()">
+          <div class="template-item" (click)="generateReport('monthly')" [class.generating]="isGenerating">
             <i class="fas fa-file-alt"></i>
             <span>月度监管分析报告</span>
+            <p class="template-desc">包含月度回收数据、区域分析、预警信息</p>
           </div>
-          <div class="template-item" (click)="generateReport()">
+          <div class="template-item" (click)="generateReport('industry')" [class.generating]="isGenerating">
             <i class="fas fa-chart-bar"></i>
             <span>产业发展评估报告</span>
+            <p class="template-desc">企业统计、产值分析、行业趋势</p>
           </div>
-          <div class="template-item" (click)="generateReport()">
+          <div class="template-item" (click)="generateReport('policy')" [class.generating]="isGenerating">
             <i class="fas fa-clipboard-check"></i>
             <span>政策效果评估报告</span>
+            <p class="template-desc">补贴发放、政策效果、优化建议</p>
+          </div>
+        </div>
+        
+        <div *ngIf="isGenerating" class="generating-overlay">
+          <div class="spinner"></div>
+          <p>AI正在生成报告...</p>
+        </div>
+        
+        <!-- 历史报告列表 -->
+        <div *ngIf="generatedReports.length > 0" class="reports-history">
+          <h3 class="panel-title">已生成的报告 ({{ generatedReports.length }})</h3>
+          <div class="report-list">
+            <div *ngFor="let report of generatedReports" class="report-card">
+              <div class="report-icon">
+                <i class="fas" [class.fa-file-alt]="report.type === 'monthly'" 
+                   [class.fa-chart-bar]="report.type === 'industry'"
+                   [class.fa-clipboard-check]="report.type === 'policy'"></i>
+              </div>
+              <div class="report-info">
+                <h4>{{ report.title }}</h4>
+                <p class="report-id">报告编号: {{ report.id }}</p>
+                <p class="report-time">生成时间: {{ report.generateTime }}</p>
+                <p class="report-summary">{{ report.summary }}</p>
+              </div>
+              <div class="report-actions">
+                <button class="btn-view" (click)="viewReport(report)">
+                  <i class="fas fa-eye"></i> 查看
+                </button>
+                <button class="btn-export" (click)="exportReport(report)">
+                  <i class="fas fa-download"></i> 导出
+                </button>
+                <button class="btn-delete" (click)="deleteReport(report.id)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </main>
+  
+  <!-- 报告详情弹窗 -->
+  <div class="report-modal-overlay" [class.show]="showReportModal" (click)="closeReportModal()">
+    <div class="report-modal-content" (click)="$event.stopPropagation()" *ngIf="currentReport">
+      <div class="report-modal-header">
+        <h3>{{ currentReport.title }}</h3>
+        <button class="modal-close" (click)="closeReportModal()">×</button>
+      </div>
+      <div class="report-modal-body">
+        <div class="report-meta">
+          <span class="meta-item"><i class="fas fa-barcode"></i> {{ currentReport.id }}</span>
+          <span class="meta-item"><i class="fas fa-clock"></i> {{ currentReport.generateTime }}</span>
+        </div>
+        
+        <!-- 月度监管分析报告 -->
+        <div *ngIf="currentReport.type === 'monthly'">
+          <div class="report-section">
+            <h4><i class="fas fa-chart-line"></i> 总体概况</h4>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-value">{{ currentReport.data.overview.totalRecycle.toLocaleString() }}</div>
+                <div class="stat-label">回收总量(kg)</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">{{ currentReport.data.overview.growthRate }}%</div>
+                <div class="stat-label">同比增长</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">{{ currentReport.data.overview.accuracy }}%</div>
+                <div class="stat-label">分类准确率</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">{{ currentReport.data.overview.carbonReduction }}</div>
+                <div class="stat-label">碳减排(kg)</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="report-section">
+            <h4><i class="fas fa-map-marked-alt"></i> 区域分析</h4>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>区域</th>
+                  <th>回收量(kg)</th>
+                  <th>准确率</th>
+                  <th>趋势</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of currentReport.data.regional">
+                  <td>{{ item.area }}</td>
+                  <td>{{ item.recycle.toLocaleString() }}</td>
+                  <td>{{ item.accuracy }}%</td>
+                  <td [class.positive]="item.trend.startsWith('+')" [class.negative]="item.trend.startsWith('-')">{{ item.trend }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="report-section">
+            <h4><i class="fas fa-exclamation-triangle"></i> 预警信息</h4>
+            <div class="warning-list">
+              <div *ngFor="let warning of currentReport.data.warnings" class="warning-item" [class.high]="warning.level === 'high'">
+                <span class="warning-badge">{{ warning.level === 'high' ? '高' : '中' }}</span>
+                <span class="warning-area">{{ warning.area }}</span>
+                <span class="warning-issue">{{ warning.issue }}</span>
+                <span class="warning-action">→ {{ warning.action }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="report-section">
+            <h4><i class="fas fa-lightbulb"></i> 优化建议</h4>
+            <ul class="suggestions-list">
+              <li *ngFor="let suggestion of currentReport.data.suggestions">{{ suggestion }}</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- 产业发展评估报告 -->
+        <div *ngIf="currentReport.type === 'industry'">
+          <div class="report-section">
+            <h4><i class="fas fa-industry"></i> 产业概况</h4>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-value">{{ currentReport.data.overview.companies }}</div>
+                <div class="stat-label">企业数量(家)</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">{{ currentReport.data.overview.employees.toLocaleString() }}</div>
+                <div class="stat-label">从业人员(人)</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">{{ (currentReport.data.overview.revenue / 100000000).toFixed(1) }}</div>
+                <div class="stat-label">年产值(亿元)</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">{{ currentReport.data.overview.chainCompleteness }}%</div>
+                <div class="stat-label">产业链完整度</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="report-section">
+            <h4><i class="fas fa-layer-group"></i> 细分领域</h4>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>领域</th>
+                  <th>企业数</th>
+                  <th>产值(亿元)</th>
+                  <th>增长率</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let sector of currentReport.data.sectors">
+                  <td>{{ sector.name }}</td>
+                  <td>{{ sector.companies }}</td>
+                  <td>{{ (sector.revenue / 100000000).toFixed(2) }}</td>
+                  <td class="positive">{{ sector.growth }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="report-section">
+            <h4><i class="fas fa-trophy"></i> 龙头企业</h4>
+            <div class="companies-list">
+              <div *ngFor="let company of currentReport.data.topCompanies; let i = index" class="company-card">
+                <div class="company-rank">{{ i + 1 }}</div>
+                <div class="company-info">
+                  <div class="company-name">{{ company.name }}</div>
+                  <div class="company-stats">
+                    <span>年产值: ¥{{ (company.revenue / 10000).toFixed(0) }}万</span>
+                    <span class="growth positive">{{ company.growth }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="report-section">
+            <h4><i class="fas fa-chart-line"></i> 发展趋势</h4>
+            <ul class="suggestions-list">
+              <li *ngFor="let trend of currentReport.data.trends">{{ trend }}</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- 政策效果评估报告 -->
+        <div *ngIf="currentReport.type === 'policy'">
+          <div class="report-section">
+            <h4><i class="fas fa-coins"></i> 政策概况</h4>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-value">{{ (currentReport.data.overview.subsidyAmount / 10000).toFixed(0) }}</div>
+                <div class="stat-label">补贴总额(万元)</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">{{ currentReport.data.overview.recycleGrowth }}%</div>
+                <div class="stat-label">回收量增长</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">{{ currentReport.data.overview.participation }}%</div>
+                <div class="stat-label">企业参与度</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">{{ currentReport.data.overview.satisfaction }}%</div>
+                <div class="stat-label">满意度</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="report-section">
+            <h4><i class="fas fa-hand-holding-usd"></i> 补贴分布</h4>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>区域</th>
+                  <th>补贴金额(万元)</th>
+                  <th>受益企业</th>
+                  <th>效果</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of currentReport.data.subsidyDistribution">
+                  <td>{{ item.area }}</td>
+                  <td>¥{{ (item.amount / 10000).toFixed(0) }}</td>
+                  <td>{{ item.companies }}家</td>
+                  <td>
+                    <span class="effect-badge" [class.excellent]="item.effect === '优秀'" 
+                          [class.good]="item.effect === '良好'"
+                          [class.normal]="item.effect === '一般'">{{ item.effect }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="report-section">
+            <h4><i class="fas fa-tasks"></i> 效果评估</h4>
+            <div class="effectiveness-list">
+              <div *ngFor="let item of currentReport.data.effectiveness" class="effectiveness-item">
+                <div class="effectiveness-name">{{ item.indicator }}</div>
+                <div class="effectiveness-progress">
+                  <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="(item.actual / item.target) * 100"></div>
+                  </div>
+                  <span class="progress-text">目标: {{ item.target }} | 实际: {{ item.actual }}</span>
+                </div>
+                <span class="status-badge success">{{ item.status }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="report-section">
+            <h4><i class="fas fa-lightbulb"></i> 优化建议</h4>
+            <ul class="suggestions-list">
+              <li *ngFor="let recommendation of currentReport.data.recommendations">{{ recommendation }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="report-modal-footer">
+        <button class="btn btn-export" (click)="exportReport(currentReport)">
+          <i class="fas fa-download"></i> 导出报告
+        </button>
+        <button class="btn btn-close" (click)="closeReportModal()">关闭</button>
+      </div>
+    </div>
+  </div>
 
   <nav class="bottom-nav">
     <div class="nav-item" routerLink="/government/supervision-overview"><div class="nav-icon">📊</div><div>监管</div></div>

@@ -1,0 +1,292 @@
+.notification-settings-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  padding-bottom: 20px;
+}
+
+// 顶部导航
+.header {
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  
+  .header-content {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: #f5f7fa;
+      color: #3498db;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      
+      i {
+        font-size: 18px;
+      }
+      
+      &:hover {
+        background: #3498db;
+        color: white;
+      }
+    }
+    
+    .page-title {
+      flex: 1;
+      text-align: center;
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .header-spacer {
+      width: 40px;
+    }
+  }
+}
+
+// 主要内容
+.content {
+  padding: 30px 20px;
+  
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+}
+
+// 设置区块
+.settings-section {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 24px;
+  
+  .section-header {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    i {
+      font-size: 22px;
+    }
+    
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+  }
+  
+  .section-body {
+    padding: 24px;
+  }
+}
+
+// 通知项
+.notification-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px;
+  background: linear-gradient(135deg, #f9f9f9 0%, #f5f7fa 100%);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  transition: all 0.3s;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  &:hover {
+    background: linear-gradient(135deg, #f0f0f0 0%, #e8f0f7 100%);
+    transform: translateX(4px);
+  }
+  
+  .item-info {
+    flex: 1;
+    
+    .item-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+    }
+    
+    .item-desc {
+      font-size: 13px;
+      color: #999;
+      line-height: 1.5;
+    }
+  }
+}
+
+// 表单组
+.form-group {
+  margin-top: 16px;
+  
+  .form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+  }
+  
+  .form-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: all 0.3s;
+    box-sizing: border-box;
+    
+    &:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+    }
+    
+    &::placeholder {
+      color: #bbb;
+    }
+  }
+}
+
+// 开关按钮
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+  flex-shrink: 0;
+  
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    
+    &:checked + .slider {
+      background-color: #3498db;
+      
+      &:before {
+        transform: translateX(24px);
+      }
+    }
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 28px;
+    
+    &:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+// 保存按钮区域
+.save-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  margin-top: 32px;
+  
+  .btn {
+    padding: 14px 36px;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    
+    i {
+      margin-right: 8px;
+    }
+    
+    &.btn-cancel {
+      background: white;
+      color: #666;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      
+      &:hover {
+        background: #f5f5f5;
+      }
+    }
+    
+    &.btn-primary {
+      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+      }
+    }
+  }
+}
+
+// 响应式
+@media (max-width: 768px) {
+  .content {
+    padding: 20px 16px;
+  }
+  
+  .settings-section .section-body {
+    padding: 20px;
+  }
+  
+  .notification-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    
+    .switch {
+      align-self: flex-end;
+    }
+  }
+  
+  .save-actions {
+    flex-direction: column;
+    
+    .btn {
+      width: 100%;
+    }
+  }
+}
+

@@ -69,14 +69,63 @@
       </div>
 
       <!-- 辖区管理 -->
-      <div *ngIf="activeTab === 'region'" class="region-list">
-        <div *ngFor="let region of regions" class="region-item" (click)="manageRegion(region)">
-          <div class="region-info">
-            <div class="region-name">{{ region.name }}</div>
-            <div class="region-manager">负责人: {{ region.manager }}</div>
-            <div class="region-contact">{{ region.contact }}</div>
+      <div *ngIf="activeTab === 'region'" class="region-section">
+        <div class="region-header">
+          <h3>辖区列表 ({{ regions.length }})</h3>
+          <button class="add-btn" (click)="openAddRegionModal()">
+            <i class="fas fa-plus"></i> 添加辖区
+          </button>
+        </div>
+        
+        <div class="region-list">
+          <div *ngFor="let region of regions" class="region-card" (click)="manageRegion(region)">
+            <div class="region-card-header">
+              <div class="region-title">
+                <h4>{{ region.name }}</h4>
+                <span class="region-id">ID: {{ region.id }}</span>
+              </div>
+              <span class="region-status" [class.active]="region.status === 'active'">
+                {{ region.status === 'active' ? '运行中' : '已停用' }}
+              </span>
+            </div>
+            
+            <div class="region-card-body">
+              <div class="region-detail">
+                <i class="fas fa-user-tie"></i>
+                <span class="detail-label">负责人:</span>
+                <span class="detail-value">{{ region.manager }}</span>
+              </div>
+              <div class="region-detail">
+                <i class="fas fa-phone"></i>
+                <span class="detail-label">联系方式:</span>
+                <span class="detail-value">{{ region.contact }}</span>
+              </div>
+              <div class="region-detail">
+                <i class="fas fa-map-marker-alt"></i>
+                <span class="detail-label">地址:</span>
+                <span class="detail-value">{{ region.address }}</span>
+              </div>
+            </div>
+            
+            <div class="region-card-footer">
+              <div class="stat-item">
+                <i class="fas fa-users"></i>
+                <span>{{ (region.population / 10000).toFixed(1) }}万人</span>
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-store"></i>
+                <span>{{ region.recyclePoints }}个网点</span>
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-check-circle"></i>
+                <span>{{ region.complianceRate }}%合规</span>
+              </div>
+            </div>
+            
+            <div class="region-card-actions">
+              <i class="fas fa-chevron-right"></i>
+            </div>
           </div>
-          <i class="fas fa-chevron-right"></i>
         </div>
       </div>
 
@@ -116,10 +165,25 @@
 
       <!-- 系统设置 -->
       <div *ngIf="activeTab === 'settings'" class="settings-list">
-        <div class="setting-item"><i class="fas fa-key"></i><span>修改密码</span><i class="fas fa-chevron-right"></i></div>
-        <div class="setting-item"><i class="fas fa-bell"></i><span>通知设置</span><i class="fas fa-chevron-right"></i></div>
-        <div class="setting-item"><i class="fas fa-question-circle"></i><span>帮助中心</span><i class="fas fa-chevron-right"></i></div>
-        <button class="logout-btn" (click)="logout()"><i class="fas fa-sign-out-alt"></i>退出登录</button>
+        <div class="setting-item" routerLink="/government/government-center/password-settings">
+          <i class="fas fa-key"></i>
+          <span>修改密码</span>
+          <i class="fas fa-chevron-right"></i>
+        </div>
+        <div class="setting-item" routerLink="/government/government-center/notification-settings">
+          <i class="fas fa-bell"></i>
+          <span>通知设置</span>
+          <i class="fas fa-chevron-right"></i>
+        </div>
+        <div class="setting-item" routerLink="/government/government-center/help-center">
+          <i class="fas fa-question-circle"></i>
+          <span>帮助中心</span>
+          <i class="fas fa-chevron-right"></i>
+        </div>
+        <button class="logout-btn" (click)="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+          退出登录
+        </button>
       </div>
     </div>
   </main>
@@ -187,6 +251,172 @@
           <div class="default-avatar" (click)="useDefaultAvatar('🏛️')">🏛️</div>
           <div class="default-avatar" (click)="useDefaultAvatar('⚖️')">⚖️</div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 辖区详情弹窗 -->
+  <div class="modal-overlay" [class.show]="showRegionModal" (click)="closeRegionModal()">
+    <div class="modal-content region-modal" (click)="$event.stopPropagation()" *ngIf="selectedRegion">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ selectedRegion.name }} - 辖区详情</h3>
+        <button class="close-btn" (click)="closeRegionModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- 基本信息 -->
+        <div class="detail-section">
+          <h4 class="section-title">📋 基本信息</h4>
+          <div class="detail-grid">
+            <div class="detail-row">
+              <span class="label">辖区ID:</span>
+              <span class="value">{{ selectedRegion.id }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">辖区名称:</span>
+              <span class="value">{{ selectedRegion.name }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">负责人:</span>
+              <span class="value">{{ selectedRegion.manager }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">联系方式:</span>
+              <span class="value">{{ selectedRegion.contact }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">详细地址:</span>
+              <span class="value">{{ selectedRegion.address }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">运行状态:</span>
+              <span class="value status" [class.active]="selectedRegion.status === 'active'">
+                {{ selectedRegion.status === 'active' ? '运行中' : '已停用' }}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 数据统计 -->
+        <div class="detail-section">
+          <h4 class="section-title">📊 数据统计</h4>
+          <div class="stats-grid">
+            <div class="stats-card">
+              <div class="stats-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="stats-content">
+                <div class="stats-value">{{ (selectedRegion.population / 10000).toFixed(1) }}</div>
+                <div class="stats-label">常住人口(万)</div>
+              </div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <i class="fas fa-store"></i>
+              </div>
+              <div class="stats-content">
+                <div class="stats-value">{{ selectedRegion.recyclePoints }}</div>
+                <div class="stats-label">回收网点(个)</div>
+              </div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div class="stats-content">
+                <div class="stats-value">{{ selectedRegion.complianceRate }}%</div>
+                <div class="stats-label">合规率</div>
+              </div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <i class="fas fa-recycle"></i>
+              </div>
+              <div class="stats-content">
+                <div class="stats-value">{{ (selectedRegion.monthlyVolume / 1000).toFixed(1) }}</div>
+                <div class="stats-label">月回收量(吨)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" (click)="deleteRegion(selectedRegion)">
+          <i class="fas fa-trash"></i> 删除
+        </button>
+        <button class="btn btn-warning" (click)="toggleRegionStatus(selectedRegion)">
+          <i class="fas" [class.fa-pause]="selectedRegion.status === 'active'" [class.fa-play]="selectedRegion.status === 'inactive'"></i>
+          {{ selectedRegion.status === 'active' ? '停用' : '启用' }}
+        </button>
+        <button class="btn btn-primary" (click)="editRegion(selectedRegion)">
+          <i class="fas fa-edit"></i> 编辑
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 添加/编辑辖区弹窗 -->
+  <div class="modal-overlay" [class.show]="showAddRegionModal" (click)="closeAddRegionModal()">
+    <div class="modal-content add-region-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ regionForm.id ? '编辑辖区' : '添加辖区' }}</h3>
+        <button class="close-btn" (click)="closeAddRegionModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-map"></i> 辖区名称 <span class="required">*</span></label>
+            <input type="text" class="form-input" [(ngModel)]="regionForm.name" placeholder="请输入辖区名称">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-user-tie"></i> 负责人 <span class="required">*</span></label>
+            <input type="text" class="form-input" [(ngModel)]="regionForm.manager" placeholder="请输入负责人姓名">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-phone"></i> 联系方式 <span class="required">*</span></label>
+            <input type="text" class="form-input" [(ngModel)]="regionForm.contact" placeholder="请输入联系方式">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-toggle-on"></i> 运行状态</label>
+            <select class="form-input" [(ngModel)]="regionForm.status">
+              <option value="active">运行中</option>
+              <option value="inactive">已停用</option>
+            </select>
+          </div>
+          
+          <div class="form-group full-width">
+            <label class="form-label"><i class="fas fa-map-marker-alt"></i> 详细地址</label>
+            <input type="text" class="form-input" [(ngModel)]="regionForm.address" placeholder="请输入详细地址">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-users"></i> 常住人口</label>
+            <input type="number" class="form-input" [(ngModel)]="regionForm.population" placeholder="请输入常住人口">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-store"></i> 回收网点数</label>
+            <input type="number" class="form-input" [(ngModel)]="regionForm.recyclePoints" placeholder="请输入回收网点数">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-check-circle"></i> 合规率 (%)</label>
+            <input type="number" class="form-input" [(ngModel)]="regionForm.complianceRate" placeholder="0-100" min="0" max="100">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-recycle"></i> 月回收量 (kg)</label>
+            <input type="number" class="form-input" [(ngModel)]="regionForm.monthlyVolume" placeholder="请输入月回收量">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-cancel" (click)="closeAddRegionModal()">取消</button>
+        <button class="btn btn-save" (click)="updateRegion()">
+          <i class="fas fa-save"></i> {{ regionForm.id ? '保存' : '添加' }}
+        </button>
       </div>
     </div>
   </div>

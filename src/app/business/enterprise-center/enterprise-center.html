@@ -275,35 +275,35 @@
             <div class="plan-comparison">
               <h3>套餐对比</h3>
               <div class="plan-cards">
-                <div class="plan-card">
-                  <div class="plan-name">基础版</div>
-                  <div class="plan-price">¥999<span>/月</span></div>
+                <div 
+                  *ngFor="let plan of plans" 
+                  class="plan-card"
+                  [class.featured]="plan.isPopular"
+                  [class.current]="plan.id === subscription.currentPlanId">
+                  <div *ngIf="plan.badge" class="plan-badge">{{plan.badge}}</div>
+                  <div *ngIf="plan.isPopular && !plan.badge" class="plan-badge popular">推荐</div>
+                  <div class="plan-name">{{plan.name}}</div>
+                  <div class="plan-price">¥{{plan.price}}<span>/{{plan.unit}}</span></div>
+                  <div class="plan-details">
+                    <div class="plan-detail-item">
+                      <i class="fas fa-users"></i> {{plan.users}}
+                    </div>
+                    <div class="plan-detail-item">
+                      <i class="fas fa-database"></i> {{plan.storage}}
+                    </div>
+                  </div>
                   <ul class="plan-features">
-                    <li><i class="fas fa-check"></i> 10个用户</li>
-                    <li><i class="fas fa-check"></i> 100GB存储</li>
-                    <li><i class="fas fa-check"></i> 基础功能</li>
+                    <li *ngFor="let feature of plan.features">
+                      <i class="fas fa-check"></i> {{feature}}
+                    </li>
                   </ul>
-                </div>
-                <div class="plan-card featured">
-                  <div class="plan-badge">当前</div>
-                  <div class="plan-name">专业版</div>
-                  <div class="plan-price">¥2999<span>/月</span></div>
-                  <ul class="plan-features">
-                    <li><i class="fas fa-check"></i> 50个用户</li>
-                    <li><i class="fas fa-check"></i> 500GB存储</li>
-                    <li><i class="fas fa-check"></i> 高级功能</li>
-                    <li><i class="fas fa-check"></i> AI助手</li>
-                  </ul>
-                </div>
-                <div class="plan-card">
-                  <div class="plan-name">企业版</div>
-                  <div class="plan-price">¥9999<span>/月</span></div>
-                  <ul class="plan-features">
-                    <li><i class="fas fa-check"></i> 不限用户</li>
-                    <li><i class="fas fa-check"></i> 2TB存储</li>
-                    <li><i class="fas fa-check"></i> 全部功能</li>
-                    <li><i class="fas fa-check"></i> 专属服务</li>
-                  </ul>
+                  <button 
+                    class="plan-select-btn"
+                    [class.current]="plan.id === subscription.currentPlanId"
+                    [disabled]="plan.id === subscription.currentPlanId"
+                    (click)="selectPlan(plan); confirmUpgrade()">
+                    {{plan.id === subscription.currentPlanId ? '当前套餐' : '选择此套餐'}}
+                  </button>
                 </div>
               </div>
             </div>
@@ -315,7 +315,7 @@
           <div class="settings-section">
             <div class="settings-group">
               <h3>账号设置</h3>
-              <div class="setting-item">
+              <div class="setting-item" (click)="openPasswordModal()">
                 <div class="setting-info">
                   <i class="fas fa-key"></i>
                   <span>修改密码</span>
@@ -324,7 +324,7 @@
                   <i class="fas fa-chevron-right"></i>
                 </button>
               </div>
-              <div class="setting-item">
+              <div class="setting-item" (click)="openSecurityModal()">
                 <div class="setting-info">
                   <i class="fas fa-shield-alt"></i>
                   <span>安全设置</span>
@@ -371,7 +371,7 @@
 
             <div class="settings-group">
               <h3>其他</h3>
-              <div class="setting-item">
+              <div class="setting-item" (click)="openHelpModal()">
                 <div class="setting-info">
                   <i class="fas fa-question-circle"></i>
                   <span>帮助中心</span>
@@ -380,7 +380,7 @@
                   <i class="fas fa-chevron-right"></i>
                 </button>
               </div>
-              <div class="setting-item">
+              <div class="setting-item" (click)="openAboutModal()">
                 <div class="setting-info">
                   <i class="fas fa-info-circle"></i>
                   <span>关于我们</span>
@@ -400,6 +400,318 @@
       </section>
     </div>
   </main>
+
+  <!-- 升级套餐弹窗 -->
+  <div *ngIf="showUpgradeModal" class="modal-overlay" (click)="closeUpgradeModal()">
+    <div class="modal-content upgrade-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>升级套餐</h3>
+        <button class="modal-close" (click)="closeUpgradeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="upgrade-plans">
+          <div 
+            *ngFor="let plan of plans"
+            class="upgrade-plan-card"
+            [class.selected]="selectedPlan?.id === plan.id"
+            [class.current]="plan.id === subscription.currentPlanId"
+            (click)="selectPlan(plan)">
+            <div *ngIf="plan.id === subscription.currentPlanId" class="current-badge">当前</div>
+            <div *ngIf="plan.isPopular && plan.id !== subscription.currentPlanId" class="popular-badge">推荐</div>
+            <div class="upgrade-plan-header">
+              <h4>{{plan.name}}</h4>
+              <div class="upgrade-plan-price">
+                <span class="price">¥{{plan.price}}</span>
+                <span class="unit">/{{plan.unit}}</span>
+              </div>
+            </div>
+            <div class="upgrade-plan-specs">
+              <div class="spec-item">
+                <i class="fas fa-users"></i>
+                <span>{{plan.users}}</span>
+              </div>
+              <div class="spec-item">
+                <i class="fas fa-database"></i>
+                <span>{{plan.storage}}</span>
+              </div>
+            </div>
+            <ul class="upgrade-plan-features">
+              <li *ngFor="let feature of plan.features">
+                <i class="fas fa-check-circle"></i>
+                {{feature}}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeUpgradeModal()">取消</button>
+        <button 
+          class="btn-primary" 
+          [disabled]="!selectedPlan || selectedPlan.id === subscription.currentPlanId"
+          (click)="confirmUpgrade()">
+          {{selectedPlan?.id === subscription.currentPlanId ? '已是当前套餐' : '确认升级'}}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 修改密码弹窗 -->
+  <div *ngIf="showPasswordModal" class="modal-overlay" (click)="closePasswordModal()">
+    <div class="modal-content password-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>修改密码</h3>
+        <button class="modal-close" (click)="closePasswordModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form class="password-form">
+          <div class="form-group">
+            <label>原密码</label>
+            <input 
+              type="password" 
+              [(ngModel)]="passwordForm.oldPassword" 
+              name="oldPassword"
+              placeholder="请输入原密码"
+              class="form-input">
+          </div>
+          <div class="form-group">
+            <label>新密码</label>
+            <input 
+              type="password" 
+              [(ngModel)]="passwordForm.newPassword" 
+              name="newPassword"
+              placeholder="请输入新密码（至少6位）"
+              class="form-input">
+          </div>
+          <div class="form-group">
+            <label>确认新密码</label>
+            <input 
+              type="password" 
+              [(ngModel)]="passwordForm.confirmPassword" 
+              name="confirmPassword"
+              placeholder="请再次输入新密码"
+              class="form-input">
+          </div>
+          <div class="form-tips">
+            <i class="fas fa-info-circle"></i>
+            <span>密码长度至少6位，建议包含字母、数字和符号</span>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closePasswordModal()">取消</button>
+        <button class="btn-primary" (click)="submitPasswordChange()">确认修改</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 安全设置弹窗 -->
+  <div *ngIf="showSecurityModal" class="modal-overlay" (click)="closeSecurityModal()">
+    <div class="modal-content security-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>安全设置</h3>
+        <button class="modal-close" (click)="closeSecurityModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="security-options">
+          <div class="security-option">
+            <div class="option-info">
+              <i class="fas fa-mobile-alt"></i>
+              <div class="option-text">
+                <h4>手机绑定</h4>
+                <p>绑定手机号用于接收验证码</p>
+              </div>
+            </div>
+            <span class="option-status bound">已绑定</span>
+          </div>
+          <div class="security-option">
+            <div class="option-info">
+              <i class="fas fa-envelope"></i>
+              <div class="option-text">
+                <h4>邮箱绑定</h4>
+                <p>绑定邮箱用于接收通知</p>
+              </div>
+            </div>
+            <span class="option-status bound">已绑定</span>
+          </div>
+          <div class="security-option">
+            <div class="option-info">
+              <i class="fas fa-lock"></i>
+              <div class="option-text">
+                <h4>两步验证</h4>
+                <p>启用两步验证提高安全性</p>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="security-option">
+            <div class="option-info">
+              <i class="fas fa-history"></i>
+              <div class="option-text">
+                <h4>登录历史</h4>
+                <p>查看最近的登录记录</p>
+              </div>
+            </div>
+            <button class="btn-link" (click)="openLoginHistoryModal()">查看</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" (click)="closeSecurityModal()">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 帮助中心弹窗 -->
+  <div *ngIf="showHelpModal" class="modal-overlay" (click)="closeHelpModal()">
+    <div class="modal-content help-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>帮助中心</h3>
+        <button class="modal-close" (click)="closeHelpModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="help-categories">
+          <div class="help-category">
+            <h4>📖 常见问题</h4>
+            <ul class="help-list">
+              <li><a href="#">如何添加员工？</a></li>
+              <li><a href="#">如何管理订单？</a></li>
+              <li><a href="#">如何查看数据报表？</a></li>
+              <li><a href="#">如何升级套餐？</a></li>
+            </ul>
+          </div>
+          <div class="help-category">
+            <h4>💡 使用教程</h4>
+            <ul class="help-list">
+              <li><a href="#">快速入门指南</a></li>
+              <li><a href="#">功能详解视频</a></li>
+              <li><a href="#">最佳实践案例</a></li>
+            </ul>
+          </div>
+          <div class="help-category">
+            <h4>📞 联系我们</h4>
+            <div class="contact-info">
+              <p><i class="fas fa-phone"></i> 客服热线：400-123-4567</p>
+              <p><i class="fas fa-envelope"></i> 邮箱：support@zhihui-eco.com</p>
+              <p><i class="fas fa-comments"></i> 在线客服：工作日 9:00-18:00</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" (click)="closeHelpModal()">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 关于我们弹窗 -->
+  <div *ngIf="showAboutModal" class="modal-overlay" (click)="closeAboutModal()">
+    <div class="modal-content about-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>关于我们</h3>
+        <button class="modal-close" (click)="closeAboutModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="about-content">
+          <div class="about-logo">
+            <span class="logo-icon">♻️</span>
+            <h2>智回回收</h2>
+          </div>
+          <div class="about-info">
+            <p class="about-desc">
+              智回回收是一款智能回收管理平台，致力于为企业提供全面的回收业务解决方案。
+              我们通过AI技术和大数据分析，帮助企业提升运营效率，降低成本，实现可持续发展。
+            </p>
+            <div class="about-stats">
+              <div class="stat">
+                <div class="stat-value">10000+</div>
+                <div class="stat-label">服务企业</div>
+              </div>
+              <div class="stat">
+                <div class="stat-value">50万+</div>
+                <div class="stat-label">日处理订单</div>
+              </div>
+              <div class="stat">
+                <div class="stat-value">99.9%</div>
+                <div class="stat-label">系统可用性</div>
+              </div>
+            </div>
+            <div class="about-version">
+              <p><strong>版本信息：</strong>v2.0.3</p>
+              <p><strong>更新时间：</strong>2024-12-16</p>
+              <p><strong>公司名称：</strong>智回环保科技有限公司</p>
+              <p><strong>备案号：</strong>京ICP备12345678号</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" (click)="closeAboutModal()">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 登录历史弹窗 -->
+  <div *ngIf="showLoginHistoryModal" class="modal-overlay" (click)="closeLoginHistoryModal()">
+    <div class="modal-content login-history-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>登录历史</h3>
+        <button class="modal-close" (click)="closeLoginHistoryModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="history-intro">
+          <i class="fas fa-info-circle"></i>
+          <span>最近5次登录记录，如有异常请及时修改密码</span>
+        </div>
+        <div class="history-list">
+          <div 
+            *ngFor="let record of loginHistory; let i = index" 
+            class="history-item"
+            [class.current]="i === 0">
+            <div class="history-icon">
+              <i class="fas" [class.fa-check-circle]="record.status === 'success'" [class.fa-times-circle]="record.status === 'failed'"></i>
+            </div>
+            <div class="history-info">
+              <div class="history-header">
+                <span class="history-time">{{ record.time }}</span>
+                <span class="history-status" [class.success]="record.status === 'success'" [class.failed]="record.status === 'failed'">
+                  {{ record.status === 'success' ? '成功' : '失败' }}
+                </span>
+              </div>
+              <div class="history-details">
+                <div class="detail-item">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>{{ record.location }}</span>
+                </div>
+                <div class="detail-item">
+                  <i class="fas fa-network-wired"></i>
+                  <span>{{ record.ip }}</span>
+                </div>
+                <div class="detail-item">
+                  <i class="fas fa-desktop"></i>
+                  <span>{{ record.device }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="history-tips">
+          <p>💡 <strong>安全提示：</strong></p>
+          <ul>
+            <li>定期检查登录记录，及时发现异常登录</li>
+            <li>如发现未授权的登录，请立即修改密码</li>
+            <li>建议开启两步验证以提高账号安全性</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" (click)="closeLoginHistoryModal()">关闭</button>
+      </div>
+    </div>
+  </div>
 
   <!-- 底部导航 -->
   <nav class="bottom-nav">
