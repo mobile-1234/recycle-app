@@ -71,7 +71,7 @@
             *ngFor="let order of filteredOrders" 
             class="order-item"
             (click)="openOrderDetail(order)">
-            <div class="order-header">
+  <div class="order-header">
               <div class="order-id">{{ order.id }}</div>
               <div class="order-status" [ngClass]="getStatusClass(order.status)">
                 {{ getStatusText(order.status) }}
@@ -277,6 +277,6 @@
     <div class="nav-item" routerLink="/business/enterprise-center">
       <div class="nav-icon">👤</div>
       <div>我的</div>
-    </div>
+  </div>
   </nav>
 </div>

@@ -93,6 +93,138 @@
           两次输入的密码不一致
         </div>
       </div>
+
+      <!-- C端用户额外字段 -->
+      <div *ngIf="registerForm.identity === 'user'">
+        <div class="form-group">
+          <label for="name">真实姓名</label>
+          <div class="input-with-icon">
+            <span class="input-icon">👤</span>
+            <input 
+              type="text" 
+              id="name" 
+              name="name"
+              [(ngModel)]="registerForm.name"
+              placeholder="请输入真实姓名">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="phone">手机号码</label>
+          <div class="input-with-icon">
+            <span class="input-icon">📱</span>
+            <input 
+              type="tel" 
+              id="phone" 
+              name="phone"
+              [(ngModel)]="registerForm.phone"
+              placeholder="请输入手机号码">
+          </div>
+        </div>
+      </div>
+
+      <!-- B端企业额外字段 -->
+      <div *ngIf="registerForm.identity === 'business'">
+        <div class="form-group">
+          <label for="companyName">企业名称</label>
+          <div class="input-with-icon">
+            <span class="input-icon">🏢</span>
+            <input 
+              type="text" 
+              id="companyName" 
+              name="companyName"
+              [(ngModel)]="registerForm.companyName"
+              placeholder="请输入企业名称">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="companyCode">统一社会信用代码</label>
+          <div class="input-with-icon">
+            <span class="input-icon">📋</span>
+            <input 
+              type="text" 
+              id="companyCode" 
+              name="companyCode"
+              [(ngModel)]="registerForm.companyCode"
+              placeholder="请输入统一社会信用代码">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="contactPerson">联系人</label>
+          <div class="input-with-icon">
+            <span class="input-icon">👤</span>
+            <input 
+              type="text" 
+              id="contactPerson" 
+              name="contactPerson"
+              [(ngModel)]="registerForm.contactPerson"
+              placeholder="请输入联系人姓名">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="contactPhone">联系电话</label>
+          <div class="input-with-icon">
+            <span class="input-icon">📞</span>
+            <input 
+              type="tel" 
+              id="contactPhone" 
+              name="contactPhone"
+              [(ngModel)]="registerForm.contactPhone"
+              placeholder="请输入联系电话">
+          </div>
+        </div>
+      </div>
+
+      <!-- G端政府额外字段 -->
+      <div *ngIf="registerForm.identity === 'government'">
+        <div class="form-group">
+          <label for="departmentName">部门名称</label>
+          <div class="input-with-icon">
+            <span class="input-icon">🏛️</span>
+            <input 
+              type="text" 
+              id="departmentName" 
+              name="departmentName"
+              [(ngModel)]="registerForm.departmentName"
+              placeholder="请输入部门名称">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="position">职位</label>
+          <div class="input-with-icon">
+            <span class="input-icon">💼</span>
+            <input 
+              type="text" 
+              id="position" 
+              name="position"
+              [(ngModel)]="registerForm.position"
+              placeholder="请输入职位">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="govPhone">办公电话</label>
+          <div class="input-with-icon">
+            <span class="input-icon">☎️</span>
+            <input 
+              type="tel" 
+              id="govPhone" 
+              name="govPhone"
+              [(ngModel)]="registerForm.govPhone"
+              placeholder="请输入办公电话">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="govEmail">政府邮箱</label>
+          <div class="input-with-icon">
+            <span class="input-icon">📧</span>
+            <input 
+              type="email" 
+              id="govEmail" 
+              name="govEmail"
+              [(ngModel)]="registerForm.govEmail"
+              placeholder="请输入政府邮箱">
+          </div>
+        </div>
+      </div>
       
       <button type="submit" class="btn-register">注册账号</button>
     </form>

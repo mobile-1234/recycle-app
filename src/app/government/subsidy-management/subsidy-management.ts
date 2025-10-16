@@ -24,6 +24,7 @@ interface PaymentRecord {
 
 @Component({
   selector: 'app-subsidy-management',
+  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './subsidy-management.html',
   styleUrl: './subsidy-management.scss'

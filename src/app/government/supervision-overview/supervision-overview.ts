@@ -22,6 +22,7 @@ interface AreaData {
 
 @Component({
   selector: 'app-supervision-overview',
+  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './supervision-overview.html',
   styleUrl: './supervision-overview.scss'
