@@ -2,7 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import{FmodeParse} from 'fmode-ng'    ;
+import { FmodeParse } from 'fmode-ng';
+import { AuthService } from '../services/auth.service';
 interface RegisterForm {
   identity: string;
   account: string;
@@ -30,8 +31,15 @@ interface FormErrors {
   confirmPassword: boolean;
 }
 
+interface ErrorMessage {
+  show: boolean;
+  message: string;
+  type: 'error' | 'success';
+}
+
 @Component({
   selector: 'app-register',
+  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './register.html',
   styleUrl: './register.scss'
@@ -70,6 +78,16 @@ export class Register {
   showPassword = false;
   showConfirmPassword = false;
 
+  // 加载状态
+  isLoading = false;
+
+  // 错误消息
+  errorMessage: ErrorMessage = {
+    show: false,
+    message: '',
+    type: 'error'
+  };
+
   // 身份选项
   identityOptions = [
     { value: 'user', label: 'C端用户', icon: '👤' },
@@ -77,7 +95,10 @@ export class Register {
     { value: 'government', label: 'G端政府', icon: '🏛️' }
   ];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   // 选择身份
   selectIdentity(identity: string) {
@@ -165,66 +186,73 @@ export class Register {
     }
 
     if (isValid) {
-      // Mock 注册成功
-      this.mockRegister();
+      // 调用注册方法
+      this.registerUser();
     }
   }
 
-  // Mock 注册处理
-  private mockRegister() {
-    // 模拟API调用延迟
-    setTimeout(() => {
-      // Mock 注册成功响应
-      const mockResponse = {
-        success: true,
-        message: '注册成功！',
-        user: {
-          id: Math.random().toString(36).substr(2, 9),
-          identity: this.registerForm.identity,
-          account: this.registerForm.account,
-          createdAt: new Date().toISOString()
-        }
+  // 注册处理
+  private async registerUser() {
+    this.isLoading = true;
+    this.errorMessage = { show: false, message: '', type: 'error' };
+
+    // 准备额外字段
+    const extraFields: any = {};
+
+    // 根据不同身份类型准备字段
+    if (this.registerForm.identity === 'user') {
+      // C端用户字段
+      if (this.registerForm.name) extraFields.name = this.registerForm.name;
+      if (this.registerForm.phone) extraFields.phone = this.registerForm.phone;
+    } else if (this.registerForm.identity === 'business') {
+      // B端企业字段
+      if (this.registerForm.companyName) extraFields.companyName = this.registerForm.companyName;
+      if (this.registerForm.companyCode) extraFields.companyCode = this.registerForm.companyCode;
+      if (this.registerForm.contactPerson) extraFields.contactPerson = this.registerForm.contactPerson;
+      if (this.registerForm.contactPhone) extraFields.contactPhone = this.registerForm.contactPhone;
+    } else if (this.registerForm.identity === 'government') {
+      // G端政府字段
+      if (this.registerForm.departmentName) extraFields.departmentName = this.registerForm.departmentName;
+      if (this.registerForm.position) extraFields.position = this.registerForm.position;
+      if (this.registerForm.govPhone) extraFields.govPhone = this.registerForm.govPhone;
+      if (this.registerForm.govEmail) extraFields.govEmail = this.registerForm.govEmail;
+    }
+
+    // 添加调试日志
+    console.log('注册数据:', {
+      account: this.registerForm.account,
+      identity: this.registerForm.identity,
+      extraFields: extraFields
+    });
+
+    // 调用 AuthService 注册
+    const result = await this.authService.register(
+      this.registerForm.account,
+      this.registerForm.password,
+      this.registerForm.identity,
+      extraFields
+    );
+
+    if (result.success) {
+      // 显示成功消息
+      this.errorMessage = {
+        show: true,
+        message: '注册成功！即将跳转到登录页面...',
+        type: 'success'
       };
 
-      // 构建完整的用户信息
-      const completeUserInfo = {
-        ...mockResponse.user,
-        ...this.registerForm
+      // 延迟跳转
+      setTimeout(() => {
+        this.router.navigate(['/auth/login']);
+      }, 1500);
+    } else {
+      this.errorMessage = {
+        show: true,
+        message: result.message,
+        type: 'error'
       };
-
-      FmodeParse.User.signUp(this.registerForm.account, this.registerForm.password).then(user => {
-        console.log('FmodeParse 注册成功:', user);
-        console.log('Mock 注册响应:', mockResponse);
-        
-        // 保存用户信息到localStorage，包含注册时的身份信息和完整资料
-        const userInfo = {
-          ...completeUserInfo,
-          fmodeUser: user
-        };
-        localStorage.setItem('registeredUser', JSON.stringify(userInfo));
-        
-        // 显示成功消息
-        alert('注册成功！请使用刚注册的账号登录。');
-        
-        // 跳转到登录页面
-        this.router.navigate(['/auth/login']);
-        
-      }).catch(err => {
-        console.log('FmodeParse 注册失败:', err);
-        
-        // 即使FmodeParse失败，也使用Mock数据继续流程
-        console.log('使用Mock数据继续注册流程');
-        
-        // 保存用户信息到localStorage，包含注册时的身份信息和完整资料
-        localStorage.setItem('registeredUser', JSON.stringify(completeUserInfo));
-        
-        // 显示成功消息
-        alert('注册成功！请使用刚注册的账号登录。');
-        
-        // 跳转到登录页面
-        this.router.navigate(['/auth/login']);
-      });
-    }, 1000);
+      this.isLoading = false;
+    }
   }
 
   // 根据用户身份类型导航到对应首页

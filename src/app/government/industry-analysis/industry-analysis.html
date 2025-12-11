@@ -21,11 +21,48 @@
       <div *ngIf="activeTab === 'chain'" class="chain-analysis">
         <h3>全产业链数据流</h3>
         <div class="chain-flow">
-          <div *ngFor="let item of chainData; let i = index" class="chain-item">
+          <div *ngFor="let item of chainData; let i = index" class="chain-item" (click)="viewChainDetail(item)">
             <div class="chain-stage">{{ item.stage }}</div>
-            <div class="chain-volume">{{ item.volume }}kg</div>
+            <div class="chain-volume">{{ item.volume.toLocaleString() }}kg</div>
             <div class="chain-efficiency">效率: {{ item.efficiency }}%</div>
+            <div class="chain-companies">企业: {{ item.companies }}家</div>
+            <div class="chain-growth" [class.positive]="item.growth > 0">
+              <i class="fas fa-arrow-up"></i> {{ item.growth }}%
+            </div>
             <div *ngIf="i < chainData.length - 1" class="chain-arrow"><i class="fas fa-arrow-right"></i></div>
+            <div class="view-detail-hint">点击查看详情</div>
+          </div>
+        </div>
+        
+        <!-- 产业链总览数据 -->
+        <div class="chain-overview">
+          <div class="overview-card">
+            <div class="card-icon"><i class="fas fa-building"></i></div>
+            <div class="card-content">
+              <div class="card-value">{{ totalCompanies }}</div>
+              <div class="card-label">参与企业</div>
+            </div>
+          </div>
+          <div class="overview-card">
+            <div class="card-icon"><i class="fas fa-users"></i></div>
+            <div class="card-content">
+              <div class="card-value">{{ totalEmployees }}k</div>
+              <div class="card-label">从业人员</div>
+            </div>
+          </div>
+          <div class="overview-card">
+            <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="card-content">
+              <div class="card-value">{{ totalRevenue }}亿</div>
+              <div class="card-label">总产值</div>
+            </div>
+          </div>
+          <div class="overview-card">
+            <div class="card-icon"><i class="fas fa-percent"></i></div>
+            <div class="card-content">
+              <div class="card-value">{{ averageGrowth }}%</div>
+              <div class="card-label">平均增长率</div>
+            </div>
           </div>
         </div>
       </div>
@@ -33,11 +70,39 @@
       <!-- 区域对比 -->
       <div *ngIf="activeTab === 'region'" class="region-comparison">
         <div *ngFor="let region of regionData" class="region-card">
-          <h4>{{ region.region }}</h4>
+          <div class="region-header">
+            <h4>{{ region.region }}</h4>
+            <span class="region-trend" [ngClass]="getTrendClass(region.trend)">
+              <i class="fas" [ngClass]="getTrendIcon(region.trend)"></i>
+            </span>
+          </div>
           <div class="region-stats">
-            <div class="stat-item"><span>回收率</span><span>{{ region.recycleRate }}%</span></div>
-            <div class="stat-item"><span>再生率</span><span>{{ region.regenerationRate }}%</span></div>
-            <div class="stat-item"><span>市场价</span><span>¥{{ region.marketPrice }}/kg</span></div>
+            <div class="stat-item">
+              <span class="stat-label">回收率</span>
+              <div class="stat-bar">
+                <div class="stat-fill" [style.width.%]="region.recycleRate"></div>
+              </div>
+              <span class="stat-value">{{ region.recycleRate }}%</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">再生率</span>
+              <div class="stat-bar">
+                <div class="stat-fill regeneration" [style.width.%]="region.regenerationRate"></div>
+              </div>
+              <span class="stat-value">{{ region.regenerationRate }}%</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">市场价</span>
+              <span class="stat-value price">¥{{ region.marketPrice }}/kg</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">企业数</span>
+              <span class="stat-value">{{ region.companies }}家</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">月回收量</span>
+              <span class="stat-value">{{ region.volume.toLocaleString() }}kg</span>
+            </div>
           </div>
         </div>
       </div>
@@ -52,8 +117,38 @@
             </span>
           </div>
           <div class="category-stats">
-            <div class="stat-row"><span>回收率</span><span>{{ cat.recycleRate }}%</span></div>
-            <div class="stat-row"><span>再生率</span><span>{{ cat.regenerationRate }}%</span></div>
+            <div class="stat-row">
+              <span class="stat-label">回收率</span>
+              <div class="stat-bar-mini">
+                <div class="stat-fill-mini" [style.width.%]="cat.recycleRate"></div>
+              </div>
+              <span class="stat-value">{{ cat.recycleRate }}%</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">再生率</span>
+              <div class="stat-bar-mini">
+                <div class="stat-fill-mini regeneration" [style.width.%]="cat.regenerationRate"></div>
+              </div>
+              <span class="stat-value">{{ cat.regenerationRate }}%</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">月回收量</span>
+              <span class="stat-value">{{ cat.volume.toLocaleString() }}kg</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">月产值</span>
+              <span class="stat-value">¥{{ (cat.value / 10000).toFixed(1) }}万</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">企业数量</span>
+              <span class="stat-value">{{ cat.companies }}家</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">市场需求</span>
+              <span class="stat-badge" [ngClass]="getDemandClass(cat.marketDemand)">
+                {{ getDemandText(cat.marketDemand) }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -62,15 +157,174 @@
       <div *ngIf="activeTab === 'risk'" class="risk-warnings">
         <div *ngFor="let risk of risks" class="risk-item" [ngClass]="getRiskClass(risk.level)">
           <div class="risk-header">
-            <span class="risk-type">{{ risk.type }}</span>
-            <span class="risk-level">{{ risk.level === 'high' ? '高' : risk.level === 'medium' ? '中' : '低' }}</span>
+            <div class="risk-type-box">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span class="risk-type">{{ risk.type }}</span>
+            </div>
+            <span class="risk-level-badge">{{ risk.level === 'high' ? '高风险' : risk.level === 'medium' ? '中风险' : '低风险' }}</span>
           </div>
-          <div class="risk-content">{{ risk.content }}</div>
-          <div class="risk-strategy">应对策略: {{ risk.strategy }}</div>
+          <div class="risk-content">
+            <div class="risk-label">风险描述：</div>
+            <div class="risk-text">{{ risk.content }}</div>
+          </div>
+          <div class="risk-impact">
+            <div class="risk-label">影响评估：</div>
+            <div class="risk-text">{{ risk.impact }}</div>
+          </div>
+          <div class="risk-probability">
+            <div class="risk-label">发生概率：</div>
+            <div class="probability-bar">
+              <div class="probability-fill" [style.width.%]="risk.probability"></div>
+            </div>
+            <span class="probability-value">{{ risk.probability }}%</span>
+          </div>
+          <div class="risk-strategy">
+            <div class="risk-label">应对策略：</div>
+            <div class="risk-text">{{ risk.strategy }}</div>
+          </div>
         </div>
       </div>
     </div>
   </main>
+
+  <!-- 产业链详情弹窗 -->
+  <div *ngIf="showDetailModal && selectedStage" class="detail-modal-overlay" (click)="closeDetailModal()">
+    <div class="detail-modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2><i class="fas fa-chart-pie"></i> {{ selectedStage.stage }}环节详细分析</h2>
+        <button class="modal-close" (click)="closeDetailModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- 基本数据概览 -->
+        <section class="detail-section">
+          <h3><i class="fas fa-info-circle"></i> 基本数据概览</h3>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-weight"></i></div>
+              <div class="stat-content">
+                <div class="stat-label">月处理量</div>
+                <div class="stat-value">{{ selectedStage.volume.toLocaleString() }} kg</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-tachometer-alt"></i></div>
+              <div class="stat-content">
+                <div class="stat-label">运营效率</div>
+                <div class="stat-value">{{ selectedStage.efficiency }}%</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-building"></i></div>
+              <div class="stat-content">
+                <div class="stat-label">参与企业</div>
+                <div class="stat-value">{{ selectedStage.companies }} 家</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-users"></i></div>
+              <div class="stat-content">
+                <div class="stat-label">从业人员</div>
+                <div class="stat-value">{{ selectedStage.employees.toLocaleString() }} 人</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+              <div class="stat-content">
+                <div class="stat-label">月营收</div>
+                <div class="stat-value">¥{{ (selectedStage.revenue / 10000).toFixed(1) }}万</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-arrow-up"></i></div>
+              <div class="stat-content">
+                <div class="stat-label">同比增长</div>
+                <div class="stat-value positive">+{{ selectedStage.growth }}%</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 龙头企业排名 -->
+        <section class="detail-section">
+          <h3><i class="fas fa-trophy"></i> 龙头企业排名 TOP 3</h3>
+          <div class="companies-list">
+            <div *ngFor="let company of selectedStage.detailData.topCompanies; let idx = index" class="company-item">
+              <div class="company-rank" [class.rank-1]="idx === 0" [class.rank-2]="idx === 1" [class.rank-3]="idx === 2">
+                {{ idx + 1 }}
+              </div>
+              <div class="company-info">
+                <div class="company-name">{{ company.name }}</div>
+                <div class="company-stats">
+                  <span><i class="fas fa-weight"></i> {{ company.volume.toLocaleString() }}kg</span>
+                  <span><i class="fas fa-chart-pie"></i> 市场份额 {{ company.share }}%</span>
+                </div>
+              </div>
+              <div class="company-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="company.share * 4"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 技术应用 -->
+        <section class="detail-section">
+          <h3><i class="fas fa-microchip"></i> 技术应用</h3>
+          <div class="tech-tags">
+            <span *ngFor="let tech of selectedStage.detailData.technologies" class="tech-tag">
+              <i class="fas fa-check-circle"></i> {{ tech }}
+            </span>
+          </div>
+        </section>
+
+        <!-- 面临挑战 -->
+        <section class="detail-section">
+          <h3><i class="fas fa-exclamation-circle"></i> 面临挑战</h3>
+          <ul class="challenge-list">
+            <li *ngFor="let challenge of selectedStage.detailData.challenges">
+              <i class="fas fa-minus"></i> {{ challenge }}
+            </li>
+          </ul>
+        </section>
+
+        <!-- 发展机遇 -->
+        <section class="detail-section">
+          <h3><i class="fas fa-lightbulb"></i> 发展机遇</h3>
+          <ul class="opportunity-list">
+            <li *ngFor="let opportunity of selectedStage.detailData.opportunities">
+              <i class="fas fa-plus"></i> {{ opportunity }}
+            </li>
+          </ul>
+        </section>
+
+        <!-- 月度趋势 -->
+        <section class="detail-section">
+          <div class="section-header-with-action">
+            <h3><i class="fas fa-chart-line"></i> 月度趋势分析</h3>
+            <button class="trend-toggle-btn" (click)="toggleTrendView()">
+              <i class="fas" [ngClass]="trendViewMode === 'recent' ? 'fa-expand' : 'fa-compress'"></i>
+              {{ trendViewMode === 'recent' ? '查看全年' : '收起' }}
+            </button>
+          </div>
+          <div class="echarts-container" [class.full-year]="trendViewMode === 'full'">
+            <div echarts 
+                 [options]="chartOption" 
+                 [loading]="!selectedStage"
+                 class="trend-echarts">
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-close" (click)="closeDetailModal()">关闭</button>
+      </div>
+    </div>
+  </div>
 
   <nav class="bottom-nav">
     <div class="nav-item" routerLink="/government/supervision-overview"><div class="nav-icon">📊</div><div>监管</div></div>

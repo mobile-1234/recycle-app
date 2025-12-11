@@ -1,13 +1,21 @@
 <div class="register-page">
   <div class="header">
     <button class="back-btn" (click)="goBack()">←</button>
-    <div class="app-title">绿色回收</div>
+    <div class="app-title">再生视界</div>
     <div class="logo">♻️</div>
   </div>
   
   <div class="container">
     <h2 class="form-title">创建账户</h2>
     <p class="form-subtitle">加入我们，共同守护地球家园</p>
+    
+    <!-- 全局消息提示 -->
+    <div *ngIf="errorMessage.show" 
+         class="message-box"
+         [class.error]="errorMessage.type === 'error'"
+         [class.success]="errorMessage.type === 'success'">
+      {{ errorMessage.message }}
+    </div>
     
     <form #regForm="ngForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
@@ -226,7 +234,14 @@
         </div>
       </div>
       
-      <button type="submit" class="btn-register">注册账号</button>
+      <button 
+        type="submit" 
+        class="btn-register"
+        [disabled]="isLoading"
+        [class.loading]="isLoading">
+        <span *ngIf="isLoading">⏳ 注册中...</span>
+        <span *ngIf="!isLoading">注册账号</span>
+      </button>
     </form>
     
     <div class="login-link">

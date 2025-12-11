@@ -1,6 +1,6 @@
 <div class="header">
   <a (click)="goBack()" class="back-btn">←</a>
-  <div class="app-title">绿色回收</div>
+  <div class="app-title">再生视界</div>
   <div class="logo">♻️</div>
 </div>
 
@@ -8,64 +8,143 @@
   <h2 class="form-title">欢迎回来</h2>
   <p class="form-subtitle">登录您的账户，继续环保之旅</p>
   
+  <!-- 全局消息提示 -->
+  <div *ngIf="errorMessage.show" 
+       class="message-box"
+       [class.error]="errorMessage.type === 'error'"
+       [class.success]="errorMessage.type === 'success'">
+    {{ errorMessage.message }}
+  </div>
+
+  <!-- 登录方式切换 -->
+  <div class="login-mode-selector" *ngIf="enablePhoneLogin">
+    <button 
+      type="button"
+      class="mode-btn"
+      [class.active]="loginMode === 'password'"
+      (click)="switchLoginMode('password')">
+      🔒 密码登录
+    </button>
+    <button 
+      type="button"
+      class="mode-btn"
+      [class.active]="loginMode === 'phone'"
+      (click)="switchLoginMode('phone')">
+      📱 验证码登录
+    </button>
+  </div>
+  
   <form (ngSubmit)="onSubmit()" #loginFormRef="ngForm">
-    <div class="form-group">
-      <label for="account">账户信息</label>
-      <div class="input-with-icon">
-        <span class="input-icon">📱</span>
-        <input 
-          type="text" 
-          id="account" 
-          name="account"
-          [(ngModel)]="loginForm.account"
-          placeholder="手机号/邮箱/用户名" 
-          required>
+    <!-- 密码登录模式 -->
+    <div *ngIf="loginMode === 'password'">
+      <div class="form-group">
+        <label for="account">账户信息</label>
+        <div class="input-with-icon">
+          <span class="input-icon">📱</span>
+          <input 
+            type="text" 
+            id="account" 
+            name="account"
+            [(ngModel)]="loginForm.account"
+            placeholder="手机号/邮箱/用户名" 
+            required>
+        </div>
+        <div class="error-message" [style.display]="errors.account ? 'block' : 'none'">
+          {{ errors.account }}
+        </div>
       </div>
-      <div class="error-message" [style.display]="errors.account ? 'block' : 'none'">
-        {{ errors.account }}
+      
+      <div class="form-group">
+        <label for="password">密码</label>
+        <div class="input-with-icon">
+          <span class="input-icon">🔒</span>
+          <input 
+            [type]="passwordVisible ? 'text' : 'password'" 
+            id="password" 
+            name="password"
+            [(ngModel)]="loginForm.password"
+            placeholder="请输入密码" 
+            required>
+          <button 
+            type="button" 
+            class="password-toggle"
+            (click)="togglePasswordVisibility()">
+            {{ passwordVisible ? '🙈' : '👁️' }}
+          </button>
+        </div>
+        <div class="error-message" [style.display]="errors.password ? 'block' : 'none'">
+          {{ errors.password }}
+        </div>
+      </div>
+      
+      <div class="remember-forgot">
+        <div class="remember-me">
+          <input 
+            type="checkbox" 
+            id="remember" 
+            name="remember"
+            [(ngModel)]="loginForm.remember">
+          <label for="remember">记住我</label>
+        </div>
+        <a (click)="goToForgotPassword()" class="forgot-password">忘记密码？</a>
       </div>
     </div>
-    
-    <div class="form-group">
-      <label for="password">密码</label>
-      <div class="input-with-icon">
-        <span class="input-icon">🔒</span>
-        <input 
-          [type]="passwordVisible ? 'text' : 'password'" 
-          id="password" 
-          name="password"
-          [(ngModel)]="loginForm.password"
-          placeholder="请输入密码" 
-          required>
-        <button 
-          type="button" 
-          class="password-toggle"
-          (click)="togglePasswordVisibility()">
-          {{ passwordVisible ? '🙈' : '👁️' }}
-        </button>
+
+    <!-- 验证码登录模式 -->
+    <div *ngIf="loginMode === 'phone'">
+      <div class="form-group">
+        <label for="phone">手机号</label>
+        <div class="input-with-icon">
+          <span class="input-icon">📱</span>
+          <input 
+            type="text" 
+            id="phone" 
+            name="phone"
+            [(ngModel)]="loginForm.account"
+            placeholder="请输入手机号" 
+            maxlength="11"
+            required>
+        </div>
+        <div class="error-message" [style.display]="errors.account ? 'block' : 'none'">
+          {{ errors.account }}
+        </div>
       </div>
-      <div class="error-message" [style.display]="errors.password ? 'block' : 'none'">
-        {{ errors.password }}
+      
+      <div class="form-group">
+        <label for="code">验证码</label>
+        <div class="code-input-group">
+          <div class="input-with-icon">
+            <span class="input-icon">🔐</span>
+            <input 
+              type="text" 
+              id="code" 
+              name="code"
+              [(ngModel)]="loginForm.verificationCode"
+              placeholder="请输入6位验证码" 
+              maxlength="6"
+              required>
+          </div>
+          <button 
+            type="button"
+            class="btn-send-code"
+            [disabled]="countdown > 0"
+            (click)="sendVerificationCode()">
+            {{ countdown > 0 ? countdown + 's' : '获取验证码' }}
+          </button>
+        </div>
+        <div class="error-message" [style.display]="errors.password ? 'block' : 'none'">
+          {{ errors.password }}
+        </div>
       </div>
-    </div>
-    
-    <div class="remember-forgot">
-      <div class="remember-me">
-        <input 
-          type="checkbox" 
-          id="remember" 
-          name="remember"
-          [(ngModel)]="loginForm.remember">
-        <label for="remember">记住我</label>
-      </div>
-      <a (click)="forgotPassword()" class="forgot-password">忘记密码？</a>
     </div>
     
     <button 
       type="submit" 
       class="btn-login"
-      [disabled]="isLoading">
-      {{ isLoading ? '登录中...' : '登录' }}
+      [disabled]="isLoading"
+      [class.loading]="isLoading">
+      <span *ngIf="isLoading">⏳ 登录中...</span>
+      <span *ngIf="!isLoading">登录</span>
     </button>
     
     <div class="divider">或使用以下方式登录</div>

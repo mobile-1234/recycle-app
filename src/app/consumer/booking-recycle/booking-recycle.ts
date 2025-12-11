@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BottomNavComponent } from '../../shared/bottom-nav/bottom-nav.component';
-import { SvgIconComponent } from '../../shared/components/svg-icons/svg-icons.component';
 
 interface WasteCategory {
   id: string;
@@ -52,32 +51,34 @@ interface AdditionalService {
 @Component({
   selector: 'app-booking-recycle',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, BottomNavComponent, SvgIconComponent],
+  imports: [CommonModule, RouterModule, FormsModule, BottomNavComponent],
   templateUrl: './booking-recycle.html',
   styleUrl: './booking-recycle.scss'
 })
 export class BookingRecycle implements OnInit {
   
-  // 废品分类
+  // 废品分类 - 采用简约清新的图标设计（Font Awesome 6.0兼容）
   wasteCategories: WasteCategory[] = [
-    { id: 'paper', name: '纸类', icon: 'eco', active: true },
-    { id: 'plastic', name: '塑料', icon: 'utensils', active: false },
-    { id: 'glass', name: '玻璃', icon: 'recycle', active: false },
-    { id: 'electronic', name: '电子', icon: 'electronics', active: false },
-    { id: 'textile', name: '衣物', icon: 'user', active: false },
-    { id: 'other', name: '其他', icon: 'trash', active: false }
+    { id: 'paper', name: '纸类', icon: 'fas fa-newspaper', active: true },
+    { id: 'plastic', name: '塑料', icon: 'fas fa-recycle', active: false },
+    { id: 'glass', name: '玻璃', icon: 'fas fa-wine-bottle', active: false },
+    { id: 'electronic', name: '电子', icon: 'fas fa-mobile-alt', active: false },
+    { id: 'textile', name: '衣物', icon: 'fas fa-tshirt', active: false },
+    { id: 'metal', name: '金属', icon: 'fas fa-wrench', active: false },
+    { id: 'furniture', name: '家具', icon: 'fas fa-chair', active: false },
+    { id: 'other', name: '其他', icon: 'fas fa-cube', active: false }
   ];
 
-  // 回收方式
+  // 回收方式 - 直观表意的图标设计（Font Awesome 6.0兼容）
   recycleMethods: RecycleMethod[] = [
-    { id: 'pickup', name: '上门回收', description: '回收员上门收取', icon: 'recycle-method', active: true },
-    { id: 'dropoff', name: '自助投递', description: '送至自助点', icon: 'address', active: false }
+    { id: 'pickup', name: '上门回收', description: '回收员上门收取', icon: 'fas fa-truck', active: true },
+    { id: 'dropoff', name: '自助投递', description: '送至自助点', icon: 'fas fa-box', active: false }
   ];
 
   // 时间选项
   timeOptions: TimeOption[] = [
-    { id: 'immediate', name: '立即上门', description: '最快30分钟', icon: 'clock', active: true },
-    { id: 'scheduled', name: '预约时间', description: '选择日期', icon: 'clock', active: false }
+    { id: 'immediate', name: '立即上门', description: '最快30分钟', icon: 'fas fa-rocket', active: true },
+    { id: 'scheduled', name: '预约时间', description: '选择日期', icon: 'fas fa-calendar-check', active: false }
   ];
 
   // 日期选项
@@ -100,9 +101,14 @@ export class BookingRecycle implements OnInit {
 
   // 附加服务
   additionalServices: AdditionalService[] = [
-    { id: 'carry', name: '搬运服务', description: '协助搬运重物', price: '免费', icon: 'service', enabled: false },
-    { id: 'clean', name: '清洁服务', description: '清理回收区域', price: '+5元', icon: 'service', enabled: false },
-    { id: 'sort', name: '分类服务', description: '专业分类指导', price: '免费', icon: 'service', enabled: false }
+    { id: 'carry', name: '搬运服务', description: '协助搬运重物（楼层搬运、电梯搬运）', price: '免费', icon: 'fas fa-people-carry', enabled: false },
+    { id: 'clean', name: '清洁服务', description: '清理回收区域，保持环境整洁', price: '+5元', icon: 'fas fa-spray-can', enabled: false },
+    { id: 'sort', name: '分类服务', description: '专业分类指导，提高回收效率', price: '免费', icon: 'fas fa-sort-alpha-down', enabled: false },
+    { id: 'dismantle', name: '拆解服务', description: '大件家具、电器拆解服务', price: '+10元', icon: 'fas fa-hammer', enabled: false },
+    { id: 'package', name: '打包服务', description: '提供环保袋、纸箱等打包材料', price: '+3元', icon: 'fas fa-gift', enabled: false },
+    { id: 'express', name: '加急服务', description: '15分钟内上门，优先处理', price: '+8元', icon: 'fas fa-tachometer-alt', enabled: false },
+    { id: 'insurance', name: '保价服务', description: '贵重物品保价，安全保障', price: '+5元', icon: 'fas fa-shield-alt', enabled: false },
+    { id: 'certificate', name: '回收凭证', description: '开具正规回收凭证，可抵税', price: '免费', icon: 'fas fa-award', enabled: false }
   ];
 
   // 表单数据
@@ -121,6 +127,7 @@ export class BookingRecycle implements OnInit {
 
   ngOnInit(): void {
     this.calculateEarnings();
+    this.loadSavedAddress();
   }
 
   // 选择废品分类
@@ -185,12 +192,92 @@ export class BookingRecycle implements OnInit {
     });
   }
 
-  // 上传照片
-  uploadPhoto(): void {
-    // 模拟照片上传
-    if (this.photos.length < 3) {
-      this.photos.push('https://via.placeholder.com/80');
+  // 照片上传相关
+  showPhotoOptions: boolean = false;
+  showCamera: boolean = false;
+  videoStream: MediaStream | null = null;
+
+  // 打开照片选项
+  openPhotoOptions(): void {
+    this.showPhotoOptions = true;
+  }
+
+  closePhotoOptions(): void {
+    this.showPhotoOptions = false;
+  }
+
+  // 从相册选择
+  selectFromGallery(): void {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.multiple = true;
+    input.onchange = (e: any) => {
+      const files = e.target.files;
+      if (files) {
+        Array.from(files).forEach((file: any) => {
+          if (this.photos.length < 9) {
+            const reader = new FileReader();
+            reader.onload = (event: any) => {
+              this.photos.push(event.target.result);
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+    };
+    input.click();
+    this.closePhotoOptions();
+  }
+
+  // 打开摄像头拍照
+  async openCamera(): Promise<void> {
+    this.closePhotoOptions();
+    this.showCamera = true;
+    try {
+      this.videoStream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' },
+        audio: false 
+      });
+      
+      // 等待 DOM 更新
+      setTimeout(() => {
+        const video = document.getElementById('camera-video') as HTMLVideoElement;
+        if (video && this.videoStream) {
+          video.srcObject = this.videoStream;
+          video.play();
+        }
+      }, 100);
+    } catch (err) {
+      console.error('无法访问摄像头:', err);
+      alert('无法访问摄像头，请检查权限设置或从相册选择照片');
+      this.closeCamera();
     }
+  }
+
+  // 拍照
+  takePhoto(): void {
+    const video = document.getElementById('camera-video') as HTMLVideoElement;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.drawImage(video, 0, 0);
+      const photoData = canvas.toDataURL('image/jpeg');
+      this.photos.push(photoData);
+      this.closeCamera();
+      this.showSuccessToast('照片已添加');
+    }
+  }
+
+  // 关闭摄像头
+  closeCamera(): void {
+    if (this.videoStream) {
+      this.videoStream.getTracks().forEach(track => track.stop());
+      this.videoStream = null;
+    }
+    this.showCamera = false;
   }
 
   // 删除照片
@@ -198,25 +285,51 @@ export class BookingRecycle implements OnInit {
     this.photos.splice(index, 1);
   }
 
-  // 更改地址
+  // 显示成功提示
+  private showSuccessToast(message: string): void {
+    const toast = document.createElement('div');
+    toast.className = 'success-toast';
+    toast.textContent = message;
+    toast.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(76, 175, 80, 0.95);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 99999;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      if (document.body.contains(toast)) {
+        document.body.removeChild(toast);
+      }
+    }, 2000);
+  }
+
+  // 更改地址 - 跳转到地址管理页面
   changeAddress(): void {
-    // 打开地址选择面板（复用 profile/addresses 模态）
-    this.showAddressPanel = true;
+    this.router.navigate(['/consumer/address-management']);
   }
 
-  // 新增：地址面板状态与选择回调
-  showAddressPanel: boolean = false;
-  selectedAddressOption: { address: string; name: string; phone: string } | null = null;
-
-  onAddressChosen(addr: { address: string; name: string; phone: string }): void {
-    this.address = addr.address;
-    this.contactName = addr.name;
-    this.contactPhone = addr.phone;
-    this.showAddressPanel = false;
-  }
-
-  closeAddressPanel(): void {
-    this.showAddressPanel = false;
+  // 加载保存的地址信息
+  loadSavedAddress(): void {
+    const savedAddresses = localStorage.getItem('userAddresses');
+    if (savedAddresses) {
+      const addresses = JSON.parse(savedAddresses);
+      const defaultAddress = addresses.find((addr: any) => addr.isDefault);
+      if (defaultAddress) {
+        this.address = `${defaultAddress.province}${defaultAddress.city}${defaultAddress.district}${defaultAddress.detail}`;
+        this.contactName = defaultAddress.name;
+        this.contactPhone = defaultAddress.phone;
+      }
+    }
   }
 
   // 导航到投递点
@@ -227,6 +340,11 @@ export class BookingRecycle implements OnInit {
   // 返回上一页
   goBack(): void {
     this.router.navigate(['/consumer/home']);
+  }
+
+  // 显示帮助信息
+  showHelp(): void {
+    alert('预约回收帮助：\n\n1. 选择废品分类和重量\n2. 上传废品照片（可选）\n3. 选择回收方式和时间\n4. 添加备注信息\n5. 确认提交预约\n\n如有问题请联系客服：400-123-4567');
   }
 
   // 提交预约

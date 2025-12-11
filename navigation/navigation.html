@@ -1,0 +1,125 @@
+<!-- navigation.html：手机端导航组件模板，实现符合大厂UI规范的导航界面 -->
+<div class="navigation-container">
+  <!-- 顶部区域：地图显示区域 -->
+  <div class="map-area">
+    <div class="map-content">
+      <!-- 地图容器 -->
+      <div id="amap-container"></div>
+    </div>
+  </div>
+
+  <!-- 顶部状态：输入框位于顶部，显示返回和搜索按钮 -->
+  <div #topInputContainer class="input-container top-state" [class.visible]="isInputBoxAtTop()">
+
+    <!-- 返回按钮 -->
+    <button class="nav-button back-button" (click)="switchToBottomInput()">
+      <i class="icon-back"></i>
+    </button>
+
+    <!-- 输入框 -->
+    <input #topInput type="text" placeholder="请输入地址" class="location-input top-input" [(ngModel)]="searchKeyword"
+      (ngModelChange)="onSearchKeywordChange()">
+
+    <!-- 搜索按钮 -->
+    <button class="nav-button search-button" (click)="performSearch()">
+      <i class="icon-search"></i>
+    </button>
+  </div>
+
+  <!-- 底部状态：输入框位于底部 -->
+  <div class="bottom-controls">
+    <div #bottomInputContainer class="input-container bottom-state" [class.visible]="!isInputBoxAtTop()"
+    (click)="switchToTopInput()">
+
+    <!-- 输入框 -->
+    <input type="text" placeholder="请输入地址" class="location-input bottom-input">
+    </div>
+    
+    <!-- 底部按钮区域 -->
+    <div class="bottom-button-area" *ngIf="showRouteButton">
+      <button class="route-btn" (click)="planRoute()">路线</button>
+      <button class="navigate-btn">导航</button>
+    </div>
+  </div>
+
+  <!-- 路线规划面板 -->
+  <div class="route-panel" *ngIf="showRoutePanel">
+    <!-- 路线类型选择 -->
+    <div class="route-type-selector">
+      <button 
+        [class.active]="routeType === 'driving'" 
+        (click)="switchRouteType('driving')"
+        class="route-type-btn"
+      >
+        <i class="icon-driving"></i>
+        <span>驾车</span>
+      </button>
+      <button 
+        [class.active]="routeType === 'walking'" 
+        (click)="switchRouteType('walking')"
+        class="route-type-btn"
+      >
+        <i class="icon-walking"></i>
+        <span>步行</span>
+      </button>
+      <button 
+        [class.active]="routeType === 'bus'" 
+        (click)="switchRouteType('bus')"
+        class="route-type-btn"
+      >
+        <i class="icon-bus"></i>
+        <span>公交</span>
+      </button>
+    </div>
+    
+    <!-- 路线结果面板 -->
+    <div id="route-panel" class="route-result-panel"></div>
+  </div>
+
+  <!-- 搜索结果和历史记录区域 -->
+  <div #historyPanel class="history-panel" [class.visible]="isInputBoxAtTop() || searchSuggestions.length > 0">
+
+    <!-- 搜索提示结果区域（独立区域） -->
+    <div class="search-results-section">
+      <div class="section-header">
+        <h3>搜索结果</h3>
+      </div>
+
+      <div class="search-results-list">
+        <div class="search-result-item" *ngFor="let suggestion of searchSuggestions"
+          (click)="selectSuggestion(suggestion)">
+
+          <div class="result-icon">
+            <i class="icon-poi"></i>
+          </div>
+
+          <div class="result-content">
+            <div class="result-name-row">
+              <div class="result-name">{{ suggestion.name }}</div>
+              <div class="result-distance" *ngIf="suggestion.distance">{{ suggestion.distance }}</div>
+            </div>
+            <div class="result-address">{{ suggestion.district }} {{ suggestion.address }}</div>
+          </div>
+        </div>
+
+        <div *ngIf="searchSuggestions.length === 0" class="no-results">
+          暂无搜索结果
+        </div>
+      </div>
+    </div>
+
+    <!-- 历史记录区域 -->
+    <div class="history-section">
+      <div class="section-header">
+        <h3>搜索历史</h3>
+      </div>
+
+      <div class="history-list">
+        <div class="history-item" *ngFor="let item of historyItems" (click)="selectHistoryItem(item)">
+          <i class="icon-history"></i>
+          <span class="history-text">{{ item }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

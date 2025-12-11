@@ -104,30 +104,8 @@ export class ActivitiesComponent implements OnInit {
 
   constructor(private router: Router) {}
 
-  // 新增：当前选中的活动详情
-  selectedActivity: any | null = null;
-
   ngOnInit() {
-    // 读取查询参数id，若存在则定位到对应活动并展示详情
-    const url = new URL(window.location.href);
-    const id = url.searchParams.get('id');
-    if (id) {
-      this.findAndShowDetail(id);
-    }
-  }
-
-  private findAndShowDetail(id: string) {
-    const all = [
-      ...this.activities.ongoing,
-      ...this.activities.upcoming,
-      ...this.activities.completed
-    ];
-    const found = all.find(a => String(a.id) === String(id));
-    if (found) {
-      this.selectedActivity = found;
-      // 切换到该活动所在tab
-      this.selectedTab = found.status as 'ongoing' | 'upcoming' | 'completed';
-    }
+    // 组件初始化
   }
 
   goBack() {
@@ -168,9 +146,8 @@ export class ActivitiesComponent implements OnInit {
   }
 
   viewActivityDetails(activity: any) {
-    // 导航到活动详情（本页），带上id参数
-    this.router.navigate(['/consumer/activities'], { queryParams: { id: activity.id } });
-    this.selectedActivity = activity;
+    // 导航到活动详情页面
+    this.router.navigate(['/consumer/activity-detail', activity.id]);
   }
 
   shareActivity(activity: any) {

@@ -109,6 +109,115 @@
           <div class="map-container-wrapper">
             <!-- 高德地图容器 -->
             <div id="amap-container" class="amap-container">
+              
+              <!-- 地图搜索框 -->
+              <div class="map-search-box">
+                <div class="search-input-wrapper">
+                  <i class="fas fa-search search-icon"></i>
+                  <input 
+                    type="text" 
+                    class="search-input" 
+                    [(ngModel)]="searchQuery"
+                    (input)="onSearchInput()"
+                    placeholder="搜索地点、地址或关键词..."
+                    autocomplete="off">
+                  <i class="fas fa-times-circle clear-icon" 
+                     *ngIf="searchQuery" 
+                     (click)="clearSearch()"></i>
+                  <div class="search-loading" *ngIf="searchLoading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                  </div>
+                </div>
+
+                <!-- 搜索结果下拉列表 -->
+                <div class="search-results" *ngIf="showSearchResults && searchResults.length > 0">
+                  <div 
+                    *ngFor="let result of searchResults" 
+                    class="search-result-item"
+                    (click)="selectSearchResult(result)">
+                    <i class="fas fa-map-marker-alt result-icon"></i>
+                    <div class="result-info">
+                      <div class="result-name">{{ result.name }}</div>
+                      <div class="result-address">{{ result.district }} {{ result.address }}</div>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                  </div>
+                </div>
+
+                <!-- 无搜索结果提示 -->
+                <div class="search-results" *ngIf="showSearchResults && searchResults.length === 0 && !searchLoading">
+                  <div class="no-results">
+                    <i class="fas fa-search"></i>
+                    <p>未找到相关结果</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 快捷搜索按钮 -->
+              <div class="quick-search-buttons">
+                <button class="quick-btn" (click)="searchNearby('餐厅')" title="附近餐厅">
+                  <i class="fas fa-utensils"></i>
+                </button>
+                <button class="quick-btn" (click)="searchNearby('加油站')" title="附近加油站">
+                  <i class="fas fa-gas-pump"></i>
+                </button>
+                <button class="quick-btn" (click)="searchNearby('停车场')" title="附近停车场">
+                  <i class="fas fa-parking"></i>
+                </button>
+                <button class="quick-btn" (click)="searchNearby('医院')" title="附近医院">
+                  <i class="fas fa-hospital"></i>
+                </button>
+              </div>
+
+              <!-- 路线面板 -->
+              <div class="route-panel" *ngIf="showRoutePanel && routeInfo">
+                <div class="route-panel-header">
+                  <h4>
+                    <i class="fas fa-route"></i>
+                    路线规划
+                  </h4>
+                  <button class="close-route-btn" (click)="closeRoutePanel()">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+                <div class="route-panel-body">
+                  <div class="route-destination">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>目的地：{{ routeInfo.destinationName }}</span>
+                  </div>
+                  <div class="route-stats">
+                    <div class="route-stat-item">
+                      <i class="fas fa-road"></i>
+                      <div class="stat-info">
+                        <span class="stat-label">距离</span>
+                        <span class="stat-value">{{ formatRouteDistance(routeInfo.distance) }}</span>
+                      </div>
+                    </div>
+                    <div class="route-stat-item">
+                      <i class="fas fa-clock"></i>
+                      <div class="stat-info">
+                        <span class="stat-label">预计用时</span>
+                        <span class="stat-value">{{ formatRouteTime(routeInfo.time) }}</span>
+                      </div>
+                    </div>
+                    <div class="route-stat-item" *ngIf="routeInfo.trafficLights > 0">
+                      <i class="fas fa-traffic-light"></i>
+                      <div class="stat-info">
+                        <span class="stat-label">红绿灯</span>
+                        <span class="stat-value">{{ routeInfo.trafficLights }}个</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="route-details" id="route-panel">
+                    <!-- 高德地图会自动填充详细路线信息到这里 -->
+                  </div>
+                  <button class="clear-route-btn" (click)="clearRoute()">
+                    <i class="fas fa-times"></i>
+                    清除路线
+                  </button>
+                </div>
+              </div>
+
               <!-- 这里将接入高德地图API -->
               <div class="map-placeholder">
                 <div class="placeholder-content">
@@ -203,6 +312,51 @@
                   </span>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 附近回收点列表 -->
+        <div class="recycle-points-section">
+          <div class="section-header">
+            <h3>附近回收点</h3>
+            <span class="points-count">{{ recyclePoints.length }}个网点</span>
+          </div>
+
+          <div class="points-list">
+            <div 
+              *ngFor="let point of recyclePoints; let i = index" 
+              class="point-item"
+              [class.point-station]="point.type === 'station'"
+              [class.point-center]="point.type === 'center'"
+              [class.point-mobile]="point.type === 'mobile'">
+              <div class="point-rank">{{ i + 1 }}</div>
+              <div class="point-content" (click)="locateRecyclePoint(point)">
+                <div class="point-header">
+                  <div class="point-name">{{ point.name }}</div>
+                  <div class="point-type-badge">{{ getPointTypeName(point.type) }}</div>
+                </div>
+                <div class="point-address">
+                  <i class="fas fa-map-marker-alt"></i>
+                  {{ point.address }}
+                </div>
+                <div class="point-stats-row">
+                  <div class="point-stat">
+                    <i class="fas fa-recycle"></i>
+                    <span>今日: {{ point.todayVolume }}kg</span>
+                  </div>
+                  <div class="point-distance" *ngIf="point.distance !== undefined">
+                    <i class="fas fa-route"></i>
+                    <span class="distance-value">{{ formatDistance(point.distance) }}</span>
+                  </div>
+                </div>
+              </div>
+              <button 
+                class="point-navigate-btn" 
+                (click)="planRouteToPoint(point); $event.stopPropagation()"
+                title="导航到此回收点">
+                <i class="fas fa-directions"></i>
+              </button>
             </div>
           </div>
         </div>

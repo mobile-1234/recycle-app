@@ -1,0 +1,1386 @@
+// ====================================
+// 预约回收页面 - 精美图标容器设计
+// 所有图标采用独立容器包裹，统一渐变背景
+// ====================================
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+}
+
+body {
+  background-color: #f8f9fa;
+  color: #333;
+  padding-bottom: 80px;
+}
+
+// ====================================
+// 通用图标容器样式
+// ====================================
+@mixin icon-container($size: 44px, $bg-color: linear-gradient(135deg, #4caf50, #66bb6a)) {
+  width: $size;
+  height: $size;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $bg-color;
+  border-radius: 12px;
+  color: white;
+  font-size: calc($size * 0.45);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.25);
+  
+  i {
+    transition: transform 0.3s ease;
+  }
+  
+  &:hover {
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 0 8px 24px rgba(76, 175, 80, 0.4);
+    
+    i {
+      transform: scale(1.1);
+    }
+  }
+}
+
+// ====================================
+// 顶部导航栏
+// ====================================
+.header {
+  background: linear-gradient(135deg, #2ecc71, #1abc9c);
+  color: white;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.back-btn, .header-right {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.1);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+  
+  i {
+    font-size: 18px;
+  }
+}
+
+.header-title {
+  flex: 1;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  
+  i {
+    font-size: 22px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+// ====================================
+// 容器和表单区域
+// ====================================
+.container {
+  padding: 15px;
+}
+
+.form-section {
+  background: white;
+  margin-bottom: 16px;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12);
+  }
+}
+
+// ====================================
+// 区块标题（带图标容器）
+// ====================================
+.section-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid #e8f5e9;
+  
+  .title-icon {
+    @include icon-container(40px);
+  }
+  
+  span {
+    flex: 1;
+    letter-spacing: 0.5px;
+  }
+}
+
+// ====================================
+// 废品分类
+// ====================================
+.category-select {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.category-item {
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border: 2px solid #e9ecef;
+  border-radius: 18px;
+  padding: 18px 12px;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    transition: left 0.6s;
+  }
+  
+  &:hover::before {
+    left: 100%;
+  }
+  
+  &.active {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.15) 0%, rgba(26, 188, 156, 0.1) 100%);
+    border-color: #2ecc71;
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(46, 204, 113, 0.3);
+    
+    .category-icon {
+      transform: scale(1.15) rotate(5deg);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+    }
+    
+    .category-name {
+      color: #2e7d32;
+      font-weight: 700;
+    }
+  }
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    border-color: #4caf50;
+  }
+}
+
+.category-icon {
+  @include icon-container(56px);
+  margin: 0 auto 12px;
+  font-size: 28px !important;
+}
+
+.category-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+// ====================================
+// 重量输入
+// ====================================
+.weight-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #f8f9fa, #e8f5e9);
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+  
+  &:focus-within {
+    border-color: #4caf50;
+    box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.1);
+  }
+  
+  .weight-icon {
+    @include icon-container(42px);
+  }
+  
+  input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    outline: none;
+    
+    &::placeholder {
+      color: #999;
+      font-weight: 400;
+    }
+  }
+  
+  .unit {
+    font-size: 15px;
+    font-weight: 600;
+    color: #4caf50;
+    padding: 6px 12px;
+    background: white;
+    border-radius: 10px;
+  }
+}
+
+// ====================================
+// 照片上传
+// ====================================
+.photo-upload {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.upload-btn {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border: 2px dashed #4caf50;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e9 100%);
+  
+  &:hover {
+    border-color: #2e7d32;
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.25);
+  }
+  
+  .upload-icon {
+    @include icon-container(48px);
+    margin-bottom: 8px;
+  }
+  
+  .upload-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4caf50;
+  }
+  
+  .photo-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: linear-gradient(135deg, #4caf50, #66bb6a);
+    color: white;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
+  }
+}
+
+.photo-preview {
+  width: 100px;
+  height: 100px;
+  border-radius: 16px;
+  background: #f8f9fa;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .remove-photo {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    cursor: pointer;
+    
+    .remove-icon {
+      @include icon-container(28px, linear-gradient(135deg, #f44336, #e53935));
+      font-size: 14px !important;
+    }
+  }
+}
+
+.photo-tip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, #e3f2fd 0%, #e8f5e9 100%);
+  border-radius: 12px;
+  border-left: 4px solid #4caf50;
+  
+  .tip-icon {
+    @include icon-container(32px, linear-gradient(135deg, #2196f3, #42a5f5));
+    font-size: 16px !important;
+  }
+  
+  span {
+    flex: 1;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.5;
+  }
+}
+
+// ====================================
+// 回收方式
+// ====================================
+.recycle-method {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.method-card {
+  background: linear-gradient(135deg, #f8f9fa, #ffffff);
+  border: 2px solid #e0e0e0;
+  border-radius: 18px;
+  padding: 18px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  
+  &.active {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(26, 188, 156, 0.05));
+    border-color: #2ecc71;
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(46, 204, 113, 0.3);
+    
+    .method-icon {
+      transform: scale(1.15);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+    }
+  }
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    border-color: #4caf50;
+  }
+  
+  .method-icon {
+    @include icon-container(52px);
+  }
+  
+  .method-content {
+    width: 100%;
+    
+    .method-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 6px;
+    }
+    
+    .method-desc {
+      font-size: 12px;
+      color: #999;
+      line-height: 1.4;
+    }
+  }
+}
+
+// ====================================
+// 地址卡片
+// ====================================
+.address-select {
+  margin-top: 16px;
+}
+
+.address-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e9 100%);
+  border-radius: 18px;
+  padding: 20px;
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    border-color: #4caf50;
+    box-shadow: 0 8px 28px rgba(76, 175, 80, 0.18);
+  }
+  
+  .address-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    
+    .address-icon {
+      @include icon-container(40px);
+    }
+    
+    .address-label {
+      font-size: 15px;
+      font-weight: 700;
+      color: #4caf50;
+    }
+  }
+  
+  .address-content {
+    margin-bottom: 16px;
+    
+    .address-main {
+      font-size: 15px;
+      color: #333;
+      line-height: 1.6;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+    
+    .address-contact {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #666;
+      flex-wrap: wrap;
+      
+      .contact-icon {
+        @include icon-container(28px);
+        font-size: 13px !important;
+      }
+      
+      span {
+        margin-right: 4px;
+      }
+    }
+  }
+  
+  .change-address-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #4caf50, #66bb6a);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(76, 175, 80, 0.3);
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(76, 175, 80, 0.4);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+    
+    .btn-icon {
+      @include icon-container(24px, rgba(255, 255, 255, 0.2));
+      font-size: 12px !important;
+      box-shadow: none;
+    }
+  }
+}
+
+// ====================================
+// 投递点
+// ====================================
+.point-select {
+  margin-top: 16px;
+}
+
+.point-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: linear-gradient(135deg, #f8f9fa, #e8f5e9);
+  border-radius: 16px;
+  border: 2px solid #e0e0e0;
+  
+  .point-icon {
+    @include icon-container(52px);
+  }
+  
+  .point-text {
+    flex: 1;
+    
+    .point-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      
+      .store-icon {
+        @include icon-container(28px);
+        font-size: 14px !important;
+      }
+      
+      span {
+        font-size: 15px;
+        font-weight: 700;
+        color: #333;
+      }
+    }
+    
+    .point-detail {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #666;
+      flex-wrap: wrap;
+      
+      .detail-icon {
+        @include icon-container(24px, linear-gradient(135deg, #9e9e9e, #bdbdbd));
+        font-size: 12px !important;
+      }
+      
+      .divider {
+        margin: 0 4px;
+        color: #ddd;
+      }
+    }
+  }
+  
+  .navigate-btn {
+    padding: 12px 18px;
+    background: linear-gradient(135deg, #2196f3, #42a5f5);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+    }
+    
+    .nav-icon {
+      @include icon-container(22px, rgba(255, 255, 255, 0.2));
+      font-size: 11px !important;
+      box-shadow: none;
+    }
+  }
+}
+
+// ====================================
+// 时间选择
+// ====================================
+.time-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.time-option {
+  background: linear-gradient(135deg, #f8f9fa, #ffffff);
+  border: 2px solid #e0e0e0;
+  border-radius: 18px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  &.active {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(26, 188, 156, 0.05));
+    border-color: #2ecc71;
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(46, 204, 113, 0.3);
+    
+    .time-icon {
+      transform: scale(1.15);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+    }
+  }
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    border-color: #4caf50;
+  }
+  
+  .time-icon {
+    @include icon-container(48px);
+  }
+  
+  .time-content {
+    flex: 1;
+    
+    .time-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    
+    .time-desc {
+      font-size: 12px;
+      color: #999;
+    }
+  }
+}
+
+// ====================================
+// 日期选择器
+// ====================================
+.date-selector {
+  margin-top: 16px;
+}
+
+.date-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #4caf50;
+    border-radius: 2px;
+  }
+}
+
+.date-item {
+  min-width: 90px;
+  padding: 12px;
+  background: linear-gradient(135deg, #f8f9fa, #ffffff);
+  border: 2px solid #e0e0e0;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  
+  &.active {
+    background: linear-gradient(135deg, #4caf50, #66bb6a);
+    border-color: #2e7d32;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(76, 175, 80, 0.4);
+    
+    .calendar-icon {
+      background: rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+    
+    .date-content {
+      color: white;
+    }
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    border-color: #4caf50;
+  }
+  
+  .calendar-icon {
+    @include icon-container(36px);
+    font-size: 18px !important;
+  }
+  
+  .date-content {
+    text-align: center;
+    
+    .date-day {
+      font-size: 14px;
+      font-weight: 700;
+      color: #333;
+    }
+    
+    .date-week {
+      font-size: 12px;
+      color: #999;
+      margin-top: 2px;
+    }
+  }
+  
+  &.active .date-content {
+    .date-day, .date-week {
+      color: white;
+    }
+  }
+}
+
+.time-slots {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.time-slot {
+  padding: 12px 8px;
+  background: linear-gradient(135deg, #f8f9fa, #ffffff);
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  
+  &.active {
+    background: linear-gradient(135deg, #4caf50, #66bb6a);
+    border-color: #2e7d32;
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    
+    .slot-icon {
+      background: rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+  }
+  
+  &:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    border-color: #4caf50;
+  }
+  
+  .slot-icon {
+    @include icon-container(24px);
+    font-size: 12px !important;
+  }
+}
+
+// ====================================
+// 附加服务
+// ====================================
+.additional-services {
+  .service-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    
+    &.enabled {
+      background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+      border-color: #4caf50;
+      box-shadow: 0 4px 16px rgba(76, 175, 80, 0.2);
+    }
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .service-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      
+      .service-icon {
+        @include icon-container(46px);
+      }
+      
+      .service-text {
+        flex: 1;
+        
+        .service-name {
+          font-size: 15px;
+          font-weight: 700;
+          color: #333;
+          margin-bottom: 4px;
+        }
+        
+        .service-desc {
+          font-size: 12px;
+          color: #999;
+          line-height: 1.4;
+        }
+      }
+    }
+    
+    .service-price {
+      font-size: 15px;
+      font-weight: 700;
+      color: #f44336;
+      margin-right: 8px;
+      min-width: 50px;
+      text-align: right;
+      
+      &.free {
+        color: #4caf50;
+      }
+    }
+    
+    // Toggle switch
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 28px;
+      
+      input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        
+        &:checked + .slider {
+          background: linear-gradient(135deg, #4caf50, #66bb6a);
+          
+          &:before {
+            transform: translateX(22px);
+          }
+        }
+      }
+      
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #ccc;
+        transition: 0.4s;
+        border-radius: 28px;
+        
+        &:before {
+          position: absolute;
+          content: "";
+          height: 22px;
+          width: 22px;
+          left: 3px;
+          bottom: 3px;
+          background: white;
+          transition: 0.4s;
+          border-radius: 50%;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+      }
+    }
+    
+    // Notes item special styling
+    &.notes-item {
+      flex-direction: column;
+      align-items: flex-start;
+      
+      .service-info {
+        width: 100%;
+        margin-bottom: 12px;
+      }
+      
+      .notes-wrapper {
+        width: 100%;
+        
+        .notes-input {
+          width: 100%;
+          padding: 12px;
+          border: 2px solid #e0e0e0;
+          border-radius: 10px;
+          font-size: 14px;
+          font-family: inherit;
+          resize: vertical;
+          transition: border-color 0.3s ease;
+          
+          &:focus {
+            outline: none;
+            border-color: #4caf50;
+            box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.1);
+          }
+          
+          &::placeholder {
+            color: #bbb;
+          }
+        }
+      }
+    }
+  }
+}
+
+// ====================================
+// 确认预约栏
+// ====================================
+.confirm-bar {
+  position: fixed;
+  bottom: 60px;
+  left: 0;
+  right: 0;
+  background: white;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 90;
+}
+
+.estimate-earnings {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  .earning-icon {
+    @include icon-container(50px, linear-gradient(135deg, #ff9800, #fb8c00));
+  }
+  
+  .earnings-info {
+    .earnings-title {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 2px;
+    }
+    
+    .earnings-amount {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ff9800;
+    }
+  }
+}
+
+.submit-btn {
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #4caf50, #66bb6a);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.4);
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(76, 175, 80, 0.5);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  .submit-icon {
+    @include icon-container(28px, rgba(255, 255, 255, 0.25));
+    font-size: 14px !important;
+    box-shadow: none;
+  }
+}
+
+// ====================================
+// 弹窗通用样式
+// ====================================
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9998;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+// ====================================
+// 照片选项弹窗
+// ====================================
+.photo-options-modal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 24px 24px 0 0;
+  z-index: 9999;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.2);
+  
+  .options-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid #f0f0f0;
+    
+    h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: #333;
+    }
+    
+    .close-icon {
+      @include icon-container(36px, linear-gradient(135deg, #f5f5f5, #e0e0e0));
+      color: #666;
+      cursor: pointer;
+      font-size: 16px !important;
+      
+      &:hover {
+        background: linear-gradient(135deg, #e0e0e0, #bdbdbd);
+        color: #333;
+      }
+    }
+  }
+  
+  .options-body {
+    padding: 16px;
+    
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px;
+      background: linear-gradient(135deg, #f8f9fa, #ffffff);
+      border-radius: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+      
+      &:hover {
+        background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+        transform: translateX(4px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        border-color: #4caf50;
+      }
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      .option-icon {
+        @include icon-container(54px);
+        
+        &.camera {
+          background: linear-gradient(135deg, #4caf50, #66bb6a);
+        }
+        
+        &.gallery {
+          background: linear-gradient(135deg, #2196f3, #42a5f5);
+        }
+      }
+      
+      .option-text {
+        flex: 1;
+        
+        .option-title {
+          font-size: 16px;
+          font-weight: 700;
+          color: #333;
+          margin-bottom: 4px;
+        }
+        
+        .option-desc {
+          font-size: 13px;
+          color: #999;
+        }
+      }
+      
+      .chevron-icon {
+        @include icon-container(28px, linear-gradient(135deg, #f5f5f5, #e0e0e0));
+        color: #999;
+        font-size: 14px !important;
+      }
+    }
+  }
+}
+
+// ====================================
+// 摄像头界面
+// ====================================
+.camera-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #000;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  .camera-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .camera-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    
+    h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    
+    .header-close-icon {
+      @include icon-container(36px, rgba(255, 255, 255, 0.2));
+      color: white;
+      cursor: pointer;
+      font-size: 16px !important;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+  }
+  
+  .camera-view {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+    
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .camera-guide {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      max-width: 400px;
+      aspect-ratio: 1;
+      pointer-events: none;
+      
+      .guide-corner {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        border-color: #4caf50;
+        border-style: solid;
+        
+        &.top-left {
+          top: 0;
+          left: 0;
+          border-width: 3px 0 0 3px;
+          border-radius: 8px 0 0 0;
+        }
+        
+        &.top-right {
+          top: 0;
+          right: 0;
+          border-width: 3px 3px 0 0;
+          border-radius: 0 8px 0 0;
+        }
+        
+        &.bottom-left {
+          bottom: 0;
+          left: 0;
+          border-width: 0 0 3px 3px;
+          border-radius: 0 0 0 8px;
+        }
+        
+        &.bottom-right {
+          bottom: 0;
+          right: 0;
+          border-width: 0 3px 3px 0;
+          border-radius: 0 0 8px 0;
+        }
+      }
+    }
+  }
+  
+  .camera-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.95);
+    
+    .btn-cancel {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.25);
+      }
+      
+      .cancel-icon {
+        @include icon-container(24px, transparent);
+        font-size: 12px !important;
+        box-shadow: none;
+      }
+    }
+    
+    .btn-capture {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4caf50, #66bb6a);
+      border: 4px solid white;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(76, 175, 80, 0.5);
+      
+      &:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 30px rgba(76, 175, 80, 0.7);
+      }
+      
+      &:active {
+        transform: scale(0.95);
+      }
+      
+      .capture-icon {
+        @include icon-container(48px, transparent);
+        font-size: 28px !important;
+        box-shadow: none;
+      }
+    }
+    
+    .photo-counter {
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 10px 18px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      min-width: 60px;
+      text-align: center;
+    }
+  }
+}
+
+// ====================================
+// 响应式设计
+// ====================================
+@media (max-width: 768px) {
+  .category-select {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  
+  .recycle-method, .time-options {
+    grid-template-columns: 1fr;
+  }
+  
+  .time-slots {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+

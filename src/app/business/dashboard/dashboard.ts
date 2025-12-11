@@ -46,7 +46,7 @@ export class Dashboard implements OnInit {
   // 用户信息
   userInfo = {
     name: '张经理',
-    company: '绿色回收有限公司'
+    company: '再生视界有限公司'
   };
 
   // 核心数据

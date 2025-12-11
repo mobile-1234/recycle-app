@@ -84,22 +84,6 @@
   </div>
 </div>
 
-<!-- 新增：活动详情模态框 -->
-<div class="activity-modal-overlay" *ngIf="selectedActivity" (click)="closeActivityModal()"></div>
-<div class="activity-modal" *ngIf="selectedActivity">
-  <div class="modal-header">
-    <div class="title">{{ selectedActivity?.title }}</div>
-    <div class="actions">
-      <button class="view-more" (click)="viewFullActivity()">查看更多</button>
-      <button class="close" (click)="closeActivityModal()">关闭</button>
-    </div>
-  </div>
-  <div class="modal-body">
-    <div class="tag">{{ selectedActivity?.tag }}</div>
-    <div class="description">{{ selectedActivity?.description }}</div>
-  </div>
-</div>
-
 <!-- AI助手入口 -->
 <div class="ai-assistant" (click)="openAIAssistant()">
   <i class="fas fa-robot"></i>

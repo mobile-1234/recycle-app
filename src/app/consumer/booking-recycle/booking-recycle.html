@@ -1,14 +1,22 @@
 <!-- 顶部标题栏 -->
 <div class="header">
-  <div class="back-btn" (click)="goBack()"><app-svg-icon name="arrow-left" size="md" color="#2e7d32"></app-svg-icon></div>
-  <div class="header-title">预约回收</div>
+  <div class="header-title">
+    <i class="fas fa-recycle"></i>
+    <span>预约回收</span>
+  </div>
+  <div class="header-right" (click)="showHelp()">
+    <i class="fas fa-question-circle"></i>
+  </div>
 </div>
 
 <div class="container">
   <!-- 废品信息填写 -->
   <div class="form-section">
     <div class="section-title">
-      <app-svg-icon name="trash" size="md" color="#2e7d32"></app-svg-icon> 废品信息
+      <div class="title-icon">
+        <i class="fas fa-trash-alt"></i>
+      </div>
+      <span>废品信息</span>
     </div>
     
     <div class="category-select">
@@ -18,17 +26,16 @@
         [class.active]="category.active"
         (click)="selectCategory(category)">
         <div class="category-icon">
-          <app-svg-icon 
-            [name]="category.icon" 
-            size="lg" 
-            [color]="category.active ? 'primary' : 'secondary'">
-          </app-svg-icon>
+          <i [class]="category.icon"></i>
         </div>
-        <div>{{category.name}}</div>
+        <div class="category-name">{{category.name}}</div>
       </div>
     </div>
     
     <div class="weight-input">
+      <div class="weight-icon">
+        <i class="fas fa-weight"></i>
+      </div>
       <input 
         type="number" 
         placeholder="输入预估重量" 
@@ -38,25 +45,40 @@
     </div>
     
     <div class="photo-upload">
-      <div class="upload-btn" (click)="uploadPhoto()">
-        <app-svg-icon name="camera" size="md" color="#6c757d"></app-svg-icon>
-        <div>上传照片</div>
+      <div class="upload-btn" (click)="openPhotoOptions()">
+        <div class="upload-icon">
+          <i class="fas fa-camera"></i>
+        </div>
+        <div class="upload-text">添加照片</div>
+        <div class="photo-count" *ngIf="photos.length > 0">{{ photos.length }}/9</div>
       </div>
       <div 
         *ngFor="let photo of photos; let i = index" 
         class="photo-preview">
         <img [src]="photo" alt="废品照片">
         <div class="remove-photo" (click)="removePhoto(i)">
-          <app-svg-icon name="times" size="sm" color="#dc3545"></app-svg-icon>
+          <div class="remove-icon">
+            <i class="fas fa-times-circle"></i>
+          </div>
         </div>
       </div>
+    </div>
+    
+    <div class="photo-tip">
+      <div class="tip-icon">
+        <i class="fas fa-info-circle"></i>
+      </div>
+      <span>建议上传清晰的废品照片，便于回收员准确评估</span>
     </div>
   </div>
   
   <!-- 回收方式选择 -->
   <div class="form-section">
     <div class="section-title">
-      <app-svg-icon name="recycle-method" size="md" color="#2e7d32"></app-svg-icon> 回收方式
+      <div class="title-icon">
+        <i class="fas fa-truck"></i>
+      </div>
+      <span>回收方式</span>
     </div>
     
     <div class="recycle-method">
@@ -66,34 +88,75 @@
         [class.active]="method.active"
         (click)="selectMethod(method)">
         <div class="method-icon">
-          <app-svg-icon 
-            [name]="method.icon" 
-            size="xl" 
-            [color]="method.active ? 'primary' : 'secondary'">
-          </app-svg-icon>
+          <i [class]="method.icon"></i>
         </div>
-        <div class="method-title">{{method.name}}</div>
-        <div class="method-desc">{{method.description}}</div>
+        <div class="method-content">
+          <div class="method-title">{{method.name}}</div>
+          <div class="method-desc">{{method.description}}</div>
+        </div>
       </div>
     </div>
     
     <div class="address-select" *ngIf="isPickupMethod">
-      <div class="address-info">
-        <div class="address-text">
-          <div>{{address}}</div>
-          <div style="font-size: 12px; color: #6c757d;">{{contactName}} {{contactPhone}}</div>
+      <div class="address-card">
+        <div class="address-header">
+          <div class="address-icon">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
+          <div class="address-label">收货地址</div>
         </div>
-        <div class="change-address" (click)="changeAddress()">更改</div>
+        <div class="address-content">
+          <div class="address-main">{{address}}</div>
+          <div class="address-contact">
+            <div class="contact-icon">
+              <i class="fas fa-user"></i>
+            </div>
+            <span>{{contactName}}</span>
+            <div class="contact-icon">
+              <i class="fas fa-phone"></i>
+            </div>
+            <span>{{contactPhone}}</span>
+          </div>
+        </div>
+        <button class="change-address-btn" (click)="changeAddress()">
+          <div class="btn-icon">
+            <i class="fas fa-edit"></i>
+          </div>
+          更改地址
+        </button>
       </div>
     </div>
     
     <div class="point-select" *ngIf="!isPickupMethod">
       <div class="point-info">
-        <div>
-          <div class="point-name">阳光小区东门回收点</div>
-          <div class="point-detail">350米 | 70% 满箱</div>
+        <div class="point-icon">
+          <i class="fas fa-map-marked-alt"></i>
         </div>
-        <button class="navigate-btn" (click)="navigateToPoint()">导航</button>
+        <div class="point-text">
+          <div class="point-name">
+            <div class="store-icon">
+              <i class="fas fa-store"></i>
+            </div>
+            <span>阳光小区东门回收点</span>
+          </div>
+          <div class="point-detail">
+            <div class="detail-icon">
+              <i class="fas fa-walking"></i>
+            </div>
+            <span>350米</span>
+            <span class="divider">|</span>
+            <div class="detail-icon">
+              <i class="fas fa-box-open"></i>
+            </div>
+            <span>70% 满箱</span>
+          </div>
+        </div>
+        <button class="navigate-btn" (click)="navigateToPoint()">
+          <div class="nav-icon">
+            <i class="fas fa-directions"></i>
+          </div>
+          导航
+        </button>
       </div>
     </div>
   </div>
@@ -101,7 +164,10 @@
   <!-- 时间选择 -->
   <div class="form-section">
     <div class="section-title">
-      <app-svg-icon name="clock" size="md" color="#2e7d32"></app-svg-icon> 回收时间
+      <div class="title-icon">
+        <i class="fas fa-clock"></i>
+      </div>
+      <span>回收时间</span>
     </div>
     
     <div class="time-options">
@@ -110,15 +176,13 @@
         class="time-option" 
         [class.active]="option.active"
         (click)="selectTimeOption(option)">
-        <div class="method-icon">
-          <app-svg-icon 
-            [name]="option.icon" 
-            size="xl" 
-            [color]="option.active ? 'primary' : 'secondary'">
-          </app-svg-icon>
+        <div class="time-icon">
+          <i [class]="option.icon"></i>
         </div>
-        <div class="method-title">{{option.name}}</div>
-        <div class="method-desc">{{option.description}}</div>
+        <div class="time-content">
+          <div class="time-title">{{option.name}}</div>
+          <div class="time-desc">{{option.description}}</div>
+        </div>
       </div>
     </div>
     
@@ -129,8 +193,13 @@
           class="date-item" 
           [class.active]="date.active"
           (click)="selectDate(date)">
-          <div class="date-day">{{date.day}}</div>
-          <div class="date-week">{{date.date}}</div>
+          <div class="calendar-icon">
+            <i class="fas fa-calendar-day"></i>
+          </div>
+          <div class="date-content">
+            <div class="date-day">{{date.day}}</div>
+            <div class="date-week">{{date.date}}</div>
+          </div>
         </div>
       </div>
       
@@ -140,7 +209,10 @@
           class="time-slot" 
           [class.active]="slot.active"
           (click)="selectTimeSlot(slot)">
-          {{slot.time}}
+          <div class="slot-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <span>{{slot.time}}</span>
         </div>
       </div>
     </div>
@@ -149,27 +221,27 @@
   <!-- 附加服务 -->
   <div class="form-section">
     <div class="section-title">
-      <app-svg-icon name="service" size="md" color="#2e7d32"></app-svg-icon> 附加服务
+      <div class="title-icon">
+        <i class="fas fa-concierge-bell"></i>
+      </div>
+      <span>附加服务</span>
     </div>
     
     <div class="additional-services">
       <div 
         *ngFor="let service of additionalServices"
-        class="service-item">
+        class="service-item"
+        [class.enabled]="service.enabled">
         <div class="service-info">
           <div class="service-icon">
-            <app-svg-icon 
-              [name]="service.icon" 
-              size="lg" 
-              color="secondary">
-            </app-svg-icon>
+            <i [class]="service.icon"></i>
           </div>
-          <div>
+          <div class="service-text">
             <div class="service-name">{{service.name}}</div>
             <div class="service-desc">{{service.description}}</div>
           </div>
         </div>
-        <div class="service-price">{{service.price}}</div>
+        <div class="service-price" [class.free]="service.price === '免费'">{{service.price}}</div>
         <label class="switch">
           <input 
             type="checkbox" 
@@ -179,22 +251,22 @@
         </label>
       </div>
       
-      <div class="service-item" style="flex-direction: column; align-items: flex-start;">
-        <div class="service-info" style="width: 100%; margin-bottom: 10px;">
+      <div class="service-item notes-item">
+        <div class="service-info">
           <div class="service-icon">
-            <app-svg-icon name="edit" size="lg" color="secondary"></app-svg-icon>
+            <i class="fas fa-comment-dots"></i>
           </div>
-          <div>
-            <div class="service-name">备注</div>
+          <div class="service-text">
+            <div class="service-name">备注信息</div>
             <div class="service-desc">特殊要求或说明</div>
           </div>
         </div>
-        <div style="position: relative; width: 100%;">
+        <div class="notes-wrapper">
           <textarea 
             class="notes-input" 
-            placeholder="请输入备注信息..."
-            [(ngModel)]="notes"></textarea>
-          <div class="voice-input"><i class="fas fa-microphone"></i></div>
+            placeholder="请输入备注信息，如楼层、门牌号、特殊要求等..."
+            [(ngModel)]="notes"
+            rows="2"></textarea>
         </div>
       </div>
     </div>
@@ -204,31 +276,93 @@
 <!-- 确认预约栏 -->
 <div class="confirm-bar">
   <div class="estimate-earnings">
-    <div class="earnings-title">预估收益</div>
-    <div class="earnings-amount">¥{{estimatedEarnings.toFixed(2)}}</div>
+    <div class="earning-icon">
+      <i class="fas fa-coins"></i>
+    </div>
+    <div class="earnings-info">
+      <div class="earnings-title">预估收益</div>
+      <div class="earnings-amount">¥{{estimatedEarnings.toFixed(2)}}</div>
+    </div>
   </div>
-  <button class="submit-btn" (click)="submitBooking()">确认提交</button>
+  <button class="submit-btn" (click)="submitBooking()">
+    <div class="submit-icon">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    <span>确认提交</span>
+  </button>
 </div>
 
 <!-- 底部导航栏 -->
 <app-bottom-nav [activeTab]="'booking'"></app-bottom-nav>
 
-
-<!-- 地址选择弹层（简版） -->
-<div class="address-panel-overlay" *ngIf="showAddressPanel" (click)="closeAddressPanel()"></div>
-<div class="address-panel" *ngIf="showAddressPanel">
-  <div class="panel-header">选择地址</div>
-  <div class="panel-body">
-    <div class="addr-item" (click)="onAddressChosen({address: '北京市朝阳区建国路88号SOHO现代城', name: '张三', phone: '138****8888'})">
-      <div class="addr-main">北京市朝阳区建国路88号SOHO现代城</div>
-      <div class="addr-sub">张三 138****8888</div>
-    </div>
-    <div class="addr-item" (click)="onAddressChosen({address: '海淀区中关村大街1号', name: '李四', phone: '139****9999'})">
-      <div class="addr-main">海淀区中关村大街1号</div>
-      <div class="addr-sub">李四 139****9999</div>
+<!-- 照片选项弹窗 -->
+<div class="modal-overlay" *ngIf="showPhotoOptions" (click)="closePhotoOptions()"></div>
+<div class="photo-options-modal" *ngIf="showPhotoOptions">
+  <div class="options-header">
+    <h3>选择照片来源</h3>
+    <div class="close-icon" (click)="closePhotoOptions()">
+      <i class="fas fa-times"></i>
     </div>
   </div>
-  <div class="panel-footer">
-    <button class="close-btn" (click)="closeAddressPanel()">取消</button>
+  <div class="options-body">
+    <div class="option-item" (click)="openCamera()">
+      <div class="option-icon camera">
+        <i class="fas fa-camera"></i>
+      </div>
+      <div class="option-text">
+        <div class="option-title">拍照</div>
+        <div class="option-desc">使用摄像头拍摄</div>
+      </div>
+      <div class="chevron-icon">
+        <i class="fas fa-chevron-right"></i>
+      </div>
+    </div>
+    <div class="option-item" (click)="selectFromGallery()">
+      <div class="option-icon gallery">
+        <i class="fas fa-images"></i>
+      </div>
+      <div class="option-text">
+        <div class="option-title">从相册选择</div>
+        <div class="option-desc">选择已有照片</div>
+      </div>
+      <div class="chevron-icon">
+        <i class="fas fa-chevron-right"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 摄像头拍照界面 -->
+<div class="camera-overlay" *ngIf="showCamera">
+  <div class="camera-container">
+    <div class="camera-header">
+      <h3>拍摄照片</h3>
+      <div class="header-close-icon" (click)="closeCamera()">
+        <i class="fas fa-times"></i>
+      </div>
+    </div>
+    <div class="camera-view">
+      <video id="camera-video" autoplay playsinline></video>
+      <div class="camera-guide">
+        <div class="guide-corner top-left"></div>
+        <div class="guide-corner top-right"></div>
+        <div class="guide-corner bottom-left"></div>
+        <div class="guide-corner bottom-right"></div>
+      </div>
+    </div>
+    <div class="camera-controls">
+      <button class="btn-cancel" (click)="closeCamera()">
+        <div class="cancel-icon">
+          <i class="fas fa-times"></i>
+        </div>
+        <span>取消</span>
+      </button>
+      <button class="btn-capture" (click)="takePhoto()">
+        <div class="capture-icon">
+          <i class="fas fa-camera"></i>
+        </div>
+      </button>
+      <div class="photo-counter">{{ photos.length }}/9</div>
+    </div>
   </div>
 </div>

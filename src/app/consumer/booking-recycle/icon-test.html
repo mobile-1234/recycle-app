@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>图标显示测试</title>
+  <!-- Font Awesome 6.0 -->
+  <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .test-section {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #333;
+      border-bottom: 2px solid #4caf50;
+      padding-bottom: 10px;
+    }
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .icon-item {
+      text-align: center;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    .icon-item i {
+      font-size: 32px;
+      color: #4caf50;
+      margin-bottom: 10px;
+    }
+    .icon-name {
+      font-size: 12px;
+      color: #666;
+      word-break: break-all;
+    }
+    .status {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin-top: 5px;
+    }
+    .status.ok {
+      background: #4caf50;
+      color: white;
+    }
+    .status.fail {
+      background: #f44336;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>预约回收页面图标显示测试</h1>
+  
+  <!-- 废品分类图标测试 -->
+  <div class="test-section">
+    <h2>废品分类图标</h2>
+    <div class="icon-grid">
+      <div class="icon-item">
+        <i class="fas fa-newspaper"></i>
+        <div class="icon-name">fa-newspaper</div>
+        <div>纸类</div>
+      </div>
+      <div class="icon-item">
+        <i class="fas fa-recycle"></i>
+        <div class="icon-name">fa-recycle</div>
+        <div>塑料</div>
+      </div>
+      <div class="icon-item">
+        <i class="fas fa-wine-bottle"></i>
+        <div class="icon-name">fa-wine-bottle</div>
+        <div>玻璃</div>
+      </div>
+      <div class="icon-item">
+        <i class="fas fa-mobile-alt"></i>
+        <div class="icon-name">fa-mobile-alt</div>
+        <div>电子</div>
+      </div>
+      <div class="icon-item">
+        <i class="fas fa-tshirt"></i>
+        <div class="icon-name">fa-tshirt</div>
+        <div>衣物</div>
+      </div>
+      <div class="icon-item">
+        <i class="fas fa-wrench"></i>
+        <div class="icon-name">fa-wrench</div>
+        <div>金属</div>
+      </div>
+      <div class="icon-item">
+        <i class="fas fa-chair"></i>
+        <div class="icon-name">fa-chair</div>
+        <div>家具</div>
+      </div>
+      <div class="icon-item">
+        <i class="fas fa-cube"></i>
+        <div class="icon-name">fa-cube</div>
+        <div>其他</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 回收方式图标测试 -->
+  <div class="test-section">
+    <h2>回收方式图标</h2>
+    <div class="icon-grid">
+      <div class="icon-item">
+        <i class="fas fa-truck"></i>
+        <div class="icon-name">fa-truck</div>
+        <div>上门回收</div>
+      </div>
+      <div class="icon-item">
+        <i class="fas fa-box"></i>
+        <div class="icon-name">fa-box</div>
+        <div>自助投递</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 其他功能图标测试 -->
+  <div class="test-section">
+    <h2>其他功能图标</h2>
+    <div class="icon-grid">
+      <div class="icon-item">
+        <i class="fas fa-camera"></i>
+        <div class="icon-name">fa-camera</div>
+        <div>相机</div>
+      </div>
+      <div class="icon-item">
+        <i class="fas fa-weight"></i>
+        <div class="icon-name">fa-weight</div>
+        <div>重量</div>
+      </div>
+      <div class="icon-item">
+        <i class="fas fa-clock"></i>
+        <div class="icon-name">fa-clock</div>
+        <div>时间</div>
+      </div>
+      <div class="icon-item">
+        <i class="fas fa-map-marker-alt"></i>
+        <div class="icon-name">fa-map-marker-alt</div>
+        <div>地址</div>
+      </div>
+      <div class="icon-item">
+        <i class="fas fa-user"></i>
+        <div class="icon-name">fa-user</div>
+        <div>用户</div>
+      </div>
+      <div class="icon-item">
+        <i class="fas fa-phone"></i>
+        <div class="icon-name">fa-phone</div>
+        <div>电话</div>
+      </div>
+      <div class="icon-item">
+        <i class="fas fa-coins"></i>
+        <div class="icon-name">fa-coins</div>
+        <div>收益</div>
+      </div>
+      <div class="icon-item">
+        <i class="fas fa-check-circle"></i>
+        <div class="icon-name">fa-check-circle</div>
+        <div>确认</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 检测图标是否加载成功
+    window.addEventListener('load', function() {
+      const icons = document.querySelectorAll('.icon-item i');
+      icons.forEach(icon => {
+        const computed = window.getComputedStyle(icon);
+        const fontFamily = computed.getPropertyValue('font-family');
+        const content = computed.getPropertyValue('content');
+        
+        const status = document.createElement('div');
+        status.className = 'status';
+        
+        if (fontFamily.includes('Font Awesome') || content !== 'none') {
+          status.className += ' ok';
+          status.textContent = '✓ 正常';
+        } else {
+          status.className += ' fail';
+          status.textContent = '✗ 失败';
+        }
+        
+        icon.parentElement.appendChild(status);
+      });
+    });
+  </script>
+</body>
+</html>
+

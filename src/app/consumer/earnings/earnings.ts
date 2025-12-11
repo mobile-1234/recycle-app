@@ -1,12 +1,10 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BottomNavComponent } from '../../shared/bottom-nav/bottom-nav.component';
-import { Chart, ChartConfiguration, registerables } from 'chart.js';
-
-// 注册Chart.js组件
-Chart.register(...registerables);
+import * as echarts from 'echarts';
+import type { ECharts, EChartsOption } from 'echarts';
 
 // 数据接口定义
 interface EarningRecord {
@@ -43,6 +41,12 @@ interface DonationProject {
   description: string;
 }
 
+interface TimeRange {
+  id: string;
+  name: string;
+  active: boolean;
+}
+
 @Component({
   selector: 'app-earnings',
   standalone: true,
@@ -50,8 +54,8 @@ interface DonationProject {
   templateUrl: './earnings.html',
   styleUrls: ['./earnings.scss']
 })
-export class EarningsComponent implements OnInit, AfterViewInit {
-  @ViewChild('carbonChart') carbonChartRef!: ElementRef<HTMLCanvasElement>;
+export class EarningsComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('carbonChartRef') carbonChartRef!: ElementRef<HTMLDivElement>;
   
   // 当前选中的导航标签
   currentTab = 'earnings';
@@ -69,223 +73,19 @@ export class EarningsComponent implements OnInit, AfterViewInit {
     { id: 'carbon', name: '碳减排', active: false }
   ];
   
+  // 时间范围选项
+  timeRangeOptions: TimeRange[] = [
+    { id: 'day', name: '每天', active: true },
+    { id: 'month', name: '每月', active: false },
+    { id: 'year', name: '每年', active: false }
+  ];
+  
   // 日期筛选
   startDate = '';
   endDate = '';
   
-  // 收益记录数据
-  earningsData: EarningRecord[] = [
-    {
-      id: '1',
-      category: '废纸回收',
-      time: '2024-01-15 14:30',
-      orderNo: 'RC202401150001',
-      cashAmount: 25.60,
-      pointsAmount: 128,
-      carbonReduction: 2.5,
-      icon: 'fas fa-newspaper',
-      weight: '5.2kg',
-      price: '¥4.92/kg',
-      address: '北京市朝阳区建国路88号',
-      collector: '张师傅'
-    },
-    {
-      id: '2',
-      category: '塑料瓶回收',
-      time: '2024-01-14 10:15',
-      orderNo: 'RC202401140002',
-      cashAmount: 18.40,
-      pointsAmount: 92,
-      carbonReduction: 1.8,
-      icon: 'fas fa-wine-bottle',
-      weight: '3.7kg',
-      price: '¥4.97/kg',
-      address: '北京市朝阳区建国路88号',
-      collector: '李师傅'
-    },
-    {
-      id: '3',
-      category: '金属回收',
-      time: '2024-01-13 16:45',
-      orderNo: 'RC202401130003',
-      cashAmount: 45.20,
-      pointsAmount: 226,
-      carbonReduction: 4.5,
-      icon: 'fas fa-cog',
-      weight: '2.8kg',
-      price: '¥16.14/kg',
-      address: '北京市朝阳区建国路88号',
-      collector: '王师傅'
-    },
-    {
-      id: '4',
-      category: '电子设备回收',
-      time: '2024-01-12 09:20',
-      orderNo: 'RC202401120004',
-      cashAmount: 120.00,
-      pointsAmount: 600,
-      carbonReduction: 12.0,
-      icon: 'fas fa-mobile-alt',
-      weight: '1.5kg',
-      price: '¥80.00/kg',
-      address: '北京市朝阳区建国路88号',
-      collector: '赵师傅'
-    },
-    {
-      id: '5',
-      category: '纺织品回收',
-      time: '2024-01-11 13:10',
-      orderNo: 'RC202401110005',
-      cashAmount: 32.80,
-      pointsAmount: 164,
-      carbonReduction: 3.3,
-      icon: 'fas fa-tshirt',
-      weight: '4.1kg',
-      price: '¥8.00/kg',
-      address: '北京市朝阳区建国路88号',
-      collector: '孙师傅'
-    },
-    {
-      id: '6',
-      category: '玻璃回收',
-      time: '2024-01-10 11:25',
-      orderNo: 'RC202401100006',
-      cashAmount: 15.30,
-      pointsAmount: 76,
-      carbonReduction: 1.5,
-      icon: 'fas fa-wine-glass',
-      weight: '6.8kg',
-      price: '¥2.25/kg',
-      address: '北京市朝阳区建国路88号',
-      collector: '刘师傅'
-    },
-    {
-      id: '7',
-      category: '废纸回收',
-      time: '2024-01-09 15:40',
-      orderNo: 'RC202401090007',
-      cashAmount: 42.80,
-      pointsAmount: 214,
-      carbonReduction: 4.3,
-      icon: 'fas fa-newspaper',
-      weight: '8.7kg',
-      price: '¥4.92/kg',
-      address: '北京市朝阳区建国路88号',
-      collector: '陈师傅'
-    },
-    {
-      id: '8',
-      category: '塑料制品回收',
-      time: '2024-01-08 09:15',
-      orderNo: 'RC202401080008',
-      cashAmount: 28.60,
-      pointsAmount: 143,
-      carbonReduction: 2.9,
-      icon: 'fas fa-bottle-water',
-      weight: '4.3kg',
-      price: '¥6.65/kg',
-      address: '北京市朝阳区建国路88号',
-      collector: '周师傅'
-    },
-    {
-      id: '9',
-      category: '电子设备回收',
-      time: '2024-01-07 14:20',
-      orderNo: 'RC202401070009',
-      cashAmount: 85.00,
-      pointsAmount: 425,
-      carbonReduction: 8.5,
-      icon: 'fas fa-laptop',
-      weight: '2.1kg',
-      price: '¥40.48/kg',
-      address: '北京市朝阳区建国路88号',
-      collector: '吴师傅'
-    },
-    {
-      id: '10',
-      category: '金属回收',
-      time: '2024-01-06 16:30',
-      orderNo: 'RC202401060010',
-      cashAmount: 67.50,
-      pointsAmount: 337,
-      carbonReduction: 6.8,
-      icon: 'fas fa-wrench',
-      weight: '3.5kg',
-      price: '¥19.29/kg',
-      address: '北京市朝阳区建国路88号',
-      collector: '郑师傅'
-    },
-    {
-      id: '11',
-      category: '纺织品回收',
-      time: '2024-01-05 12:45',
-      orderNo: 'RC202401050011',
-      cashAmount: 24.00,
-      pointsAmount: 120,
-      carbonReduction: 2.4,
-      icon: 'fas fa-shirt',
-      weight: '3.0kg',
-      price: '¥8.00/kg',
-      address: '北京市朝阳区建国路88号',
-      collector: '马师傅'
-    },
-    {
-      id: '12',
-      category: '废纸回收',
-      time: '2024-01-04 10:30',
-      orderNo: 'RC202401040012',
-      cashAmount: 36.90,
-      pointsAmount: 184,
-      carbonReduction: 3.7,
-      icon: 'fas fa-file-alt',
-      weight: '7.5kg',
-      price: '¥4.92/kg',
-      address: '北京市朝阳区建国路88号',
-      collector: '黄师傅'
-    },
-    {
-      id: '13',
-      category: '塑料瓶回收',
-      time: '2024-01-03 13:15',
-      orderNo: 'RC202401030013',
-      cashAmount: 21.70,
-      pointsAmount: 108,
-      carbonReduction: 2.2,
-      icon: 'fas fa-wine-bottle',
-      weight: '4.4kg',
-      price: '¥4.93/kg',
-      address: '北京市朝阳区建国路88号',
-      collector: '徐师傅'
-    },
-    {
-      id: '14',
-      category: '电子设备回收',
-      time: '2024-01-02 11:50',
-      orderNo: 'RC202401020014',
-      cashAmount: 95.00,
-      pointsAmount: 475,
-      carbonReduction: 9.5,
-      icon: 'fas fa-tablet-alt',
-      weight: '1.8kg',
-      price: '¥52.78/kg',
-      address: '北京市朝阳区建国路88号',
-      collector: '朱师傅'
-    },
-    {
-      id: '15',
-      category: '玻璃回收',
-      time: '2024-01-01 14:35',
-      orderNo: 'RC202401010015',
-      cashAmount: 18.90,
-      pointsAmount: 94,
-      carbonReduction: 1.9,
-      icon: 'fas fa-wine-glass',
-      weight: '8.4kg',
-      price: '¥2.25/kg',
-      address: '北京市朝阳区建国路88号',
-      collector: '何师傅'
-    }
-  ];
+  // 收益记录数据 - 生成更多数据用于测试
+  earningsData: EarningRecord[] = [];
   
   // 筛选后的收益数据
   filteredEarnings: EarningRecord[] = [];
@@ -327,27 +127,77 @@ export class EarningsComponent implements OnInit, AfterViewInit {
   // 选中的订单详情
   selectedOrder: EarningRecord | null = null;
   
-  // Chart.js实例
-  carbonChart: Chart | null = null;
+  // ECharts实例
+  carbonChart: ECharts | null = null;
 
   constructor(private router: Router) {}
 
   ngOnInit() {
+    this.generateMockData();
     this.initializeData();
   }
 
   ngAfterViewInit() {
-    this.initCarbonChart();
+    setTimeout(() => {
+      this.initCarbonChart();
+    }, 100);
+  }
+
+  // 生成模拟数据
+  generateMockData() {
+    const categories = [
+      { name: '废纸回收', icon: 'fas fa-newspaper', priceRange: [4, 6] },
+      { name: '塑料瓶回收', icon: 'fas fa-wine-bottle', priceRange: [4, 5] },
+      { name: '金属回收', icon: 'fas fa-wrench', priceRange: [15, 20] },
+      { name: '电子设备回收', icon: 'fas fa-mobile-alt', priceRange: [50, 100] },
+      { name: '纺织品回收', icon: 'fas fa-tshirt', priceRange: [6, 10] },
+      { name: '玻璃回收', icon: 'fas fa-wine-glass', priceRange: [2, 3] }
+    ];
+    
+    const collectors = ['张师傅', '李师傅', '王师傅', '赵师傅', '孙师傅', '刘师傅'];
+    
+    // 生成最近12个月的数据
+    for (let month = 11; month >= 0; month--) {
+      const recordsPerMonth = Math.floor(Math.random() * 5) + 3; // 每月3-7条记录
+      
+      for (let i = 0; i < recordsPerMonth; i++) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - month);
+        date.setDate(Math.floor(Math.random() * 28) + 1);
+        date.setHours(Math.floor(Math.random() * 14) + 8);
+        date.setMinutes(Math.floor(Math.random() * 60));
+        
+        const category = categories[Math.floor(Math.random() * categories.length)];
+        const weight = (Math.random() * 8 + 1).toFixed(1);
+        const pricePerKg = (Math.random() * (category.priceRange[1] - category.priceRange[0]) + category.priceRange[0]).toFixed(2);
+        const cashAmount = parseFloat((parseFloat(weight) * parseFloat(pricePerKg)).toFixed(2));
+        const pointsAmount = Math.floor(cashAmount * 5);
+        const carbonReduction = parseFloat((parseFloat(weight) * 0.1).toFixed(1));
+        
+        this.earningsData.push({
+          id: `${date.getTime()}_${i}`,
+          category: category.name,
+          time: date.toLocaleString('zh-CN'),
+          orderNo: `RC${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}${i.toString().padStart(4, '0')}`,
+          cashAmount: cashAmount,
+          pointsAmount: pointsAmount,
+          carbonReduction: carbonReduction,
+          icon: category.icon,
+          weight: `${weight}kg`,
+          price: `¥${pricePerKg}/kg`,
+          address: '北京市朝阳区建国路88号',
+          collector: collectors[Math.floor(Math.random() * collectors.length)]
+        });
+      }
+    }
+    
+    // 按时间倒序排序
+    this.earningsData.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
   }
 
   // 初始化数据
   initializeData() {
-    // 初始显示全部数据，不启用日期筛选，避免列表为空
     this.filteredEarnings = [...this.earningsData];
-    this.startDate = '';
-    this.endDate = '';
-
-    // 应用初始筛选
     this.applyFilter();
   }
 
@@ -355,74 +205,249 @@ export class EarningsComponent implements OnInit, AfterViewInit {
   initCarbonChart() {
     if (!this.carbonChartRef?.nativeElement) return;
 
-    const ctx = this.carbonChartRef.nativeElement.getContext('2d');
-    if (!ctx) return;
-
-    // 生成最近7天的碳减排数据
-    const labels = [];
-    const data = [];
-    const today = new Date();
-    
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
-      labels.push(`${date.getMonth() + 1}/${date.getDate()}`);
-      data.push(Math.random() * 20 + 5); // 模拟数据
+    // 如果已存在图表，先销毁
+    if (this.carbonChart) {
+      this.carbonChart.dispose();
     }
 
-    const config: ChartConfiguration = {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: '碳减排量 (kg)',
-          data: data,
-          borderColor: '#1abc9c',
-          backgroundColor: 'rgba(26, 188, 156, 0.1)',
-          borderWidth: 3,
-          fill: true,
-          tension: 0.4,
-          pointBackgroundColor: '#1abc9c',
-          pointBorderColor: '#ffffff',
-          pointBorderWidth: 2,
-          pointRadius: 6
-        }]
+    this.carbonChart = echarts.init(this.carbonChartRef.nativeElement);
+    this.updateChartData();
+  }
+
+  // 更新图表数据
+  updateChartData() {
+    if (!this.carbonChart) return;
+
+    const activeTimeRange = this.timeRangeOptions.find(t => t.active);
+    let chartData: { labels: string[], data: number[] };
+
+    switch (activeTimeRange?.id) {
+      case 'day':
+        chartData = this.getDailyData();
+        break;
+      case 'month':
+        chartData = this.getMonthlyData();
+        break;
+      case 'year':
+        chartData = this.getYearlyData();
+        break;
+      default:
+        chartData = this.getDailyData();
+    }
+
+    const option: EChartsOption = {
+      title: {
+        text: '碳减排趋势',
+        left: 'center',
+        textStyle: {
+          color: '#333',
+          fontSize: 16,
+          fontWeight: 600
+        }
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false
+      tooltip: {
+        trigger: 'axis',
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderColor: '#4caf50',
+        borderWidth: 1,
+        textStyle: {
+          color: '#333'
+        },
+        formatter: (params: any) => {
+          const param = params[0];
+          return `${param.name}<br/>碳减排量: <strong style="color: #4caf50">${param.value} kg</strong>`;
+        }
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        top: '15%',
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        data: chartData.labels,
+        boundaryGap: false,
+        axisLine: {
+          lineStyle: {
+            color: '#e0e0e0'
           }
         },
-        scales: {
-          x: {
-            grid: {
-              display: false
-            },
-            ticks: {
-              color: '#6c757d',
-              font: {
-                size: 12
-              }
+        axisLabel: {
+          color: '#6c757d',
+          fontSize: 11,
+          rotate: activeTimeRange?.id === 'month' ? 45 : 0
+        }
+      },
+      yAxis: {
+        type: 'value',
+        name: 'kg',
+        axisLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        },
+        axisLabel: {
+          color: '#6c757d',
+          fontSize: 11
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#f0f0f0',
+            type: 'dashed'
+          }
+        }
+      },
+      series: [
+        {
+          name: '碳减排量',
+          type: 'line',
+          data: chartData.data,
+          smooth: true,
+          symbol: 'circle',
+          symbolSize: 8,
+          lineStyle: {
+            width: 3,
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 1,
+              y2: 0,
+              colorStops: [
+                { offset: 0, color: '#4caf50' },
+                { offset: 1, color: '#1abc9c' }
+              ]
             }
           },
-          y: {
-            grid: {
-              color: '#f0f0f0'
-            },
-            ticks: {
-              color: '#6c757d',
-              font: {
-                size: 12
-              }
+          itemStyle: {
+            color: '#4caf50',
+            borderColor: '#fff',
+            borderWidth: 2
+          },
+          areaStyle: {
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                { offset: 0, color: 'rgba(76, 175, 80, 0.3)' },
+                { offset: 1, color: 'rgba(76, 175, 80, 0.05)' }
+              ]
+            }
+          },
+          emphasis: {
+            itemStyle: {
+              color: '#2e7d32',
+              borderColor: '#fff',
+              borderWidth: 3,
+              shadowBlur: 10,
+              shadowColor: 'rgba(76, 175, 80, 0.5)'
             }
           }
         }
-      }
+      ]
     };
 
-    this.carbonChart = new Chart(ctx, config);
+    this.carbonChart.setOption(option);
+    
+    // 响应式
+    window.addEventListener('resize', () => {
+      this.carbonChart?.resize();
+    });
+  }
+
+  // 获取每日数据
+  getDailyData(): { labels: string[], data: number[] } {
+    const labels: string[] = [];
+    const data: number[] = [];
+    const today = new Date();
+    
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
+      const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
+      labels.push(dateStr);
+      
+      // 计算该天的碳减排量
+      const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
+      
+      const dayCarbon = this.earningsData
+        .filter(e => {
+          const eDate = new Date(e.time);
+          return eDate >= dayStart && eDate <= dayEnd;
+        })
+        .reduce((sum, e) => sum + e.carbonReduction, 0);
+      
+      data.push(parseFloat(dayCarbon.toFixed(2)));
+    }
+    
+    return { labels, data };
+  }
+
+  // 获取每月数据
+  getMonthlyData(): { labels: string[], data: number[] } {
+    const labels: string[] = [];
+    const data: number[] = [];
+    const today = new Date();
+    
+    for (let i = 11; i >= 0; i--) {
+      const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const monthStr = `${date.getFullYear()}/${date.getMonth() + 1}`;
+      labels.push(monthStr);
+      
+      // 计算该月的碳减排量
+      const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
+      const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59);
+      
+      const monthCarbon = this.earningsData
+        .filter(e => {
+          const eDate = new Date(e.time);
+          return eDate >= monthStart && eDate <= monthEnd;
+        })
+        .reduce((sum, e) => sum + e.carbonReduction, 0);
+      
+      data.push(parseFloat(monthCarbon.toFixed(2)));
+    }
+    
+    return { labels, data };
+  }
+
+  // 获取每年数据
+  getYearlyData(): { labels: string[], data: number[] } {
+    const labels: string[] = [];
+    const data: number[] = [];
+    const currentYear = new Date().getFullYear();
+    
+    for (let i = 4; i >= 0; i--) {
+      const year = currentYear - i;
+      labels.push(`${year}年`);
+      
+      // 计算该年的碳减排量
+      const yearStart = new Date(year, 0, 1);
+      const yearEnd = new Date(year, 11, 31, 23, 59, 59);
+      
+      const yearCarbon = this.earningsData
+        .filter(e => {
+          const eDate = new Date(e.time);
+          return eDate >= yearStart && eDate <= yearEnd;
+        })
+        .reduce((sum, e) => sum + e.carbonReduction, 0);
+      
+      data.push(parseFloat(yearCarbon.toFixed(2)));
+    }
+    
+    return { labels, data };
+  }
+
+  // 选择时间范围
+  selectTimeRange(selected: TimeRange) {
+    this.timeRangeOptions.forEach(t => t.active = t.id === selected.id);
+    this.updateChartData();
   }
 
   // 返回上一页
@@ -442,7 +467,6 @@ export class EarningsComponent implements OnInit, AfterViewInit {
         this.router.navigate(['/consumer/booking-recycle']);
         break;
       case 'earnings':
-        // 当前页面，不需要跳转
         break;
       case 'mall':
         this.router.navigate(['/consumer/points-mall']);
@@ -466,47 +490,39 @@ export class EarningsComponent implements OnInit, AfterViewInit {
   applyFilter() {
     let filtered = [...this.earningsData];
     
-    // 首先按类型筛选
     const activeFilter = this.filterOptions.find(f => f.active);
     if (activeFilter) {
       switch (activeFilter.id) {
         case 'all':
-          // 显示所有记录
           break;
         case 'cash':
-          // 按现金收益排序，优先显示现金收益高的记录
-          filtered = filtered.filter(e => e.cashAmount > 0).sort((a, b) => b.cashAmount - a.cashAmount);
+          filtered = filtered.filter(e => e.cashAmount > 0);
           break;
         case 'points':
-          // 按积分收益排序，优先显示积分收益高的记录
-          filtered = filtered.filter(e => e.pointsAmount > 0).sort((a, b) => b.pointsAmount - a.pointsAmount);
+          filtered = filtered.filter(e => e.pointsAmount > 0);
           break;
         case 'carbon':
-          // 按碳减排排序，优先显示碳减排高的记录
-          filtered = filtered.filter(e => e.carbonReduction > 0).sort((a, b) => b.carbonReduction - a.carbonReduction);
+          filtered = filtered.filter(e => e.carbonReduction > 0);
           break;
       }
     }
     
-    // 然后按日期筛选
     if (this.startDate && this.endDate) {
       const start = new Date(this.startDate);
       const end = new Date(this.endDate);
-      end.setHours(23, 59, 59, 999); // 设置为当天的最后一刻
+      end.setHours(23, 59, 59, 999);
       
       filtered = filtered.filter(earning => {
         const earningDate = new Date(earning.time);
         return earningDate >= start && earningDate <= end;
       });
     } else if (this.startDate) {
-      // 只有开始日期
       const start = new Date(this.startDate);
       filtered = filtered.filter(earning => {
         const earningDate = new Date(earning.time);
         return earningDate >= start;
       });
     } else if (this.endDate) {
-      // 只有结束日期
       const end = new Date(this.endDate);
       end.setHours(23, 59, 59, 999);
       filtered = filtered.filter(earning => {
@@ -518,47 +534,39 @@ export class EarningsComponent implements OnInit, AfterViewInit {
     this.filteredEarnings = filtered;
   }
 
-  // 按日期筛选
   filterByDate() {
-    this.applyFilter(); // 重新应用所有筛选条件
+    this.applyFilter();
   }
 
-  // 清除日期筛选
   clearDateFilter() {
     this.startDate = '';
     this.endDate = '';
     this.applyFilter();
   }
 
-  // 显示订单详情
   showOrderDetail(earning: EarningRecord) {
     this.selectedOrder = earning;
     this.showOrderDetailModal = true;
   }
 
-  // 显示提现模态框
   showWithdrawModal() {
     this.showWithdraw = true;
   }
 
-  // 显示捐赠模态框
   showDonationModal() {
     this.showDonation = true;
   }
 
-  // 选择提现方式
   selectWithdrawOption(selectedOption: WithdrawOption) {
     this.withdrawOptions.forEach(option => {
       option.active = option.id === selectedOption.id;
     });
   }
 
-  // 选择捐赠项目
   selectDonationProject(project: DonationProject) {
     this.selectedProject = project;
   }
 
-  // 确认提现
   confirmWithdraw() {
     if (this.withdrawAmount <= 0) {
       this.showAlert('请输入有效的提现金额', 'warning');
@@ -581,45 +589,21 @@ export class EarningsComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    // 显示确认对话框
     if (confirm(`确认提现 ¥${this.withdrawAmount.toFixed(2)} 到${selectedOption.name}？`)) {
       this.processWithdraw(selectedOption);
     }
   }
 
-  // 处理提现请求
   private processWithdraw(option: WithdrawOption) {
-    // 模拟API调用
     this.showAlert('正在处理提现申请...', 'info');
     
     setTimeout(() => {
-      // 模拟成功响应
       this.totalCashEarnings -= this.withdrawAmount;
       this.showAlert(`提现申请已提交！预计1-3个工作日通过${option.name}到账`, 'success');
       this.closeModal('withdraw');
-      
-      // 添加提现记录到收益明细
-      const withdrawRecord: EarningRecord = {
-        id: Date.now().toString(),
-        category: '提现',
-        time: new Date().toLocaleString('zh-CN'),
-        orderNo: `WD${Date.now()}`,
-        cashAmount: -this.withdrawAmount,
-        pointsAmount: 0,
-        carbonReduction: 0,
-        icon: 'fas fa-money-bill-wave',
-        weight: '-',
-        price: '-',
-        address: '-',
-        collector: option.name
-      };
-      
-      this.earningsData.unshift(withdrawRecord);
-      this.applyFilter();
     }, 2000);
   }
 
-  // 确认捐赠
   confirmDonation() {
     if (!this.selectedProject) {
       this.showAlert('请选择捐赠项目', 'warning');
@@ -636,48 +620,26 @@ export class EarningsComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    // 显示确认对话框
     if (confirm(`确认向"${this.selectedProject.name}"捐赠 ¥${this.donationAmount.toFixed(2)}？`)) {
       this.processDonation();
     }
   }
 
-  // 处理捐赠请求
   private processDonation() {
     if (!this.selectedProject) return;
     
     this.showAlert('正在处理捐赠...', 'info');
     
     setTimeout(() => {
-      // 模拟成功响应
       this.totalCashEarnings -= this.donationAmount;
+      this.totalPointsEarnings += Math.floor(this.donationAmount * 2);
+      this.totalCarbonReduction += this.donationAmount * 0.1;
+      
       this.showAlert(`感谢您的爱心！已成功向"${this.selectedProject!.name}"捐赠 ¥${this.donationAmount.toFixed(2)}`, 'success');
       this.closeModal('donation');
-      
-      // 添加捐赠记录到收益明细
-      const donationRecord: EarningRecord = {
-        id: Date.now().toString(),
-        category: '公益捐赠',
-        time: new Date().toLocaleString('zh-CN'),
-        orderNo: `DN${Date.now()}`,
-        cashAmount: -this.donationAmount,
-        pointsAmount: Math.floor(this.donationAmount * 2), // 捐赠获得双倍积分
-        carbonReduction: this.donationAmount * 0.1, // 每元捐赠相当于0.1kg碳减排
-        icon: 'fas fa-hand-holding-heart',
-        weight: '-',
-        price: '-',
-        address: '-',
-        collector: this.selectedProject!.name
-      };
-      
-      this.earningsData.unshift(donationRecord);
-      this.totalPointsEarnings += donationRecord.pointsAmount;
-      this.totalCarbonReduction += donationRecord.carbonReduction;
-      this.applyFilter();
     }, 2000);
   }
 
-  // 关闭模态框
   closeModal(type: string) {
     switch (type) {
       case 'withdraw':
@@ -696,12 +658,10 @@ export class EarningsComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // 跳转到商城
   goToMall() {
     this.router.navigate(['/consumer/points-mall']);
   }
 
-  // 导出账单
   exportBill() {
     this.showAlert('正在生成账单...', 'info');
     
@@ -710,24 +670,13 @@ export class EarningsComponent implements OnInit, AfterViewInit {
     }, 1500);
   }
 
-  // 生成账单报告
   private generateBillReport() {
-    const billData = {
-      period: `${this.startDate} 至 ${this.endDate}`,
-      totalCash: this.totalCashEarnings,
-      totalPoints: this.totalPointsEarnings,
-      totalCarbon: this.totalCarbonReduction,
-      records: this.filteredEarnings
-    };
-
-    // 创建CSV格式的账单数据
     let csvContent = "日期,类别,订单号,现金收益,积分收益,碳减排量\n";
     
     this.filteredEarnings.forEach(record => {
       csvContent += `${record.time},${record.category},${record.orderNo},${record.cashAmount},${record.pointsAmount},${record.carbonReduction}\n`;
     });
 
-    // 创建并下载文件
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
@@ -741,14 +690,11 @@ export class EarningsComponent implements OnInit, AfterViewInit {
     this.showAlert('账单已导出到下载文件夹', 'success');
   }
 
-  // 显示提示信息
   private showAlert(message: string, type: 'success' | 'error' | 'warning' | 'info') {
-    // 创建提示元素
     const alertDiv = document.createElement('div');
     alertDiv.className = `custom-alert alert-${type}`;
     alertDiv.textContent = message;
     
-    // 添加样式
     alertDiv.style.cssText = `
       position: fixed;
       top: 80px;
@@ -766,7 +712,6 @@ export class EarningsComponent implements OnInit, AfterViewInit {
 
     document.body.appendChild(alertDiv);
 
-    // 3秒后自动移除
     setTimeout(() => {
       if (alertDiv.parentNode) {
         alertDiv.style.animation = 'slideUp 0.3s ease-in';
@@ -777,7 +722,6 @@ export class EarningsComponent implements OnInit, AfterViewInit {
     }, 3000);
   }
 
-  // 获取提示颜色
   private getAlertColor(type: string): string {
     switch (type) {
       case 'success': return '#4caf50';
@@ -788,10 +732,9 @@ export class EarningsComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // 组件销毁时清理图表
   ngOnDestroy() {
     if (this.carbonChart) {
-      this.carbonChart.destroy();
+      this.carbonChart.dispose();
     }
   }
 }

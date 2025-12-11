@@ -81,10 +81,10 @@ export class AboutUsPage implements OnInit {
   async followWeChat() {
     if (confirm('是否关注我们的微信公众号？')) {
       try {
-        await this.copyToClipboard('绿色回收助手');
+        await this.copyToClipboard('再生视界助手');
         this.showAlert('公众号名称已复制到剪贴板');
       } catch (error) {
-        this.showAlert('复制失败，请手动搜索：绿色回收助手');
+        this.showAlert('复制失败，请手动搜索：再生视界助手');
       }
     }
   }
@@ -95,10 +95,10 @@ export class AboutUsPage implements OnInit {
   async followWeibo() {
     if (confirm('是否关注我们的官方微博？')) {
       try {
-        await this.copyToClipboard('@绿色回收助手官方');
+        await this.copyToClipboard('@再生视界助手官方');
         this.showAlert('微博账号已复制到剪贴板');
       } catch (error) {
-        this.showAlert('复制失败，请手动搜索：@绿色回收助手官方');
+        this.showAlert('复制失败，请手动搜索：@再生视界助手官方');
       }
     }
   }
@@ -109,10 +109,10 @@ export class AboutUsPage implements OnInit {
   async followDouyin() {
     if (confirm('是否关注我们的抖音账号？')) {
       try {
-        await this.copyToClipboard('绿色回收小助手');
+        await this.copyToClipboard('再生视界小助手');
         this.showAlert('抖音账号已复制到剪贴板');
       } catch (error) {
-        this.showAlert('复制失败，请手动搜索：绿色回收小助手');
+        this.showAlert('复制失败，请手动搜索：再生视界小助手');
       }
     }
   }

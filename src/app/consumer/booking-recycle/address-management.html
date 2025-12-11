@@ -1,0 +1,279 @@
+<div class="address-management-container">
+  <!-- 顶部导航栏 -->
+  <div class="header">
+    <div class="header-left" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+    </div>
+    <div class="header-title">地址管理</div>
+    <div class="header-right" (click)="openAddModal()">
+      <i class="fas fa-plus"></i>
+    </div>
+  </div>
+
+  <!-- 地址列表 -->
+  <div class="address-list">
+    <div class="address-card" *ngFor="let address of addresses" 
+         [class.default]="address.isDefault">
+      <!-- 默认标签 -->
+      <div class="default-badge" *ngIf="address.isDefault">
+        <i class="fas fa-check-circle"></i>
+        默认
+      </div>
+
+      <!-- 地址标签 -->
+      <div class="address-tag" [class.home]="address.tag === '家'" 
+           [class.office]="address.tag === '公司'"
+           [class.school]="address.tag === '学校'">
+        <i class="fas" 
+           [ngClass]="{
+             'fa-home': address.tag === '家',
+             'fa-building': address.tag === '公司',
+             'fa-graduation-cap': address.tag === '学校'
+           }">
+        </i>
+        {{ address.tag }}
+      </div>
+
+      <!-- 联系人信息 -->
+      <div class="contact-info">
+        <span class="name">{{ address.name }}</span>
+        <span class="phone">{{ address.phone }}</span>
+      </div>
+
+      <!-- 详细地址 -->
+      <div class="address-detail">
+        <i class="fas fa-map-marker-alt"></i>
+        <span>{{ address.province }}{{ address.city }}{{ address.district }}{{ address.detail }}</span>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="address-actions">
+        <button class="btn-default" *ngIf="!address.isDefault" 
+                (click)="setDefaultAddress(address.id)">
+          设为默认
+        </button>
+        <button class="btn-edit" (click)="openEditModal(address)">
+          <i class="fas fa-edit"></i>
+          编辑
+        </button>
+        <button class="btn-delete" (click)="deleteAddress(address.id)">
+          <i class="fas fa-trash"></i>
+          删除
+        </button>
+      </div>
+    </div>
+
+    <!-- 空状态 -->
+    <div class="empty-state" *ngIf="addresses.length === 0">
+      <i class="fas fa-map-marked-alt"></i>
+      <p>暂无地址</p>
+      <button class="btn-add" (click)="openAddModal()">
+        <i class="fas fa-plus"></i>
+        添加新地址
+      </button>
+    </div>
+  </div>
+
+  <!-- 新增地址弹窗 -->
+  <div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()"></div>
+  <div class="modal address-modal" *ngIf="showAddModal">
+    <div class="modal-header">
+      <h3>新增地址</h3>
+      <i class="fas fa-times" (click)="closeAddModal()"></i>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label>
+          <i class="fas fa-user"></i>
+          联系人
+        </label>
+        <input type="text" [(ngModel)]="newAddress.name" placeholder="请输入姓名" />
+      </div>
+
+      <div class="form-group">
+        <label>
+          <i class="fas fa-phone"></i>
+          手机号
+        </label>
+        <input type="tel" [(ngModel)]="newAddress.phone" placeholder="请输入手机号" />
+      </div>
+
+      <div class="form-group">
+        <label>
+          <i class="fas fa-map-marker-alt"></i>
+          所在地区
+        </label>
+        <div class="region-select">
+          <input type="text" [(ngModel)]="newAddress.province" placeholder="省" />
+          <input type="text" [(ngModel)]="newAddress.city" placeholder="市" />
+          <input type="text" [(ngModel)]="newAddress.district" placeholder="区/县" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <i class="fas fa-home"></i>
+          详细地址
+        </label>
+        <textarea [(ngModel)]="newAddress.detail" placeholder="街道、门牌号等详细信息" rows="3"></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-action" (click)="pasteFromClipboard()">
+          <i class="fas fa-paste"></i>
+          粘贴地址
+        </button>
+        <button class="btn-action" (click)="selectLocation()">
+          <i class="fas fa-map"></i>
+          地图选点
+        </button>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <i class="fas fa-tag"></i>
+          地址标签
+        </label>
+        <div class="tag-select">
+          <button [class.active]="newAddress.tag === '家'" 
+                  (click)="newAddress.tag = '家'">
+            <i class="fas fa-home"></i>
+            家
+          </button>
+          <button [class.active]="newAddress.tag === '公司'" 
+                  (click)="newAddress.tag = '公司'">
+            <i class="fas fa-building"></i>
+            公司
+          </button>
+          <button [class.active]="newAddress.tag === '学校'" 
+                  (click)="newAddress.tag = '学校'">
+            <i class="fas fa-graduation-cap"></i>
+            学校
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group checkbox">
+        <label>
+          <input type="checkbox" [(ngModel)]="newAddress.isDefault" />
+          <span>设为默认地址</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeAddModal()">取消</button>
+      <button class="btn-save" (click)="saveNewAddress()">保存</button>
+    </div>
+  </div>
+
+  <!-- 编辑地址弹窗 -->
+  <div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()"></div>
+  <div class="modal address-modal" *ngIf="showEditModal && currentAddress">
+    <div class="modal-header">
+      <h3>编辑地址</h3>
+      <i class="fas fa-times" (click)="closeEditModal()"></i>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label>
+          <i class="fas fa-user"></i>
+          联系人
+        </label>
+        <input type="text" [(ngModel)]="currentAddress.name" placeholder="请输入姓名" />
+      </div>
+
+      <div class="form-group">
+        <label>
+          <i class="fas fa-phone"></i>
+          手机号
+        </label>
+        <input type="tel" [(ngModel)]="currentAddress.phone" placeholder="请输入手机号" />
+      </div>
+
+      <div class="form-group">
+        <label>
+          <i class="fas fa-map-marker-alt"></i>
+          所在地区
+        </label>
+        <div class="region-select">
+          <input type="text" [(ngModel)]="currentAddress.province" placeholder="省" />
+          <input type="text" [(ngModel)]="currentAddress.city" placeholder="市" />
+          <input type="text" [(ngModel)]="currentAddress.district" placeholder="区/县" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <i class="fas fa-home"></i>
+          详细地址
+        </label>
+        <textarea [(ngModel)]="currentAddress.detail" placeholder="街道、门牌号等详细信息" rows="3"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <i class="fas fa-tag"></i>
+          地址标签
+        </label>
+        <div class="tag-select">
+          <button [class.active]="currentAddress.tag === '家'" 
+                  (click)="currentAddress.tag = '家'">
+            <i class="fas fa-home"></i>
+            家
+          </button>
+          <button [class.active]="currentAddress.tag === '公司'" 
+                  (click)="currentAddress.tag = '公司'">
+            <i class="fas fa-building"></i>
+            公司
+          </button>
+          <button [class.active]="currentAddress.tag === '学校'" 
+                  (click)="currentAddress.tag = '学校'">
+            <i class="fas fa-graduation-cap"></i>
+            学校
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group checkbox">
+        <label>
+          <input type="checkbox" [(ngModel)]="currentAddress.isDefault" />
+          <span>设为默认地址</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeEditModal()">取消</button>
+      <button class="btn-save" (click)="saveEditAddress()">保存</button>
+    </div>
+  </div>
+
+  <!-- 地图选点弹窗 -->
+  <div class="modal-overlay" *ngIf="showMapModal" (click)="closeMapModal()"></div>
+  <div class="modal map-modal" *ngIf="showMapModal">
+    <div class="modal-header">
+      <h3>选择位置</h3>
+      <i class="fas fa-times" (click)="closeMapModal()"></i>
+    </div>
+
+    <div class="modal-body">
+      <div class="map-placeholder">
+        <i class="fas fa-map-marked-alt"></i>
+        <p>地图功能</p>
+        <p class="tip">提示：点击地图选择位置</p>
+        <p class="note">实际项目中可集成高德地图、百度地图等</p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeMapModal()">取消</button>
+      <button class="btn-save" (click)="confirmLocation(39.9042, 116.4074, '北京市朝阳区建国路88号')">
+        确定位置
+      </button>
+    </div>
+  </div>
+</div>
+

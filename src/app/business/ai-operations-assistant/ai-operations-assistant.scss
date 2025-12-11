@@ -322,8 +322,38 @@
   }
 
   .message-text {
-    line-height: 1.6;
+    line-height: 1.8;
     white-space: pre-wrap;
+    word-wrap: break-word;
+    display: inline;
+    font-size: 15px;
+    color: #333;
+  }
+
+  // 流式输出光标
+  .streaming-cursor {
+    display: inline-block;
+    color: #4CAF50;
+    font-weight: bold;
+    animation: blink 1s infinite;
+    margin-left: 2px;
+    font-size: 16px;
+  }
+
+  @keyframes blink {
+    0%, 50% {
+      opacity: 1;
+    }
+    51%, 100% {
+      opacity: 0;
+    }
+  }
+
+  // 流式输出中的消息气泡
+  .message-bubble.streaming {
+    background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e9 100%);
+    border-left: 3px solid #4CAF50;
+    box-shadow: 0 2px 12px rgba(76, 175, 80, 0.15);
   }
 
   .message-time {

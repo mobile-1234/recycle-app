@@ -1,12 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <title>RecycleApp</title>
+  <title>智回回收 - 环保回收平台</title>
   <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="description" content="智回回收 - 智能环保回收平台，提供便捷的废品回收服务">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <!-- 使用本地依赖的Font Awesome，避免CDN字体加载错误 -->
+  
+  <!-- Font Awesome 图标库 - 使用可靠的CDN源 -->
+  <!-- jsDelivr CDN（主CDN，全球加速） -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+  <!-- Staticfile CDN备用 -->
+  <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.5.1/css/all.min.css" media="none" onload="if(media!='all')media='all'">
+  <!-- 本地备用（已在styles.scss中导入Font Awesome 7.0.1） -->
 </head>
 <body>
   <app-root></app-root>

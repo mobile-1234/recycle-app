@@ -35,7 +35,7 @@ export class AIDecisionAssistant {
   qaResult = '';
   complianceResults = [
     { company: '某环保企业', risk: 'high', pattern: '异常资金流向', suggestion: '加强监管' },
-    { company: '绿色回收公司', risk: 'medium', pattern: '回收量波动', suggestion: '核查数据' }
+    { company: '再生视界公司', risk: 'medium', pattern: '回收量波动', suggestion: '核查数据' }
   ];
   
   // 报告相关

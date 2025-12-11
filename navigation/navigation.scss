@@ -1,0 +1,605 @@
+// navigation.scss：手机端导航组件样式文件，实现符合大厂UI规范的设计
+
+@use 'sass:math';
+@use 'sass:color';
+
+// 定义颜色变量（符合大厂UI规范）
+$primary-color: #1890FF; // 主色
+$success-color: #52C41A; // 成功色
+$warning-color: #FAAD14; // 警告色
+$error-color: #F5222D; // 错误色
+$text-primary: #1D1D1F; // 主文本色
+$text-secondary: #8E8E93; // 次文本色
+$bg-page: #F8F8F8; // 页面背景色
+$bg-card: #FFFFFF; // 卡片背景色
+$border-color: #EEEEEE; // 边框色
+$shadow-color: rgba(0, 0, 0, 0.1); // 阴影色
+
+// 定义尺寸变量（基于vw单位，适配移动端）
+$space-xs: 1.07vw; // 4px
+$space-s: 2.13vw; // 8px
+$space-m: 4.27vw; // 16px
+$space-l: 6.4vw; // 24px
+$space-xl: 8.53vw; // 32px
+
+$font-title: 5.33vw; // 20px
+$font-subtitle: 4.27vw; // 16px
+$font-body: 3.73vw; // 14px
+$font-caption: 3.2vw; // 12px
+
+$border-radius-small: 1.07vw; // 4px
+$border-radius-medium: 2.13vw; // 8px
+$border-radius-large: 3.2vw; // 12px
+
+// 基础容器样式
+.navigation-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-color: $bg-page;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  overflow: hidden;
+}
+
+// 地图区域样式
+.map-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.map-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+// 地图容器
+#amap-container {
+  width: 100%;
+  height: 100%;
+}
+
+// 输入框容器样式（两种状态）
+.input-container {
+  position: absolute;
+  left: 4.27vw; // 16px
+  right: 4.27vw; // 16px
+  background-color: $bg-card;
+  border-radius: $border-radius-medium;
+  box-shadow: 0 0.53vw 2.13vw $shadow-color; // 2px 8px
+  z-index: 10;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: flex;
+  align-items: center;
+  padding: 0 $space-s;
+  height: 12.8vw; // 48px
+  opacity: 0;
+  visibility: hidden;
+
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  // 顶部状态
+  &.top-state {
+    top: $space-m; // 16px
+  }
+
+  // 底部状态
+  &.bottom-state {
+    bottom: $space-m; // 16px
+  }
+}
+
+// 底部控件容器
+.bottom-controls {
+  position: absolute;
+  bottom: $space-m; // 16px
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-m; // 16px
+  z-index: 10;
+}
+
+// 底部按钮区域
+.bottom-button-area {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: $space-m;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.9) 100%);
+  display: flex;
+  justify-content: center;
+  gap: $space-m; // 16px
+  z-index: 90;
+}
+
+// 路线按钮样式
+.route-button {
+  width: 85%;
+  height: 12.8vw; // 48px
+  background-color: $primary-color; // 使用主色调
+  border: none;
+  border-radius: $border-radius-medium;
+  color: white;
+  font-size: $font-subtitle; // 16px
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-s; // 8px
+  cursor: pointer;
+  box-shadow: 0 0.53vw 2.13vw rgba(24, 144, 255, 0.4); // 主色阴影
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  padding: 0;
+  
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  &:active {
+    background-color: color.mix($primary-color, #000, 90%); // 按下时颜色变深，使用新的color.mix()函数
+    transform: scale(0.98);
+  }
+  
+  i {
+    color: white;
+  }
+  
+  span {
+    font-weight: 500;
+  }
+}
+
+// 路线按钮样式（底部按钮区）
+.route-btn {
+  background-color: $primary-color; // 使用主色调
+  color: white;
+  border: none;
+  border-radius: $border-radius-medium;
+  padding: $space-s $space-xl;
+  font-size: $font-subtitle; // 16px
+  cursor: pointer;
+  box-shadow: 0 0.53vw 2.13vw rgba(24, 144, 255, 0.4); // 主色阴影
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  flex: 1;
+  max-width: 180px;
+  
+  &:active {
+    background-color: color.mix($primary-color, #000, 90%); // 按下时颜色变深，使用新的color.mix()函数
+    transform: scale(0.98);
+  }
+}
+
+// 导航按钮样式
+.navigate-btn {
+  background-color: $success-color; // 使用成功色
+  color: white;
+  border: none;
+  border-radius: $border-radius-medium;
+  padding: $space-s $space-xl;
+  font-size: $font-subtitle; // 16px
+  cursor: pointer;
+  box-shadow: 0 0.53vw 2.13vw rgba(82, 196, 26, 0.4); // 成功色阴影
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  flex: 1;
+  max-width: 180px;
+  
+  &:active {
+    background-color: color.mix($success-color, #000, 90%); // 按下时颜色变深，使用新的color.mix()函数
+    transform: scale(0.98);
+  }
+}
+
+// 路线规划面板
+.route-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 110;
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 1.07vw 4.27vw rgba(0, 0, 0, 0.15); // 4px 16px
+  animation: slideDown 0.3s ease;
+}
+
+// 路线类型选择器
+.route-type-selector {
+  display: flex;
+  justify-content: center;
+  padding: $space-m 0;
+  border-bottom: 0.27vw solid $border-color; // 1px
+  background-color: $bg-card;
+}
+
+// 路线类型按钮
+.route-type-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $space-s $space-l;
+  margin: 0 $space-s;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  color: $text-secondary;
+  font-size: $font-body; // 14px
+  position: relative;
+  
+  &:active {
+    color: $primary-color;
+  }
+  
+  &.active {
+    color: $primary-color;
+  }
+  
+  &.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 20%;
+    right: 20%;
+    height: 0.53vw; // 2px
+    background-color: $primary-color;
+    border-radius: 0.27vw;
+  }
+}
+
+// 图标样式 - 可以使用字体图标或SVG图标
+.route-type-btn i {
+  font-size: 5.33vw; // 20px
+  margin-bottom: $space-xs;
+  display: block;
+}
+
+// 路线结果面板
+.route-result-panel {
+  max-height: 60vh;
+  overflow-y: auto;
+  background-color: $bg-card;
+  // 高德地图API会自动填充内容
+}
+
+// 动画效果
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// 搜索提示结果区域
+.suggestion-panel {
+  position: absolute;
+  top: 19.2vw; // 顶部输入框下方
+  left: 4.27vw; // 与输入框对齐
+  right: 4.27vw;
+  background-color: $bg-card;
+  border-radius: $border-radius-medium;
+  box-shadow: 0 1.07vw 4.27vw rgba(0, 0, 0, 0.15); // 4px 16px
+  z-index: 20;
+  max-height: 50vh;
+  overflow-y: auto;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.suggestion-list {
+  padding: $space-xs 0;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: flex-start;
+  padding: $space-m;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:active {
+    background-color: $bg-page;
+  }
+}
+
+.suggestion-icon {
+  margin-right: $space-s;
+  margin-top: $space-xs;
+}
+
+.suggestion-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+.suggestion-name {
+  font-size: $font-subtitle; // 16px
+  color: $text-primary;
+  margin-bottom: $space-xs;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.suggestion-address {
+  font-size: $font-caption; // 12px
+  color: $text-secondary;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// 导航按钮样式
+.nav-button {
+  height: 11.73vw; // 44px
+  min-width: 11.73vw;
+  min-height: 11.73vw;
+  border-radius: 50%;
+  background-color: rgba($bg-card, 0.9);
+  border: none;
+  box-shadow: 0 0.53vw 2.13vw rgba(0, 0, 0, 0.15); // 2px 8px
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+
+  &:active {
+    background-color: rgba($bg-card, 0.7);
+  }
+}
+
+// 图标样式
+.icon-back,
+.icon-search,
+.icon-history,
+.icon-location,
+.icon-poi {
+  &::before {
+    content: "";
+    display: block;
+    width: 5.33vw; // 20px
+    height: 5.33vw; // 20px
+    background-color: $text-primary;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+  }
+}
+
+.icon-back::before {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z'/%3E%3C/svg%3E");
+}
+
+.icon-search::before {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E");
+}
+
+.icon-history::before {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z'/%3E%3C/svg%3E");
+}
+
+.icon-location::before {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/%3E%3C/svg%3E");
+}
+
+.icon-poi::before {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/%3E%3C/svg%3E");
+  background-color: $primary-color;
+}
+
+// 路线图标样式
+.icon-route::before {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z'/%3E%3C/svg%3E");
+}
+
+// 输入框样式
+.location-input {
+  flex: 1;
+  border: none;
+  font-size: $font-subtitle; // 16px
+  color: $text-primary;
+  background: transparent;
+  box-sizing: border-box;
+  padding: $space-xs $space-s;
+  margin: 0 $space-s;
+
+  &:focus {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: $text-secondary;
+  }
+}
+
+// 历史记录面板
+.history-panel {
+  position: absolute;
+  top: 21.33vw; // 80px (顶部输入框高度 + 间距)
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: $bg-card;
+  z-index: 5;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  opacity: 0;
+  visibility: hidden;
+  overflow-y: auto;
+
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+// 区域头部样式
+.section-header {
+  padding: $space-m;
+  border-bottom: 0.27vw solid $border-color; // 1px
+
+  h3 {
+    margin: 0;
+    font-size: $font-subtitle; // 16px
+    color: $text-primary;
+    font-weight: 500;
+  }
+}
+
+// 搜索结果区域
+.search-results-section {
+  margin-bottom: $space-m;
+}
+
+.search-results-list {
+  padding: $space-s 0;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: flex-start;
+  padding: $space-m;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:active {
+    background-color: $bg-page;
+  }
+}
+
+.result-icon {
+  margin-right: $space-s;
+  margin-top: $space-xs;
+}
+
+.result-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+.result-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $space-xs;
+}
+
+.result-name {
+  font-size: $font-subtitle; // 16px
+  color: $text-primary;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  margin-right: $space-s;
+}
+
+.result-distance {
+  font-size: $font-caption; // 12px
+  color: $primary-color;
+  font-weight: 500;
+  white-space: nowrap;
+  min-width: 60px;
+  text-align: right;
+}
+
+.result-address {
+  font-size: $font-caption; // 12px
+  color: $text-secondary;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.no-results {
+  padding: $space-l $space-m;
+  text-align: center;
+  color: $text-secondary;
+  font-size: $font-body;
+}
+
+// 历史记录区域
+.history-section {
+  border-top: 0.27vw solid $border-color; // 1px
+}
+
+.history-list {
+  padding: $space-s 0;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  padding: $space-s $space-m;
+
+  &:active {
+    background-color: $bg-page;
+  }
+}
+
+.history-text {
+  font-size: $font-body; // 14px
+  color: $text-primary;
+}
+
+// 响应式设计（针对不同屏幕尺寸优化）
+@media (max-width: 768px) {
+
+  // 在小屏幕上增加内边距
+  .input-container {
+    left: 2.13vw; // 8px
+    right: 2.13vw; // 8px
+  }
+
+  // 调整搜索提示面板位置
+  .suggestion-panel {
+    left: 2.13vw;
+    right: 2.13vw;
+    top: 19.2vw;
+  }
+
+  // 调整历史记录面板的顶部位置
+  .history-panel {
+    top: 19.2vw; // 72px
+  }
+}
+
+// 针对大屏幕设备的优化
+@media (min-width: 1024px) {
+  .input-container {
+    max-width: 500px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  // 搜索提示面板居中
+  .suggestion-panel {
+    max-width: 500px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+}

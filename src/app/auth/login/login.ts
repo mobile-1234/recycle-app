@@ -3,26 +3,34 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { FmodeParse } from 'fmode-ng';
+import { AuthService } from '../services/auth.service';
 // 定义登录表单接口
 interface LoginForm {
   account: string;
   password: string;
   remember: boolean;
+  verificationCode?: string;
 }
 
 // 定义用户接口
 interface User {
   id: string;
   account: string;
-  password: string;
   name: string;
-  identity?: string; // 添加身份类型字段
-  fmodeUser?: any; // FmodeParse用户对象
+  identity?: string;
   [key: string]: any; // 允许其他动态属性
+}
+
+// 错误消息接口
+interface ErrorMessage {
+  show: boolean;
+  message: string;
+  type: 'error' | 'success';
 }
 
 @Component({
   selector: 'app-login',
+  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './login.html',
   styleUrl: './login.scss'
@@ -35,10 +43,17 @@ export class LoginComponent {
     remember: false
   };
 
-  // 错误信息
+  // 表单错误
   errors = {
     account: '',
     password: ''
+  };
+
+  // 错误/成功消息
+  errorMessage: ErrorMessage = {
+    show: false,
+    message: '',
+    type: 'error'
   };
 
   // 密码可见性
@@ -47,32 +62,20 @@ export class LoginComponent {
   // 登录状态
   isLoading = false;
 
-  // Mock用户数据
-  private mockUsers: User[] = [
-    {
-      id: '1',
-      account: '13800138000',
-      password: '123456',
-      name: '张三',
-      identity: 'user'
-    },
-    {
-      id: '2',
-      account: 'user@example.com',
-      password: 'password',
-      name: '李四',
-      identity: 'business'
-    },
-    {
-      id: '3',
-      account: 'admin',
-      password: 'admin123',
-      name: '管理员',
-      identity: 'government'
-    }
-  ];
+  // 登录方式：'password' | 'phone'
+  loginMode: 'password' | 'phone' = 'password';
 
-  constructor(private router: Router) {}
+  // 是否启用手机验证码登录（临时禁用，等待后端实现 Cloud Functions）
+  enablePhoneLogin: boolean = false;
+
+  // 验证码倒计时
+  countdown: number = 0;
+  countdownTimer: any = null;
+
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   // 切换密码可见性
   togglePasswordVisibility(): void {
@@ -103,11 +106,85 @@ export class LoginComponent {
     return true;
   }
 
+  // 切换登录方式
+  switchLoginMode(mode: 'password' | 'phone'): void {
+    this.loginMode = mode;
+    this.loginForm.account = '';
+    this.loginForm.password = '';
+    this.loginForm.verificationCode = '';
+    this.errors = { account: '', password: '' };
+    this.errorMessage = { show: false, message: '', type: 'error' };
+  }
+
+  // 发送验证码
+  async sendVerificationCode(): Promise<void> {
+    if (!this.loginForm.account.trim()) {
+      this.errors.account = '请输入手机号';
+      return;
+    }
+
+    if (!this.authService.validatePhone(this.loginForm.account)) {
+      this.errors.account = '请输入有效的手机号';
+      return;
+    }
+
+    try {
+      const result = await this.authService.sendVerificationCode(
+        this.loginForm.account,
+        'login'
+      );
+
+      if (result.success) {
+        this.errorMessage = {
+          show: true,
+          message: '验证码已发送',
+          type: 'success'
+        };
+        this.startCountdown();
+      } else {
+        this.errorMessage = {
+          show: true,
+          message: result.message,
+          type: 'error'
+        };
+      }
+    } catch (error: any) {
+      this.errorMessage = {
+        show: true,
+        message: '发送验证码失败',
+        type: 'error'
+      };
+    }
+  }
+
+  // 开始倒计时
+  private startCountdown(): void {
+    this.countdown = 60;
+    this.countdownTimer = setInterval(() => {
+      this.countdown--;
+      if (this.countdown <= 0) {
+        clearInterval(this.countdownTimer);
+      }
+    }, 1000);
+  }
+
   // 表单提交
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     // 重置错误信息
     this.errors = { account: '', password: '' };
+    this.errorMessage = { show: false, message: '', type: 'error' };
 
+    if (this.loginMode === 'password') {
+      // 密码登录
+      await this.loginWithPassword();
+    } else {
+      // 验证码登录
+      await this.loginWithPhoneCode();
+    }
+  }
+
+  // 密码登录
+  private async loginWithPassword(): Promise<void> {
     // 验证表单
     const isAccountValid = this.validateAccount();
     const isPasswordValid = this.validatePassword();
@@ -119,86 +196,90 @@ export class LoginComponent {
     // 开始登录
     this.isLoading = true;
 
-    // 模拟登录API调用
-    setTimeout(() => {
-      const user = this.authenticateUser(this.loginForm.account, this.loginForm.password);
-      
-      if (user) {
-        // 登录成功
-        console.log('登录成功:', user);
-        
-        // 保存用户信息到localStorage
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        
-        if (this.loginForm.remember) {
-          localStorage.setItem('rememberLogin', 'true');
-        }
-
-        // 显示成功消息并根据用户身份跳转
-        alert('登录成功！即将跳转到对应首页。');
-        this.navigateToHomePage(user.identity || 'user');
-        
-      } else {
-        // 登录失败
-        this.errors.account = '账户或密码错误';
-      }
-      
-      this.isLoading = false;
-    }, 1500);
-  }
-
-  // 验证用户凭据
-  private authenticateUser(account: string, password: string): User | null {
-    // 首先检查是否有注册用户信息
-    const registeredUser = localStorage.getItem('registeredUser');
-    if (registeredUser) {
-      const userData = JSON.parse(registeredUser);
-      // 检查账号是否匹配注册的用户（密码在注册时已验证，这里不再需要验证密码）
-      if (userData.account === account) {
-        // 使用FmodeParse登录（异步）
-        FmodeParse.User.logIn(account, password).then(user => {
-          console.log('FmodeParse 登录成功:', user);
-          // 合并FmodeParse用户信息
-          userData.fmodeUser = user;
-          localStorage.setItem('currentUser', JSON.stringify(userData));
-        }).catch(err => {
-          console.log('FmodeParse 登录失败:', err);
-        });
-        
-        // 将注册用户信息转移到当前用户
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-        localStorage.removeItem('registeredUser'); // 清除注册临时数据
-        
-        return {
-          id: userData.id,
-          account: userData.account,
-          password: password,
-          name: userData.name || userData.companyName || userData.departmentName || userData.account,
-          identity: userData.identity
-        };
-      }
-    }
-    
-    // 检查Mock用户数据
-    const mockUser = this.mockUsers.find(user => 
-      user.account === account && user.password === password
+    const result = await this.authService.loginWithPassword(
+      this.loginForm.account,
+      this.loginForm.password
     );
-    
-    if (mockUser) {
-      // 尝试FmodeParse登录
-      FmodeParse.User.logIn(account, password).then(user => {
-        console.log('FmodeParse 登录成功:', user);
-        mockUser.fmodeUser = user;
-        localStorage.setItem('currentUser', JSON.stringify(mockUser));
-      }).catch(err => {
-        console.log('FmodeParse 登录失败:', err);
-      });
-      
-      return mockUser;
+
+    if (result.success && result.user) {
+      // 处理记住登录
+      if (this.loginForm.remember) {
+        localStorage.setItem('rememberLogin', 'true');
+        localStorage.setItem('rememberedAccount', this.loginForm.account);
+      } else {
+        localStorage.removeItem('rememberLogin');
+        localStorage.removeItem('rememberedAccount');
+      }
+
+      // 显示成功消息
+      this.errorMessage = {
+        show: true,
+        message: '登录成功！即将跳转...',
+        type: 'success'
+      };
+
+      // 延迟跳转
+      setTimeout(() => {
+        this.authService.navigateToHome(result.user!.identity);
+      }, 1000);
+    } else {
+      this.errorMessage = {
+        show: true,
+        message: result.message,
+        type: 'error'
+      };
+      this.isLoading = false;
     }
-    
-    return null;
   }
+
+  // 验证码登录
+  private async loginWithPhoneCode(): Promise<void> {
+    // 验证手机号
+    if (!this.loginForm.account.trim()) {
+      this.errors.account = '请输入手机号';
+      return;
+    }
+
+    if (!this.authService.validatePhone(this.loginForm.account)) {
+      this.errors.account = '请输入有效的手机号';
+      return;
+    }
+
+    // 验证验证码
+    if (!this.loginForm.verificationCode || this.loginForm.verificationCode.length !== 6) {
+      this.errors.password = '请输入6位验证码';
+      return;
+    }
+
+    this.isLoading = true;
+
+    const result = await this.authService.loginWithPhoneCode(
+      this.loginForm.account,
+      this.loginForm.verificationCode
+    );
+
+    if (result.success && result.user) {
+      // 显示成功消息
+      this.errorMessage = {
+        show: true,
+        message: '登录成功！即将跳转...',
+        type: 'success'
+      };
+
+      // 延迟跳转
+      setTimeout(() => {
+        this.authService.navigateToHome(result.user!.identity);
+      }, 1000);
+    } else {
+      this.errorMessage = {
+        show: true,
+        message: result.message,
+        type: 'error'
+      };
+      this.isLoading = false;
+    }
+  }
+
 
   // 根据用户身份类型导航到对应首页
   private navigateToHomePage(identity: string) {
@@ -233,8 +314,20 @@ export class LoginComponent {
   }
 
   // 跳转到注册页面
-  goToRegister(): void {
+  goToRegister() {
     this.router.navigate(['/auth/register']);
+  }
+
+  // 跳转到忘记密码页面
+  goToForgotPassword() {
+    this.router.navigate(['/auth/forgot-password']);
+  }
+
+  // 组件销毁时清除定时器
+  ngOnDestroy(): void {
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
+    }
   }
 
   // 返回上一页

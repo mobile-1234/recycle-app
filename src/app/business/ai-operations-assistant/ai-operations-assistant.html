@@ -15,6 +15,9 @@
       </div>
     </div>
     <div class="header-actions">
+      <button class="icon-btn" (click)="configureApiKey()" title="配置 API Key">
+        <span>🔑</span>
+      </button>
       <button class="icon-btn" (click)="clearChat()" title="清空对话">
         <span>🗑️</span>
       </button>
@@ -83,8 +86,10 @@
               <span>🤖</span>
             </div>
             <div class="message-content">
-              <div class="message-bubble">
+              <div class="message-bubble" [class.streaming]="isStreamingResponse && streamingMessageId === msg.id">
                 <div class="message-text" [innerHTML]="msg.content | nl2br"></div>
+                <!-- 流式输出光标 -->
+                <span class="streaming-cursor" *ngIf="isStreamingResponse && streamingMessageId === msg.id">▊</span>
               </div>
               <!-- AI建议按钮 -->
               <div class="suggestions" *ngIf="msg.suggestions && msg.suggestions.length > 0">

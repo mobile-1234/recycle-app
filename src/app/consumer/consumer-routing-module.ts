@@ -12,6 +12,8 @@ import { ArRecognitionComponent } from './home/ar-recognition/ar-recognition';
 import { DropPointsComponent } from './home/drop-points/drop-points';
 import { CollectorsComponent } from './home/collectors/collectors';
 import { ActivitiesComponent } from './home/activities/activities';
+import { ActivityDetailComponent } from './home/activities/activity-detail';
+import { AddressManagement } from './booking-recycle/address-management';
 
 // Profile子页面组件导入
 import { AddressesComponent } from './profile/addresses/addresses';
@@ -53,7 +55,9 @@ const routes: Routes = [
   { path: 'ar-recognition', component: ArRecognitionComponent },
   { path: 'drop-points', component: DropPointsComponent },
   { path: 'collectors', component: CollectorsComponent },
-  { path: 'activities', component: ActivitiesComponent }
+  { path: 'activities', component: ActivitiesComponent },
+  { path: 'activity-detail/:id', component: ActivityDetailComponent },
+  { path: 'address-management', component: AddressManagement }
 ];
 
 @NgModule({

@@ -15,6 +15,8 @@ import { ArRecognitionComponent } from './home/ar-recognition/ar-recognition';
 import { DropPointsComponent } from './home/drop-points/drop-points';
 import { CollectorsComponent } from './home/collectors/collectors';
 import { ActivitiesComponent } from './home/activities/activities';
+import { ActivityDetailComponent } from './home/activities/activity-detail';
+import { AddressManagement } from './booking-recycle/address-management';
 import { AddressesComponent } from './profile/addresses/addresses';
 import { OrdersComponent } from './profile/orders/orders';
 import { FavoritesComponent } from './profile/favorites/favorites';
@@ -44,6 +46,8 @@ import { PrivacyPolicyPage } from './profile/privacy-policy/privacy-policy';
     DropPointsComponent,
     CollectorsComponent,
     ActivitiesComponent,
+    ActivityDetailComponent,
+    AddressManagement,
     AddressesComponent,
     OrdersComponent,
     FavoritesComponent,
