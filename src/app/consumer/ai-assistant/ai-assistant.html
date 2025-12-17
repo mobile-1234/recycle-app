@@ -1,63 +1,319 @@
-<div class="ai-assistant-container">
-  <div class="assistant-header">
-    <div class="title">AI回收助手</div>
-    <button class="back-home" (click)="goHome()"><i class="fas fa-home"></i> 返回首页</button>
+<div class="chat-container" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+  <!-- 头部 -->
+  <div class="chat-header">
+    <button class="back-btn" (click)="goHome()">
+      <span>🔙</span>
+    </button>
+    <div class="header-content">
+      <h1><span class="icon">♻️</span>再生视界AI助手</h1>
+      <p class="tagline">智能回收，绿色未来</p>
+    </div>
+    <button class="clear-btn" (click)="clearChat()" title="清空对话">
+      <span>🗑️</span>
+    </button>
+  </div>
+
+  <!-- 快捷操作按钮 -->
+  <div class="quick-actions">
+    <button 
+      class="action-btn" 
+      *ngFor="let ability of abilities" 
+      (click)="useAbility(ability)"
+    >
+      {{ ability.name }}
+    </button>
   </div>
 
   <!-- 对话区域 -->
-  <div class="chat-container">
-    <div class="messages">
-      <div class="message" *ngFor="let m of messages" [class.user]="m.role==='user'" [class.assistant]="m.role==='assistant'">
-        <div class="avatar">
-          <i class="fas" [ngClass]="m.role==='user' ? 'fa-user' : 'fa-robot'"></i>
+  <div class="chat-body" #messagesContainer (scroll)="onScroll($event)">
+    <!-- 欢迎卡片 - 仅在消息少时显示 -->
+    <div class="welcome-card" *ngIf="messages.length <= 1">
+      <h2>欢迎使用再生视界AI助手！</h2>
+      <p>我是小回，你的智能回收助手。我能帮你处理回收相关的各类问题，让回收变得更简单、更环保。</p>
+      <div class="welcome-features">
+        <div class="welcome-feature" (click)="askQuestion('帮我识别一个可回收物品')">
+          📸 图片识别可回收物
         </div>
-        <div class="bubble">{{ m.text }}</div>
+        <div class="welcome-feature" (click)="askQuestion('查询当前废纸的回收价格')">
+          💰 实时回收价格查询
+        </div>
+        <div class="welcome-feature" (click)="askQuestion('我想预约上门回收服务')">
+          🚚 一键预约上门回收
+        </div>
+        <div class="welcome-feature" (click)="askQuestion('查找附近的回收投递点')">
+          🗺️ 智能推荐附近投递点
+        </div>
       </div>
     </div>
-    <div class="input-bar">
-      <input [(ngModel)]="inputText" placeholder="请输入问题或上传图片..." />
-      <button class="voice-btn" [class.recording]="isRecording" (mousedown)="startRecording()" (mouseup)="stopRecording()" (touchstart)="startRecording()" (touchend)="stopRecording()">
-        <i class="fas fa-microphone"></i>
-      </button>
-      <button class="send-btn" (click)="sendMessage()">
-        <i class="fas fa-paper-plane"></i>
+
+    <!-- 消息列表 -->
+    <div 
+      class="message-row" 
+      *ngFor="let msg of messages; trackBy: trackByMessageId"
+      [class.user-row]="msg.role === 'user'"
+      [class.ai-row]="msg.role === 'assistant'"
+    >
+      <!-- 头像 -->
+      <div class="avatar">
+        <span *ngIf="msg.role === 'assistant'">🤖</span>
+        <span *ngIf="msg.role === 'user'">👤</span>
+      </div>
+
+      <!-- 消息气泡 -->
+      <div 
+        class="message-bubble"
+        [class.streaming]="msg.isStreaming"
+        [class.error]="msg.isError"
+      >
+        <!-- 用户消息附件预览 -->
+        <div class="message-attachments" *ngIf="msg.attachments && msg.attachments.length > 0">
+          <div class="attachment-item" *ngFor="let file of msg.attachments">
+            <span class="file-icon">{{ getFileIcon(file.type) }}</span>
+            <span class="file-name">{{ file.name }}</span>
+            <span class="file-size">{{ formatFileSize(file.size) }}</span>
+          </div>
+        </div>
+        
+        <div class="message-content" [innerHTML]="formatMessage(msg.content)"></div>
+        
+        <!-- 消息操作按钮 -->
+        <div class="message-actions" *ngIf="msg.role === 'assistant' && !msg.isStreaming">
+          <button 
+            class="action-icon-btn" 
+            (click)="playMessageAudio(msg)" 
+            [title]="isPlayingAudio ? '停止播放' : '语音播放'"
+          >
+            <span>{{ isPlayingAudio ? '⏹️' : '🔊' }}</span>
+          </button>
+          <button 
+            class="action-icon-btn" 
+            (click)="copyMessage(msg)" 
+            title="复制"
+          >
+            <span>📋</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 加载中 / 停止按钮 -->
+    <div class="loading-wrapper" *ngIf="isLoading">
+      <button class="stop-btn" (click)="stopGeneration()">
+        <span class="icon">🛑</span>
+        <span>停止生成</span>
       </button>
     </div>
   </div>
 
-  <!-- 助手能力导航 -->
-  <div class="section">
-    <div class="section-title">助手能力</div>
-    <div class="abilities-grid">
-      <div class="ability-card" (click)="askQuickQuestion('帮我识别这个物品是否可以回收')">
-        <div class="ability-icon"><i class="fas fa-question-circle"></i></div>
-        <div class="ability-name">识别答疑</div>
-        <div class="ability-desc">物品分类识别</div>
+  <!-- 滚动到底部按钮 -->
+  <button 
+    class="scroll-bottom-btn" 
+    *ngIf="showScrollButton" 
+    (click)="scrollToBottomClick()"
+  >
+    <i class="fas fa-chevron-down"></i>
+  </button>
+
+  <!-- 录音指示器遮罩层 -->
+  <div class="recording-overlay" *ngIf="isRecording">
+    <div class="recording-content">
+      <div class="recording-animation">
+        <div class="pulse-ring"></div>
+        <div class="mic-icon">🎙️</div>
       </div>
-      <div class="ability-card" (click)="askQuickQuestion('查询当前回收价格')">
-        <div class="ability-icon"><i class="fas fa-tag"></i></div>
-        <div class="ability-name">价格查询</div>
-        <div class="ability-desc">实时价格信息</div>
+      <div class="recording-text">正在识别语音...</div>
+      <div class="recording-time">{{ formatRecordingTime() }}</div>
+      <div class="recording-hint">点击任意位置停止</div>
+    </div>
+    <div class="recording-backdrop" (click)="stopRecording()"></div>
+  </div>
+
+  <!-- 输入区域 -->
+  <div class="chat-footer">
+    <div class="input-wrapper">
+      <!-- 语音输入按钮 -->
+      <button 
+        class="voice-btn" 
+        (click)="toggleVoiceInput()"
+        [class.recording]="isRecording"
+        [disabled]="isLoading"
+        title="语音输入"
+      >
+        <span class="voice-icon">{{ isRecording ? '🔴' : '🎙️' }}</span>
+      </button>
+      
+      <textarea 
+        #inputField
+        [(ngModel)]="inputText" 
+        placeholder="输入或语音提问..."
+        rows="1"
+        (keydown)="onKeydown($event)"
+        [disabled]="isLoading || isRecording"
+      ></textarea>
+      
+      <!-- 附件上传按钮 -->
+      <button 
+        class="attach-btn" 
+        (click)="triggerFileInput()"
+        [disabled]="isLoading"
+        title="上传附件"
+      >
+        <span>📎</span>
+      </button>
+      
+      <button 
+        class="send-btn" 
+        (click)="sendMessage()"
+        [disabled]="(!inputText.trim() && uploadedFiles.length === 0) || isLoading"
+      >
+        发送
+      </button>
+    </div>
+    
+    <!-- 附件预览区域 -->
+    <div class="attachment-preview" *ngIf="uploadedFiles.length > 0">
+      <div class="attachment-list">
+        <div 
+          class="attachment-card" 
+          *ngFor="let file of uploadedFiles"
+          [class.processing]="file.status === 'processing'"
+          [class.error]="file.status === 'error'"
+        >
+          <div class="attachment-icon">
+            <img *ngIf="file.thumbnail" [src]="file.thumbnail" alt="preview">
+            <span *ngIf="!file.thumbnail">{{ getFileIcon(file.type) }}</span>
+          </div>
+          <div class="attachment-info">
+            <div class="attachment-name">{{ file.name }}</div>
+            <div class="attachment-meta">
+              <span class="file-size">{{ formatFileSize(file.size) }}</span>
+              <span class="file-status" *ngIf="file.status === 'processing'">处理中...</span>
+              <span class="file-status ready" *ngIf="file.status === 'ready'">✓ 就绪</span>
+              <span class="file-status error" *ngIf="file.status === 'error'">{{ file.error }}</span>
+            </div>
+          </div>
+          <button class="remove-attachment" (click)="removeUploadedFile(file)">
+            <span>✕</span>
+          </button>
+        </div>
       </div>
-      <div class="ability-card" (click)="askQuickQuestion('回收流程指导')">
-        <div class="ability-icon"><i class="fas fa-list-alt"></i></div>
-        <div class="能力-name">流程指导</div>
-        <div class="ability-desc">标准化流程说明</div>
+    </div>
+    
+    <div class="hint-text">
+      <span class="upload-hint" (click)="triggerFileInput()">📎 上传附件</span> | 
+      <span class="voice-hint">🎙️ 语音输入</span> | 
+      <strong (click)="askQuestion('什么物品可以回收？')">什么物品可以回收？</strong>
+    </div>
+  </div>
+  
+  <!-- 拖拽上传遮罩层 -->
+  <div 
+    class="drag-overlay" 
+    *ngIf="isDragging"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    <div class="drag-content">
+      <span class="drag-icon">📁</span>
+      <span class="drag-text">松开以上传文件</span>
+    </div>
+  </div>
+
+  <!-- 语音通话悬浮按钮 -->
+  <button 
+    class="voice-call-fab" 
+    *ngIf="!isInVoiceCall"
+    (click)="startVoiceCall()"
+    title="开始语音通话"
+  >
+    <span class="fab-icon">📞</span>
+    <span class="fab-text">语音通话</span>
+  </button>
+
+  <!-- 语音通话全屏界面 -->
+  <div class="voice-call-overlay" *ngIf="isInVoiceCall">
+    <div class="voice-call-container">
+      <!-- 顶部状态栏 -->
+      <div class="voice-call-header">
+        <div class="call-status">
+          <span class="status-icon">{{ getVoiceCallStateIcon() }}</span>
+          <span class="status-text">{{ getVoiceCallStateText() }}</span>
+        </div>
+        <button class="close-call-btn" (click)="endVoiceCall()">
+          <span>✕</span>
+        </button>
       </div>
-      <div class="ability-card" (click)="askQuickQuestion('附近投递点查询')">
-        <div class="能力-icon"><i class="fas fa-location-dot"></i></div>
-        <div class="ability-name">投递点</div>
-        <div class="ability-desc">附近站点信息</div>
+
+      <!-- 中心区域 - AI头像和动画 -->
+      <div class="voice-call-center">
+        <div class="ai-avatar-container" [class.speaking]="voiceCallState === 'speaking'">
+          <div class="avatar-glow"></div>
+          <div class="avatar-ring ring-1"></div>
+          <div class="avatar-ring ring-2"></div>
+          <div class="avatar-ring ring-3"></div>
+          <div class="ai-avatar">
+            <span>🤖</span>
+          </div>
+        </div>
+        
+        <!-- 音量可视化 -->
+        <div class="volume-visualizer">
+          <div 
+            class="volume-bar" 
+            *ngFor="let bar of [1,2,3,4,5,6,7,8,9,10,11,12]; let i = index"
+            [style.height.%]="getVolumeBarHeight(i)"
+            [class.active]="voiceVisualizationData.isSpeaking"
+          ></div>
+        </div>
+
+        <!-- 转写文本显示 -->
+        <div class="transcript-display" *ngIf="voiceCallTranscript">
+          <div class="transcript-label">你说：</div>
+          <div class="transcript-text">{{ voiceCallTranscript }}</div>
+        </div>
+
+        <!-- AI回复显示 -->
+        <div class="ai-response-display" *ngIf="voiceCallAIResponse">
+          <div class="response-label">小回：</div>
+          <div class="response-text">{{ voiceCallAIResponse }}</div>
+        </div>
       </div>
-      <div class="ability-card" (click)="askQuickQuestion('预约上门时间建议')">
-        <div class="ability-icon"><i class="fas fa-calendar-days"></i></div>
-        <div class="ability-name">时间建议</div>
-        <div class="ability-desc">合适预约时间</div>
+
+      <!-- 底部控制栏 -->
+      <div class="voice-call-controls">
+        <!-- 静音按钮 -->
+        <button 
+          class="control-btn mute-btn" 
+          [class.active]="voiceCallMuted"
+          (click)="toggleVoiceCallMute()"
+        >
+          <span class="btn-icon">{{ voiceCallMuted ? '🔇' : '🎤' }}</span>
+          <span class="btn-label">{{ voiceCallMuted ? '取消静音' : '静音' }}</span>
+        </button>
+
+        <!-- 中断按钮 -->
+        <button 
+          class="control-btn interrupt-btn" 
+          *ngIf="voiceCallState === 'speaking'"
+          (click)="interruptAISpeaking()"
+        >
+          <span class="btn-icon">✋</span>
+          <span class="btn-label">打断</span>
+        </button>
+
+        <!-- 挂断按钮 -->
+        <button class="control-btn hangup-btn" (click)="endVoiceCall()">
+          <span class="btn-icon">📵</span>
+          <span class="btn-label">结束通话</span>
+        </button>
       </div>
-      <div class="ability-card" (click)="askQuickQuestion('环保积分规则说明')">
-        <div class="ability-icon"><i class="fas fa-coins"></i></div>
-        <div class="ability-name">积分规则</div>
-        <div class="ability-desc">获取与使用</div>
+
+      <!-- 提示文字 -->
+      <div class="voice-call-hint">
+        <span *ngIf="voiceCallState === 'listening'">💡 直接说话，小回在听...</span>
+        <span *ngIf="voiceCallState === 'processing'">⏳ 小回正在思考...</span>
+        <span *ngIf="voiceCallState === 'speaking'">🔊 点击"打断"可以中断小回说话</span>
       </div>
     </div>
   </div>

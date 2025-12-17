@@ -10,35 +10,96 @@
     </div>
   </div>
 
+  <!-- Mode Indicator -->
+  @if (!isModelLoading && isSimulationMode) {
+    <div class="mode-indicator simulation">
+      🎮 模拟识别模式（网络受限）
+    </div>
+  }
+
   <!-- Camera View -->
   <div class="camera-container">
-    <div class="camera-view" [class.scanning]="isScanning">
-      <div class="camera-overlay">
-        <div class="scan-frame">
-          <div class="corner top-left"></div>
-          <div class="corner top-right"></div>
-          <div class="corner bottom-left"></div>
-          <div class="corner bottom-right"></div>
-          
-          <div class="scan-line" *ngIf="isScanning"></div>
-        </div>
-        
-        <div class="scan-tips" *ngIf="!isScanning && !recognitionResult">
-          <app-svg-icon name="camera" class="camera-icon"></app-svg-icon>
-          <p>将垃圾物品放入框内进行识别</p>
-          <p class="sub-tip">支持塑料、纸张、金属、电池等物品识别</p>
-        </div>
+    <!-- Loading State -->
+    @if (isModelLoading) {
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>正在初始化...</p>
+        <p class="sub-tip">请稍候</p>
+      </div>
+    }
 
-        <div class="scanning-tips" *ngIf="isScanning">
-          <div class="loading-spinner"></div>
-          <p>正在识别中...</p>
-          <p class="sub-tip">请保持物品清晰可见</p>
+    <!-- Error State -->
+    @if (cameraError && !isModelLoading) {
+      <div class="error-state">
+        <div class="error-icon-large">⚠️</div>
+        <h3>AI模型加载失败</h3>
+        <p class="error-detail">无法访问 Google 服务器</p>
+        <div class="error-solutions">
+          <p><strong>解决方案：</strong></p>
+          <p>1. 开启 VPN/代理 后刷新页面</p>
+          <p>2. 或使用备用识别模式</p>
+        </div>
+        <div class="error-buttons">
+          <button class="primary-btn" onclick="location.reload()">🔄 刷新页面</button>
+          <button class="secondary-btn" (click)="enableSimulationMode()">🎮 使用备用模式</button>
         </div>
       </div>
-    </div>
+    }
+
+    <!-- Camera View with Video -->
+    @if (!isModelLoading && !cameraError) {
+      <div class="camera-view" [class.scanning]="isScanning">
+        <video 
+          #videoElement 
+          autoplay 
+          playsinline 
+          muted
+          [style.display]="isScanning ? 'block' : 'none'"
+        ></video>
+        
+        <canvas 
+          #canvasElement 
+          class="detection-canvas"
+          [style.display]="isScanning ? 'block' : 'none'"
+        ></canvas>
+
+        @if (!isScanning) {
+          <div class="camera-overlay">
+            <div class="scan-frame">
+              <div class="corner top-left"></div>
+              <div class="corner top-right"></div>
+              <div class="corner bottom-left"></div>
+              <div class="corner bottom-right"></div>
+            </div>
+            
+            <div class="scan-tips">
+              <app-svg-icon name="camera" class="camera-icon"></app-svg-icon>
+              <p>将废品对准摄像头进行识别</p>
+              <p class="sub-tip">支持塑料瓶、纸张、电子产品等物品</p>
+            </div>
+          </div>
+        }
+
+        @if (isScanning) {
+          <div class="scanning-overlay">
+            <div class="scan-indicator">
+              <div class="scan-line"></div>
+              <p>🔍 {{ isSimulationMode ? '智能分析中' : 'AI识别中' }}...</p>
+              <p class="sub-tip">请保持物品在画面中</p>
+            </div>
+          </div>
+          
+          <!-- Camera Switch Button -->
+          <button class="camera-switch-btn" (click)="switchCamera()">
+            🔄 {{ getCameraModeText() }}
+          </button>
+        }
+      </div>
+    }
 
     <!-- Recognition Result -->
-    <div class="recognition-result" *ngIf="recognitionResult">
+    @if (recognitionResult) {
+      <div class="recognition-result">
       <div class="result-header">
         <h3>识别结果</h3>
         <div class="confidence">置信度: {{ recognitionResult.confidence }}%</div>
@@ -74,7 +135,9 @@
         <div class="tips-section">
           <h4>回收提示</h4>
           <ul class="tips-list">
-            <li *ngFor="let tip of recognitionResult.tips">{{ tip }}</li>
+            @for (tip of recognitionResult.tips; track tip) {
+              <li>{{ tip }}</li>
+            }
           </ul>
         </div>
       </div>
@@ -83,44 +146,51 @@
         <button class="retry-btn" (click)="retryScanning()">重新识别</button>
         <button class="confirm-btn" (click)="confirmRecognition()">确认回收</button>
       </div>
-    </div>
+      </div>
+    }
   </div>
 
   <!-- Control Buttons -->
-  <div class="control-buttons" *ngIf="!recognitionResult">
-    <button 
-      class="scan-btn" 
-      [class.scanning]="isScanning"
-      (click)="isScanning ? stopScanning() : startScanning()"
-    >
-      <app-svg-icon [name]="isScanning ? 'stop' : 'scan'" class="btn-icon"></app-svg-icon>
-      <span>{{ isScanning ? '停止扫描' : '开始扫描' }}</span>
-    </button>
-  </div>
+  @if (!recognitionResult) {
+    <div class="control-buttons">
+      <button 
+        class="scan-btn" 
+        [class.scanning]="isScanning"
+        (click)="isScanning ? stopScanning() : startScanning()"
+      >
+        <app-svg-icon [name]="isScanning ? 'stop' : 'scan'" class="btn-icon"></app-svg-icon>
+        <span>{{ isScanning ? '停止扫描' : '开始扫描' }}</span>
+      </button>
+    </div>
+  }
 
   <!-- Scan History -->
-  <div class="scan-history" *ngIf="scanHistory.length > 0">
-    <div class="history-header">
-      <h3>扫描历史</h3>
-      <span class="history-count">{{ scanHistory.length }} 条记录</span>
-    </div>
-    
-    <div class="history-list">
-      <div class="history-item" *ngFor="let item of scanHistory.slice(0, 3)">
-        <div class="item-icon">
-          <app-svg-icon name="recycle" class="icon"></app-svg-icon>
-        </div>
-        <div class="item-details">
-          <div class="item-name">{{ item.item }}</div>
-          <div class="item-meta">
-            <span class="category" [style.color]="getCategoryColor(item.category)">
-              {{ item.category }}
-            </span>
-            <span class="time">{{ item.time }}</span>
+  @if (scanHistory.length > 0) {
+    <div class="scan-history">
+      <div class="history-header">
+        <h3>扫描历史</h3>
+        <span class="history-count">{{ scanHistory.length }} 条记录</span>
+      </div>
+      
+      <div class="history-list">
+        @for (item of scanHistory.slice(0, 3); track item.id) {
+          <div class="history-item">
+            <div class="item-icon">
+              <app-svg-icon name="recycle" class="icon"></app-svg-icon>
+            </div>
+            <div class="item-details">
+              <div class="item-name">{{ item.item }}</div>
+              <div class="item-meta">
+                <span class="category" [style.color]="getCategoryColor(item.category)">
+                  {{ item.category }}
+                </span>
+                <span class="time">{{ item.time }}</span>
+              </div>
+            </div>
+            <div class="item-points">+{{ item.points }}</div>
           </div>
-        </div>
-        <div class="item-points">+{{ item.points }}</div>
+        }
       </div>
     </div>
-  </div>
+  }
 </div>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI回收助手 - 对话模式</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            background: #00c853;
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+            position: relative;
+        }
+        .chat-header h1 {
+            font-size: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .chat-header h1::before {
+            content: "🤖";
+            font-size: 32px;
+        }
+        .tagline {
+            font-size: 15px;
+            opacity: 0.95;
+            margin-top: 8px;
+        }
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 20px 30px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #eee;
+            justify-content: center;
+        }
+        .action-btn {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .action-btn:hover {
+            background: #00c853;
+            color: white;
+            border-color: #00c853;
+            transform: translateY(-2px);
+        }
+        .action-btn::before {
+            content: "⚡";
+        }
+        .chat-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            background: #fefefe;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .welcome-card {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        }
+        .welcome-card h2 {
+            color: #1e88e5;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+        .welcome-card p {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .welcome-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+        .welcome-feature {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #444;
+            text-align: center;
+            border-left: 4px solid #00c853;
+        }
+        .message {
+            max-width: 80%;
+            padding: 18px;
+            border-radius: 20px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+        .message.ai {
+            background: #e8f5e9;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+            color: #1b5e20;
+        }
+        .message.user {
+            background: #1e88e5;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        .chat-footer {
+            padding: 25px 30px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .input-wrapper {
+            display: flex;
+            gap: 15px;
+        }
+        .input-wrapper textarea {
+            flex: 1;
+            padding: 18px;
+            border: 2px solid #ddd;
+            border-radius: 16px;
+            font-size: 16px;
+            resize: none;
+            height: 60px;
+            transition: border 0.3s;
+            font-family: inherit;
+        }
+        .input-wrapper textarea:focus {
+            border-color: #00c853;
+            outline: none;
+        }
+        .send-btn {
+            background: #00c853;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 0 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .send-btn:hover {
+            background: #00b248;
+        }
+        .hint-text {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .hint-text strong {
+            color: #1e88e5;
+        }
+        @media (max-width: 600px) {
+            .quick-actions {
+                padding: 15px;
+                gap: 10px;
+            }
+            .action-btn {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+            .welcome-features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>AI回收助手</h1>
+            <p class="tagline">智能回收，绿色生活</p>
+        </div>
+        <div class="quick-actions">
+            <button class="action-btn">识别物品</button>
+            <button class="action-btn">查询价格</button>
+            <button class="action-btn">预约上门</button>
+            <button class="action-btn">附近站点</button>
+            <button class="action-btn">环保知识</button>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="welcome-card">
+                <h2>欢迎使用 AI 回收助手！</h2>
+                <p>我能够帮助你处理回收相关的各类问题，让回收变得更简单、更智能。</p>
+                <div class="welcome-features">
+                    <div class="welcome-feature">📸 图片识别可回收物</div>
+                    <div class="welcome-feature">💰 实时回收价格查询</div>
+                    <div class="welcome-feature">🚚 一键预约上门回收</div>
+                    <div class="welcome-feature">🗺️ 智能推荐附近投递点</div>
+                </div>
+            </div>
+            <div class="message ai">
+                你好！我是你的 AI 回收助手，随时为你服务。你可以直接输入问题，或点击上方快捷按钮。
+            </div>
+        </div>
+        <div class="chat-footer">
+            <div class="input-wrapper">
+                <textarea id="userMessage" placeholder="输入你的问题... 按 Enter 发送，Shift + Enter 换行"></textarea>
+                <button class="send-btn" id="sendMessage">发送</button>
+            </div>
+            <div class="hint-text">
+                试试提问：<strong>什么物品可以回收？</strong> | <strong>如何预约上门回收？</strong> | <strong>积分规则是什么？</strong>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatBody = document.getElementById('chatBody');
+        const userMessage = document.getElementById('userMessage');
+        const sendMessage = document.getElementById('sendMessage');
+        const actionButtons = document.querySelectorAll('.action-btn');
+
+        actionButtons.forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                const actions = [
+                    "请帮我识别一个可回收物品",
+                    "查询当前废纸的回收价格",
+                    "我想预约上门回收服务",
+                    "查找附近的回收投递点",
+                    "介绍一些环保回收知识"
+                ];
+                userMessage.value = actions[index];
+            });
+        });
+
+        function addMessage(text, isUser = false) {
+            const msg = document.createElement('div');
+            msg.className = `message ${isUser ? 'user' : 'ai'}`;
+            msg.textContent = text;
+            chatBody.appendChild(msg);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        sendMessage.addEventListener('click', () => {
+            sendMessageFunc();
+        });
+
+        userMessage.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessageFunc();
+            }
+        });
+
+        function sendMessageFunc() {
+            const text = userMessage.value.trim();
+            if (text) {
+                addMessage(text, true);
+                userMessage.value = '';
+
+                setTimeout(() => {
+                    const replies = [
+                        "已收到您的请求，正在为您处理...",
+                        "这个问题我可以帮您解答，请稍等。",
+                        "正在查询相关信息，马上为您呈现。",
+                        "好的，关于这个问题，我们的建议是..."
+                    ];
+                    const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                    addMessage(randomReply);
+                }, 1000);
+            }
+        }
+    </script>
+</body>
+</html>
