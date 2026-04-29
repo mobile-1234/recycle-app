@@ -9,7 +9,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/huanbao?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: root
-    password: xfj7758758@
+    password: your_password  # 请替换为你的MySQL密码
   
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -47,12 +47,12 @@ knife4j:
 
 # JWT配置
 jwt:
-  secret: recycle-app-jwt-secret-key-2024-very-long-secret
+  secret: your-jwt-secret-key  # 请替换为你的JWT密钥（建议32位以上随机字符串）
   expiration: 86400000  # 24小时
 
 # DeepSeek AI配置
 ai:
   api:
-    key: sk-3ae5d07978a54d369b8e9fb9bc944e78 # 请替换为你的DeepSeek API Key
+    key: your-deepseek-api-key  # 请替换为你的DeepSeek API Key，申请地址: https://platform.deepseek.com
     url: https://api.deepseek.com/v1/chat/completions
     model: deepseek-chat
