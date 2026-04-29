@@ -1,93 +1,176 @@
-<!-- 顶部状态栏 -->
-<div class="status-bar">
-  <div class="user-level">
-    <div class="level-badge">环保达人 LV.{{ userLevel }}</div>
-    <div class="level-progress">
-      <div class="progress-bar" [style.width.%]="levelProgress"></div>
+<!-- ====== 顶部状态栏 ====== -->
+<header class="home-header">
+  <div class="header-row">
+    <div class="user-greeting">
+      <div class="greeting-text">再生视界</div>
+      <div class="greeting-sub">智慧回收 · 绿色生活</div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" (click)="openNotifications()" aria-label="通知">
+        <i class="fas fa-bell"></i>
+        <span class="notification-dot" *ngIf="unreadCount > 0"></span>
+      </button>
     </div>
   </div>
-  <div class="points-cash">
-    <div>积分: {{ userPoints | number }}</div>
-    <div>现金: ¥{{ userCash | number:'1.2-2' }}</div>
-  </div>
-  <div class="notification-icon" (click)="openNotifications()">
-    <i class="far fa-bell"></i>
-  </div>
-</div>
 
-<!-- 核心功能入口区 -->
-<div class="core-functions">
-  <div class="function-title">核心功能</div>
-  <div class="quick-booking" (click)="quickBooking()">
-    <i class="fas fa-recycle"></i> 一键预约回收
-  </div>
-  <div class="function-buttons">
-    <div class="func-btn" (click)="openARRecognition()">
-      <div class="func-icon"><i class="fas fa-camera"></i></div>
-      <div>AR识废品</div>
-    </div>
-    <div class="func-btn" (click)="findDropPoints()">
-      <div class="func-icon"><i class="fas fa-map-marker-alt"></i></div>
-      <div>自助投递点</div>
-    </div>
-  </div>
-</div>
-
-<!-- 动态信息区 -->
-<div class="dynamic-info">
-  <!-- 附近回收员动态 -->
-  <div class="info-section">
-    <div class="section-title">
-      <h3>附近回收员</h3>
-      <a (click)="viewMoreCollectors()" class="more-link">查看更多</a>
-    </div>
-    <div class="collector-list">
-      <div class="collector-card" *ngFor="let collector of nearbyCollectors">
-        <div class="collector-avatar"><i class="fas fa-user"></i></div>
-        <div class="collector-name">{{ collector.name }}</div>
-        <div class="collector-status">{{ collector.distance }} · {{ collector.status }}</div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- 自助投递点状态 -->
-  <div class="info-section">
-    <div class="section-title">
-      <h3>自助投递点</h3>
-      <a (click)="viewMoreDropPoints()" class="more-link">查看更多</a>
-    </div>
-    <div class="drop-points">
-      <div class="point-card" *ngFor="let point of dropPoints">
-        <div class="point-name">{{ point.name }}</div>
-        <div class="point-distance">{{ point.distance }}</div>
-        <div class="capacity-bar">
-          <div class="capacity-fill" [style.width.%]="point.capacity"></div>
+  <!-- 用户资产卡片 -->
+  <div class="asset-card">
+    <app-skeleton *ngIf="loading.user" type="card"></app-skeleton>
+    <ng-container *ngIf="!loading.user">
+      <div class="asset-row">
+        <div class="asset-item">
+          <div class="asset-value">{{ userPoints | number }}</div>
+          <div class="asset-label">环保积分</div>
         </div>
-        <div class="capacity-text">{{ point.capacity }}% 满箱</div>
+        <div class="asset-divider"></div>
+        <div class="asset-item">
+          <div class="asset-value">¥{{ userCash | number:'1.2-2' }}</div>
+          <div class="asset-label">可提现金额</div>
+        </div>
+        <div class="asset-divider"></div>
+        <div class="asset-item">
+          <div class="asset-value">LV.{{ userLevel }}</div>
+          <div class="asset-label">环保等级</div>
+        </div>
+      </div>
+      <div class="level-bar">
+        <div class="level-bar-track">
+          <div class="level-bar-fill" [style.width.%]="levelProgress"></div>
+        </div>
+        <span class="level-bar-text">距下一级 {{ 100 - levelProgress }}%</span>
+      </div>
+    </ng-container>
+  </div>
+</header>
+
+<!-- ====== 核心功能入口 ====== -->
+<section class="core-actions">
+  <button class="main-cta" (click)="quickBooking()">
+    <div class="cta-icon"><i class="fas fa-recycle"></i></div>
+    <div class="cta-text">
+      <span class="cta-title">一键预约回收</span>
+      <span class="cta-sub">上门取件 · 即时报价 · 安全便捷</span>
+    </div>
+    <i class="fas fa-chevron-right cta-arrow"></i>
+  </button>
+
+  <div class="action-grid">
+    <div class="action-item" (click)="openARRecognition()">
+      <div class="action-icon green"><i class="fas fa-camera"></i></div>
+      <span class="action-text">AR识废品</span>
+      <span class="action-desc">拍照识别</span>
+    </div>
+    <div class="action-item" (click)="findDropPoints()">
+      <div class="action-icon blue"><i class="fas fa-map-marker-alt"></i></div>
+      <span class="action-text">投递点</span>
+      <span class="action-desc">附近站点</span>
+    </div>
+    <div class="action-item" (click)="viewMoreCollectors()">
+      <div class="action-icon orange"><i class="fas fa-truck"></i></div>
+      <span class="action-text">回收员</span>
+      <span class="action-desc">在线预约</span>
+    </div>
+    <div class="action-item" (click)="openAIAssistant()">
+      <div class="action-icon purple"><i class="fas fa-robot"></i></div>
+      <span class="action-text">AI助手</span>
+      <span class="action-desc">智能问答</span>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 附近回收员 ====== -->
+<section class="section-card">
+  <div class="section-header">
+    <h3><i class="fas fa-users"></i> 附近回收员</h3>
+    <a class="see-all" (click)="viewMoreCollectors()">全部 <i class="fas fa-angle-right"></i></a>
+  </div>
+  <app-skeleton *ngIf="loading.collectors" type="list" [count]="3"></app-skeleton>
+  <app-empty-state *ngIf="!loading.collectors && nearbyCollectors.length === 0"
+    icon="no-data" title="附近暂无在线回收员" description="尝试扩大搜索范围或稍后再试" size="small">
+  </app-empty-state>
+  <div class="collector-list" *ngIf="!loading.collectors && nearbyCollectors.length > 0">
+    <div class="collector-row" *ngFor="let c of nearbyCollectors; let i = index" [style.animation-delay.ms]="i * 80">
+      <div class="collector-avatar" [class.online]="c.status === '在线'">
+        <i class="fas fa-user-tie"></i>
+        <span class="online-dot" *ngIf="c.status === '在线'"></span>
+      </div>
+      <div class="collector-info">
+        <div class="collector-name">{{ c.name }}</div>
+        <div class="collector-meta">
+          <app-status-badge [text]="c.status" [status]="c.status === '在线' ? 'success' : 'default'" size="small" [pulse]="c.status === '在线'"></app-status-badge>
+          <span class="distance-tag"><i class="fas fa-location-arrow"></i> {{ c.distance }}</span>
+        </div>
+      </div>
+      <button class="call-btn" title="联系回收员"><i class="fas fa-phone-alt"></i></button>
+    </div>
+  </div>
+</section>
+
+<!-- ====== 自助投递点状态 ====== -->
+<section class="section-card">
+  <div class="section-header">
+    <h3><i class="fas fa-recycle"></i> 自助投递点</h3>
+    <a class="see-all" (click)="viewMoreDropPoints()">全部 <i class="fas fa-angle-right"></i></a>
+  </div>
+  <app-skeleton *ngIf="loading.dropPoints" type="list" [count]="3"></app-skeleton>
+  <app-empty-state *ngIf="!loading.dropPoints && dropPoints.length === 0"
+    icon="no-device" title="附近暂无投递点" size="small">
+  </app-empty-state>
+  <div class="point-list" *ngIf="!loading.dropPoints && dropPoints.length > 0">
+    <div class="point-row" *ngFor="let p of dropPoints; let i = index" [style.animation-delay.ms]="i * 80">
+      <div class="point-icon-box" [ngClass]="getCapacityLevel(p.capacity)">
+        <i class="fas fa-trash-alt"></i>
+      </div>
+      <div class="point-info">
+        <div class="point-name">{{ p.name }}</div>
+        <div class="point-meta">
+          <span class="distance-tag"><i class="fas fa-walking"></i> {{ p.distance }}</span>
+        </div>
+      </div>
+      <div class="capacity-indicator">
+        <svg viewBox="0 0 36 36" class="capacity-ring">
+          <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+          <path class="ring-fill" [ngClass]="getCapacityLevel(p.capacity)"
+            [attr.stroke-dasharray]="p.capacity + ', 100'"
+            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+        </svg>
+        <span class="capacity-num">{{ p.capacity }}%</span>
       </div>
     </div>
   </div>
-  
-  <!-- 环保活动/政策公告轮播 -->
-  <div class="info-section">
-    <div class="section-title">
-      <h3>环保活动</h3>
-      <a (click)="viewMoreActivities()" class="more-link">查看更多</a>
-    </div>
-    <div class="activity-carousel">
-      <div class="activity-card" *ngFor="let activity of activities" (click)="openActivity(activity)">
-        <div class="activity-tag">{{ activity.tag }}</div>
-        <div class="activity-title">{{ activity.title }}</div>
-        <div class="activity-desc">{{ activity.description }}</div>
+</section>
+
+<!-- ====== 环保活动 ====== -->
+<section class="section-card section-last">
+  <div class="section-header">
+    <h3><i class="fas fa-leaf"></i> 环保活动</h3>
+    <a class="see-all" (click)="viewMoreActivities()">全部 <i class="fas fa-angle-right"></i></a>
+  </div>
+  <app-skeleton *ngIf="loading.activities" type="card"></app-skeleton>
+  <app-empty-state *ngIf="!loading.activities && activities.length === 0"
+    icon="no-data" title="暂无进行中的活动" size="small">
+  </app-empty-state>
+  <div class="activity-list" *ngIf="!loading.activities && activities.length > 0">
+    <div class="activity-card" *ngFor="let a of activities; let i = index" (click)="openActivity(a)" [style.animation-delay.ms]="i * 100">
+      <div class="activity-header">
+        <span class="activity-tag">{{ a.tag }}</span>
+      </div>
+      <div class="activity-title">{{ a.title }}</div>
+      <div class="activity-desc">{{ a.description }}</div>
+      <div class="activity-footer">
+        <span class="join-hint"><i class="fas fa-hand-point-right"></i> 点击参与</span>
       </div>
     </div>
   </div>
+</section>
+
+<!-- ====== 悬浮AI助手 ====== -->
+<div class="fab-ai" (click)="openAIAssistant()">
+  <div class="fab-ai-inner">
+    <i class="fas fa-robot"></i>
+  </div>
+  <div class="fab-ai-pulse"></div>
 </div>
 
-<!-- AI助手入口 -->
-<div class="ai-assistant" (click)="openAIAssistant()">
-  <i class="fas fa-robot"></i>
-</div>
-
-<!-- 底部导航栏 -->
+<!-- ====== 底部导航 ====== -->
 <app-bottom-nav [activeTab]="'home'"></app-bottom-nav>

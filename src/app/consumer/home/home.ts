@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { BottomNavComponent } from '../../shared/bottom-nav/bottom-nav.component';
+import { SkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
+import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
+import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { ConsumerApiService } from '../../core/services/consumer-api.service';
 import { AuthService } from '../../auth/services/auth.service';
 
@@ -29,7 +32,7 @@ interface Activity {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, BottomNavComponent],
+  imports: [CommonModule, BottomNavComponent, SkeletonComponent, EmptyStateComponent, StatusBadgeComponent],
   templateUrl: './home.html',
   styleUrls: ['./home.scss']
 })
@@ -39,6 +42,7 @@ export class HomeComponent implements OnInit {
   levelProgress: number = 0;
   userPoints: number = 0;
   userCash: number = 0;
+  unreadCount: number = 0;
   
   // 当前选中的底部导航标签
   currentTab: string = 'home';
@@ -327,5 +331,13 @@ export class HomeComponent implements OnInit {
   updateCash(amount: number): void {
     this.userCash += amount;
     console.log(`Cash updated: +${amount}, Total: ${this.userCash}`);
+  }
+
+  // 获取容量等级样式类
+  getCapacityLevel(capacity: number): string {
+    if (capacity >= 90) return 'cap-critical';
+    if (capacity >= 70) return 'cap-warning';
+    if (capacity >= 40) return 'cap-normal';
+    return 'cap-low';
   }
 }

@@ -40,7 +40,7 @@
             "styles": [
               "src/styles.scss"
             ],
-            "externalDependencies": []
+            "externalDependencies": ["buffer"]
           },
           "configurations": {
             "production": {

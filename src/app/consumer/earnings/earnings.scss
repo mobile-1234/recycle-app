@@ -1,8 +1,11 @@
-// 全局样式重置
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  background: #f4f6f8;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', sans-serif;
+  color: #1a1a1a;
+  -webkit-font-smoothing: antialiased;
 }
 
 // 动画定义
@@ -64,16 +67,14 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 60px;
-  background: linear-gradient(135deg, #2e7d32, #4caf50, #66bb6a);
-  background-size: 200% 200%;
-  animation: gradientShift 8s ease infinite;
+  height: 56px;
+  background: linear-gradient(145deg, #1b5e20 0%, #2e7d32 40%, #43a047 100%);
   color: white;
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 16px;
   z-index: 1000;
-  box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 2px 12px rgba(27, 94, 32, 0.3);
 
   .back-btn {
     width: 40px;

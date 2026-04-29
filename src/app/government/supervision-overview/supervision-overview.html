@@ -1,18 +1,21 @@
 <div class="supervision-overview-container">
   <!-- 顶部导航 -->
-  <header class="header">
-    <div class="header-content">
-      <div class="logo">
-        <span class="logo-icon">🏛️</span>
-        <span>智回监管</span>
-      </div>
-      <div class="user-info">
-        <span>政府管理员</span>
-        <div class="avatar">
-          <span>政</span>
+  <header class="g-header">
+    <div class="g-header-inner">
+      <div class="g-brand">
+        <div class="g-brand-icon"><i class="fas fa-shield-alt"></i></div>
+        <div class="g-brand-text">
+          <span class="g-brand-name">智回监管</span>
+          <span class="g-brand-sub">政府监管平台</span>
         </div>
-        <div class="settings-icon" (click)="toggleSettingsMenu()" title="系统设置">
+      </div>
+      <div class="g-header-right">
+        <button class="g-hdr-btn" (click)="toggleSettingsMenu()" title="系统设置">
           <i class="fas fa-cog"></i>
+        </button>
+        <div class="g-user-chip">
+          <div class="g-user-avatar"><i class="fas fa-user-shield"></i></div>
+          <span class="g-user-label">管理员</span>
         </div>
       </div>
     </div>
@@ -22,44 +25,36 @@
   <main class="content">
     <div class="container">
       <section id="supervision-overview">
-        <h2 class="section-title">监管总览</h2>
+        <div class="g-overview-title">
+          <h2><i class="fas fa-tachometer-alt"></i> 监管总览</h2>
+          <span class="g-live-dot">实时监控中</span>
+        </div>
 
         <!-- 全域核心指标仪表盘 -->
-        <div class="indicators-dashboard">
-          <div class="indicator-card">
-            <div class="indicator-icon" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
-              <i class="fas fa-recycle"></i>
+        <div class="g-indicators">
+          <div class="g-ind-card g-ind-green">
+            <div class="g-ind-icon"><i class="fas fa-recycle"></i></div>
+            <div class="g-ind-body">
+              <div class="g-ind-value">{{ indicators.todayRecycle.toLocaleString() }}<span class="g-ind-unit">kg</span></div>
+              <div class="g-ind-label">当日回收总量</div>
             </div>
-            <div class="indicator-content">
-              <div class="indicator-label">当日回收总量</div>
-              <div class="indicator-value">{{ indicators.todayRecycle.toLocaleString() }}</div>
-              <div class="indicator-unit">kg</div>
-              <div class="indicator-trend up">{{ indicators.trend.recycle }}</div>
-            </div>
+            <div class="g-ind-trend up">{{ indicators.trend.recycle }}</div>
           </div>
-          
-          <div class="indicator-card">
-            <div class="indicator-icon" style="background: linear-gradient(135deg, #3498db, #2980b9);">
-              <i class="fas fa-bullseye"></i>
+          <div class="g-ind-card g-ind-blue">
+            <div class="g-ind-icon"><i class="fas fa-bullseye"></i></div>
+            <div class="g-ind-body">
+              <div class="g-ind-value">{{ indicators.accuracyRate }}<span class="g-ind-unit">%</span></div>
+              <div class="g-ind-label">分类准确率</div>
             </div>
-            <div class="indicator-content">
-              <div class="indicator-label">分类准确率</div>
-              <div class="indicator-value">{{ indicators.accuracyRate }}</div>
-              <div class="indicator-unit">%</div>
-              <div class="indicator-trend up">{{ indicators.trend.accuracy }}</div>
-            </div>
+            <div class="g-ind-trend up">{{ indicators.trend.accuracy }}</div>
           </div>
-          
-          <div class="indicator-card">
-            <div class="indicator-icon" style="background: linear-gradient(135deg, #27ae60, #229954);">
-              <i class="fas fa-leaf"></i>
+          <div class="g-ind-card g-ind-teal">
+            <div class="g-ind-icon"><i class="fas fa-leaf"></i></div>
+            <div class="g-ind-body">
+              <div class="g-ind-value">{{ indicators.carbonReduction }}<span class="g-ind-unit">kg</span></div>
+              <div class="g-ind-label">碳减排总量</div>
             </div>
-            <div class="indicator-content">
-              <div class="indicator-label">碳减排总量</div>
-              <div class="indicator-value">{{ indicators.carbonReduction }}</div>
-              <div class="indicator-unit">kg</div>
-              <div class="indicator-trend up">{{ indicators.trend.carbon }}</div>
-            </div>
+            <div class="g-ind-trend up">{{ indicators.trend.carbon }}</div>
           </div>
         </div>
 
@@ -742,26 +737,26 @@
   </div>
 
   <!-- 底部导航 -->
-  <nav class="bottom-nav">
-    <div class="nav-item active">
-      <div class="nav-icon">📊</div>
-      <div>监管</div>
+  <nav class="g-bottom-nav">
+    <div class="g-nav-item active">
+      <div class="g-nav-icon"><i class="fas fa-chart-bar"></i></div>
+      <div class="g-nav-label">监管</div>
     </div>
-    <div class="nav-item" routerLink="/government/subsidy-management">
-      <div class="nav-icon">💰</div>
-      <div>补贴</div>
+    <div class="g-nav-item" routerLink="/government/subsidy-management">
+      <div class="g-nav-icon"><i class="fas fa-hand-holding-usd"></i></div>
+      <div class="g-nav-label">补贴</div>
     </div>
-    <div class="nav-item" routerLink="/government/industry-analysis">
-      <div class="nav-icon">📈</div>
-      <div>分析</div>
+    <div class="g-nav-item" routerLink="/government/industry-analysis">
+      <div class="g-nav-icon"><i class="fas fa-chart-line"></i></div>
+      <div class="g-nav-label">分析</div>
     </div>
-    <div class="nav-item" routerLink="/government/ai-decision-assistant">
-      <div class="nav-icon">🤖</div>
-      <div>AI助手</div>
+    <div class="g-nav-item" routerLink="/government/ai-decision-assistant">
+      <div class="g-nav-icon"><i class="fas fa-robot"></i></div>
+      <div class="g-nav-label">AI助手</div>
     </div>
-    <div class="nav-item" routerLink="/government/government-center">
-      <div class="nav-icon">⚙️</div>
-      <div>政务</div>
-  </div>
+    <div class="g-nav-item" routerLink="/government/government-center">
+      <div class="g-nav-icon"><i class="fas fa-university"></i></div>
+      <div class="g-nav-label">政务</div>
+    </div>
   </nav>
 </div>

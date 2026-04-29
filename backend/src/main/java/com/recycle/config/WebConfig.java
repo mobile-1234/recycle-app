@@ -9,6 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class WebConfig implements WebMvcConfigurer {
 
     private final AuthInterceptor authInterceptor;

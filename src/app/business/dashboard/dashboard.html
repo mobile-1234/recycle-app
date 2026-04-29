@@ -1,99 +1,126 @@
-<!-- 顶部导航 -->
-<header class="header">
-  <div class="container">
-    <div class="header-content">
-      <div class="logo">
-        <span class="logo-icon">♻️</span>
-        <span>再生视界</span>
+<!-- ====== B端 顶部导航 ====== -->
+<header class="b-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="brand-icon"><i class="fas fa-recycle"></i></div>
+      <div class="brand-text">
+        <span class="brand-name">再生视界</span>
+        <span class="brand-sub">企业工作台</span>
       </div>
-      <div class="user-info">
-        <span>企业管理员</span>
-        <div class="avatar" (click)="onUserAvatarClick()" title="查看企业中心">
-          <span>管</span>
-        </div>
+    </div>
+    <div class="header-right">
+      <button class="hdr-btn" (click)="onViewMoreClick('alerts')" title="预警中心">
+        <i class="fas fa-bell"></i>
+        <span class="badge-dot" *ngIf="alertInfo.content.length > 0"></span>
+      </button>
+      <div class="user-chip" (click)="onUserAvatarClick()">
+        <div class="user-avatar"><i class="fas fa-building"></i></div>
+        <span class="user-name">{{ userInfo.company || '企业' }}</span>
       </div>
     </div>
   </div>
 </header>
 
-<!-- 主要内容 -->
-<main class="content">
-  <div class="container">
-    <!-- 工作台首页 -->
-    <section id="dashboard">
-      <h2 class="section-title">工作台首页 <span class="more-link">今日数据</span></h2>
-      
-      <!-- 核心数据看板 -->
-      <div class="data-dashboard">
-        <div class="data-card" *ngFor="let card of dataCards" (click)="onDataCardClick(card)">
-          <div class="data-label">{{card.label}}</div>
-          <div class="data-value">{{card.value}}</div>
-          <div class="data-trend">{{card.trend}}</div>
+<!-- ====== 主内容 ====== -->
+<main class="b-content">
+
+  <!-- 核心数据看板 -->
+  <section class="stats-section">
+    <div class="stats-header">
+      <h2><i class="fas fa-chart-line"></i> 今日数据</h2>
+      <span class="stats-time">实时更新</span>
+    </div>
+    <app-skeleton *ngIf="loading.dashboard" type="stat"></app-skeleton>
+    <div class="stats-grid" *ngIf="!loading.dashboard">
+      <div class="stat-tile" *ngFor="let card of dataCards; let i = index" 
+           [ngClass]="'tile-' + i" (click)="onDataCardClick(card)">
+        <div class="tile-icon">{{ card.icon }}</div>
+        <div class="tile-body">
+          <div class="tile-value">{{ card.value }}</div>
+          <div class="tile-label">{{ card.label }}</div>
+        </div>
+        <div class="tile-trend" [ngClass]="card.trend.startsWith('↑') ? 'up' : card.trend.startsWith('↓') ? 'down' : 'flat'">
+          {{ card.trend }}
         </div>
       </div>
-      
-      <!-- 预警信息卡片 -->
-      <div class="card alert-card" *ngIf="alertInfo.content.length > 0">
-        <div class="alert-title">
-          <div>
-            <span class="alert-icon">{{alertInfo.icon}}</span>
-            <span>{{alertInfo.title}}</span>
-          </div>
-          <span class="more-link" (click)="onViewMoreClick('alerts')">查看全部</span>
-        </div>
-        <div class="alert-content">
-          <p *ngFor="let content of alertInfo.content">• {{content}}</p>
-        </div>
-      </div>
-      
-      <!-- AI运营助手 -->
-      <div class="ai-assistant" (click)="onAIAssistantClick()">
-        <div class="ai-header">
-          <div class="ai-icon">🤖</div>
-          <div class="ai-title">AI运营助手</div>
-        </div>
-        <div class="ai-suggestions">
-          <div class="ai-suggestion" *ngFor="let suggestion of aiSuggestions" (click)="onAISuggestionClick(suggestion)">
-            {{suggestion.text}}
-          </div>
+    </div>
+  </section>
+
+  <!-- 预警信息 -->
+  <section class="alert-section" *ngIf="alertInfo.content.length > 0">
+    <div class="alert-bar">
+      <div class="alert-icon-wrap"><i class="fas fa-exclamation-triangle"></i></div>
+      <div class="alert-body">
+        <div class="alert-headline">{{ alertInfo.title }}</div>
+        <div class="alert-items">
+          <span *ngFor="let c of alertInfo.content" class="alert-item">{{ c }}</span>
         </div>
       </div>
-      
-      <!-- 快捷操作入口 -->
-      <div class="card">
-        <h3 class="section-title">快捷操作</h3>
-        <div class="quick-actions">
-          <div class="action-item" *ngFor="let action of quickActions" (click)="onQuickActionClick(action)">
-            <div class="action-icon">{{action.icon}}</div>
-            <div class="action-label">{{action.label}}</div>
-          </div>
+      <button class="alert-more" (click)="onViewMoreClick('alerts')">
+        查看 <i class="fas fa-angle-right"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- 快捷操作 + AI 助手 双栏 -->
+  <div class="dual-row">
+    <!-- 快捷操作 -->
+    <section class="quick-section card-panel">
+      <h3 class="panel-title"><i class="fas fa-bolt"></i> 快捷操作</h3>
+      <div class="quick-grid">
+        <div class="quick-item" *ngFor="let action of quickActions" (click)="onQuickActionClick(action)">
+          <div class="quick-icon">{{ action.icon }}</div>
+          <div class="quick-label">{{ action.label }}</div>
         </div>
       </div>
-      
-      <!-- 待办事项列表 -->
-      <div class="card">
-        <h3 class="section-title">待办事项 <span class="more-link" (click)="onViewMoreClick('todos')">查看全部</span></h3>
-        <div class="todo-list">
-          <div class="todo-item" *ngFor="let todo of todoItems" (click)="onTodoItemClick(todo)">
-            <div class="todo-info">
-              <div class="todo-icon">{{todo.icon}}</div>
-              <div>
-                <div class="todo-title">{{todo.title}}</div>
-                <div class="todo-desc">{{todo.description}}</div>
-              </div>
-            </div>
-            <div class="todo-count">{{todo.count}}</div>
-          </div>
+    </section>
+
+    <!-- AI运营助手 -->
+    <section class="ai-section card-panel" (click)="onAIAssistantClick()">
+      <div class="ai-banner">
+        <div class="ai-logo"><i class="fas fa-robot"></i></div>
+        <div class="ai-info">
+          <h3>AI运营助手</h3>
+          <span>智能分析 · 运营建议</span>
+        </div>
+      </div>
+      <app-skeleton *ngIf="loading.aiSuggestions" type="lines" [count]="2"></app-skeleton>
+      <div class="ai-chips" *ngIf="!loading.aiSuggestions">
+        <div class="ai-chip" *ngFor="let s of aiSuggestions" (click)="onAISuggestionClick(s); $event.stopPropagation()">
+          <i class="fas fa-lightbulb"></i> {{ s.text }}
         </div>
       </div>
     </section>
   </div>
+
+  <!-- 待办事项 -->
+  <section class="todo-section card-panel">
+    <div class="panel-header">
+      <h3 class="panel-title"><i class="fas fa-tasks"></i> 待办事项</h3>
+      <a class="see-all" (click)="onViewMoreClick('todos')">全部 <i class="fas fa-angle-right"></i></a>
+    </div>
+    <app-skeleton *ngIf="loading.todos" type="list" [count]="3"></app-skeleton>
+    <app-empty-state *ngIf="!loading.todos && todoItems.length === 0"
+      icon="no-order" title="暂无待办事项" description="所有任务已处理完毕" size="small">
+    </app-empty-state>
+    <div class="todo-list" *ngIf="!loading.todos && todoItems.length > 0">
+      <div class="todo-row" *ngFor="let todo of todoItems" (click)="onTodoItemClick(todo)">
+        <div class="todo-icon-box">{{ todo.icon }}</div>
+        <div class="todo-body">
+          <div class="todo-title">{{ todo.title }}</div>
+          <div class="todo-desc">{{ todo.description }}</div>
+        </div>
+        <div class="todo-badge">{{ todo.count }}</div>
+      </div>
+    </div>
+  </section>
+
 </main>
 
-<!-- 底部导航 -->
-<nav class="bottom-nav">
-  <div class="nav-item" *ngFor="let item of navItems" [class.active]="item.active" (click)="onNavItemClick(item)">
-    <div class="nav-icon">{{item.icon}}</div>
-    <div>{{item.label}}</div>
+<!-- ====== 底部导航 ====== -->
+<nav class="b-bottom-nav">
+  <div class="b-nav-item" *ngFor="let item of navItems" [class.active]="item.active" (click)="onNavItemClick(item)">
+    <div class="b-nav-icon">{{ item.icon }}</div>
+    <div class="b-nav-label">{{ item.label }}</div>
   </div>
 </nav>

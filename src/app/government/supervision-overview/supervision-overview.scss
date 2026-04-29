@@ -8,8 +8,8 @@
   --light-bg: #f8f9fa;
   --dark-text: #2c3e50;
   --light-text: #7f8c8d;
-  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --border-radius: 12px;
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --border-radius: 14px;
 }
 
 * {
@@ -20,98 +20,320 @@
 
 .supervision-overview-container {
   min-height: 100vh;
-  background-color: #f5f7fa;
+  background-color: #eef1f5;
   color: var(--dark-text);
-  font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', sans-serif;
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
 
 .container {
   max-width: 100%;
   margin: 0 auto;
-  padding: 0 15px;
+  padding: 0 16px;
 }
 
-/* 顶部导航 */
-.header {
-  background: linear-gradient(135deg, #3498db, #2980b9);
-  color: white;
-  padding: 15px;
+// ============ G端 Header ============
+.g-header {
+  background: linear-gradient(135deg, #0d47a1 0%, #1565c0 50%, #1976d2 100%);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px rgba(13, 71, 161, 0.3);
 }
 
-.header-content {
+.g-header-inner {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
+  padding: 12px 16px;
+  min-height: 56px;
 }
 
-.logo {
+.g-brand {
   display: flex;
   align-items: center;
-  font-weight: bold;
-  font-size: 20px;
+  gap: 10px;
 }
 
-.logo-icon {
-  margin-right: 10px;
-  font-size: 24px;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-}
-
-.avatar {
+.g-brand-icon {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 10px;
+  color: #fff;
+  font-size: 16px;
 }
 
-/* 内容区域 */
+.g-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.g-brand-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.g-brand-sub {
+  font-size: 10px;
+  color: rgba(255,255,255,0.6);
+}
+
+.g-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.g-hdr-btn {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+
+  &:hover { background: rgba(255,255,255,0.22); }
+  &:active { transform: scale(0.93); }
+}
+
+.g-user-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 4px 12px 4px 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover { background: rgba(255,255,255,0.18); }
+}
+
+.g-user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+}
+
+.g-user-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.9);
+  font-weight: 500;
+}
+
+// ============ Content ============
 .content {
-  padding: 20px 0 80px;
+  padding: 16px 0 90px;
 }
 
 .section-title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 15px;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 14px;
 }
 
-/* 核心指标仪表盘 */
-.indicators-dashboard {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.indicator-card {
-  background: white;
-  border-radius: var(--border-radius);
-  padding: 16px;
+// ============ Overview Title ============
+.g-overview-title {
   display: flex;
   align-items: center;
-  gap: 16px;
-  box-shadow: var(--card-shadow);
-  transition: all 0.3s;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding: 0 2px;
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    i { color: #1565c0; font-size: 14px; }
   }
 }
 
+.g-live-dot {
+  font-size: 11px;
+  color: #4caf50;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4caf50;
+    animation: gPulse 2s infinite;
+  }
+}
+
+// ============ Indicator Cards ============
+.g-indicators {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.g-ind-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  }
+
+  &.g-ind-green {
+    &::before { background: linear-gradient(180deg, #4caf50, #81c784); }
+    .g-ind-icon { background: rgba(76,175,80,0.1); color: #2e7d32; }
+  }
+  &.g-ind-blue {
+    &::before { background: linear-gradient(180deg, #2196f3, #64b5f6); }
+    .g-ind-icon { background: rgba(33,150,243,0.1); color: #1565c0; }
+  }
+  &.g-ind-teal {
+    &::before { background: linear-gradient(180deg, #009688, #4db6ac); }
+    .g-ind-icon { background: rgba(0,150,136,0.1); color: #00695c; }
+  }
+}
+
+.g-ind-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.g-ind-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.g-ind-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1.2;
+}
+
+.g-ind-unit {
+  font-size: 12px;
+  font-weight: 400;
+  color: #999;
+  margin-left: 2px;
+}
+
+.g-ind-label {
+  font-size: 12px;
+  color: #888;
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+.g-ind-trend {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
+
+  &.up { color: #4caf50; background: rgba(76,175,80,0.1); }
+  &.down { color: #f44336; background: rgba(244,67,54,0.1); }
+}
+
+// ============ Bottom Nav ============
+.g-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  display: flex;
+  padding: 8px 0 20px;
+  box-shadow: 0 -1px 8px rgba(0,0,0,0.06);
+  z-index: 100;
+}
+
+.g-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #999;
+  text-decoration: none;
+
+  &.active {
+    color: #1565c0;
+    .g-nav-icon { transform: scale(1.1); }
+  }
+
+  &:hover:not(.active) { color: #666; }
+}
+
+.g-nav-icon {
+  font-size: 18px;
+  margin-bottom: 3px;
+  transition: transform 0.2s;
+}
+
+.g-nav-label {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+@keyframes gPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+// ============ Legacy compat (keep old .indicator-icon used deeper) ============
 .indicator-icon {
   width: 60px;
   height: 60px;

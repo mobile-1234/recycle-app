@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { SkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
+import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { BusinessApiService } from '../../core/services/business-api.service';
 import { AuthService } from '../../auth/services/auth.service';
 
@@ -40,7 +42,7 @@ interface AISuggestion {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, SkeletonComponent, EmptyStateComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
