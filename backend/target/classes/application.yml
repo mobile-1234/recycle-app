@@ -7,9 +7,9 @@ spring:
   
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/recycle_app?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/huanbao?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: root
-    password: root  # 请根据实际情况修改
+    password: xfj7758758@
   
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -49,3 +49,10 @@ knife4j:
 jwt:
   secret: recycle-app-jwt-secret-key-2024-very-long-secret
   expiration: 86400000  # 24小时
+
+# DeepSeek AI配置
+ai:
+  api:
+    key: sk-3ae5d07978a54d369b8e9fb9bc944e78 # 请替换为你的DeepSeek API Key
+    url: https://api.deepseek.com/v1/chat/completions
+    model: deepseek-chat

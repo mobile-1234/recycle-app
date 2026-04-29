@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { BusinessApiService } from '../../core/services/business-api.service';
+import { AuthService } from '../../auth/services/auth.service';
 
 interface DataCard {
   value: string;
@@ -45,47 +47,26 @@ interface AISuggestion {
 export class Dashboard implements OnInit {
   // 用户信息
   userInfo = {
-    name: '张经理',
-    company: '再生视界有限公司'
+    name: '',
+    company: ''
+  };
+
+  // 数据加载状态
+  loading = {
+    dashboard: false,
+    alerts: false,
+    todos: false,
+    aiSuggestions: false
   };
 
   // 核心数据
-  dataCards: DataCard[] = [
-    {
-      value: '2,456',
-      label: '今日回收量(kg)',
-      trend: '↑ 12.5%',
-      icon: '♻️'
-    },
-    {
-      value: '¥18,920',
-      label: '产值',
-      trend: '↑ 8.3%',
-      icon: '💰'
-    },
-    {
-      value: '94.2%',
-      label: '订单完成率',
-      trend: '↑ 2.1%',
-      icon: '📊'
-    },
-    {
-      value: '98.5%',
-      label: '设备运行率',
-      trend: '→ 0%',
-      icon: '⚙️'
-    }
-  ];
+  dataCards: DataCard[] = [];
 
   // 预警信息
   alertInfo: AlertInfo = {
     title: '预警信息',
     icon: '⚠️',
-    content: [
-      '设备A3需要维护保养',
-      '库存不足，建议及时补货',
-      '3个订单超时未处理'
-    ]
+    content: []
   };
 
   // 快捷操作
@@ -113,37 +94,10 @@ export class Dashboard implements OnInit {
   ];
 
   // 待办事项
-  todoItems: TodoItem[] = [
-    {
-      title: '待处理订单',
-      description: '需要及时处理的新订单',
-      count: 12,
-      icon: '📦',
-      route: '/business/orders/pending'
-    },
-    {
-      title: '待审核申请',
-      description: '用户提交的回收申请',
-      count: 8,
-      icon: '📋',
-      route: '/business/applications'
-    },
-    {
-      title: '设备维护计划',
-      description: '本周需要维护的设备',
-      count: 3,
-      icon: '🔧',
-      route: '/business/equipment/maintenance'
-    }
-  ];
+  todoItems: TodoItem[] = [];
 
   // AI建议
-  aiSuggestions: AISuggestion[] = [
-    { text: '优化回收路线', action: 'optimizeRoute' },
-    { text: '库存预警提醒', action: 'inventoryAlert' },
-    { text: '设备维护建议', action: 'maintenanceAdvice' },
-    { text: '效率分析报告', action: 'efficiencyReport' }
-  ];
+  aiSuggestions: AISuggestion[] = [];
 
   // 底部导航
   navItems = [
@@ -154,17 +108,223 @@ export class Dashboard implements OnInit {
     { label: '我的', icon: '👤', route: '/business/profile', active: false }
   ];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private businessApi: BusinessApiService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
-    // 初始化数据
+    // 加载企业信息
+    this.loadEnterpriseInfo();
+    // 加载仪表板数据
     this.loadDashboardData();
+    // 加载预警信息
+    this.loadAlerts();
+    // 加载待办事项
+    this.loadTodos();
+    // 加载AI建议
+    this.loadAISuggestions();
+  }
+
+  // 加载企业信息
+  private loadEnterpriseInfo(): void {
+    this.businessApi.getEnterpriseInfo().subscribe({
+      next: (info) => {
+        this.userInfo = {
+          name: info.contactPerson || '管理员',
+          company: info.name || '企业'
+        };
+      },
+      error: (error) => {
+        console.error('加载企业信息失败:', error);
+        const currentUser = this.authService.getCurrentUser();
+        if (currentUser) {
+          this.userInfo = {
+            name: currentUser.name || '管理员',
+            company: currentUser.companyName || '企业'
+          };
+        }
+      }
+    });
   }
 
   // 加载仪表板数据
-  loadDashboardData() {
-    // 这里可以调用API获取实时数据
-    console.log('Loading dashboard data...');
+  private loadDashboardData(): void {
+    this.loading.dashboard = true;
+    this.businessApi.getDashboardStats().subscribe({
+      next: (stats) => {
+        this.dataCards = [
+          {
+            value: this.formatNumber(stats.todayRecycleWeight || 0),
+            label: '今日回收量(kg)',
+            trend: this.formatTrend(stats.recycleWeightTrend),
+            icon: '♻️'
+          },
+          {
+            value: `¥${this.formatNumber(stats.todayRevenue || 0)}`,
+            label: '产值',
+            trend: this.formatTrend(stats.revenueTrend),
+            icon: '💰'
+          },
+          {
+            value: `${(stats.orderCompletionRate || 0).toFixed(1)}%`,
+            label: '订单完成率',
+            trend: this.formatTrend(stats.completionRateTrend),
+            icon: '📊'
+          },
+          {
+            value: `${(stats.deviceRunningRate || 0).toFixed(1)}%`,
+            label: '设备运行率',
+            trend: this.formatTrend(stats.deviceRunningTrend),
+            icon: '⚙️'
+          }
+        ];
+        this.loading.dashboard = false;
+      },
+      error: (error) => {
+        console.error('加载仪表盘数据失败:', error);
+        this.loading.dashboard = false;
+        // 使用默认数据
+        this.dataCards = [
+          { value: '0', label: '今日回收量(kg)', trend: '→ 0%', icon: '♻️' },
+          { value: '¥0', label: '产值', trend: '→ 0%', icon: '💰' },
+          { value: '0%', label: '订单完成率', trend: '→ 0%', icon: '📊' },
+          { value: '0%', label: '设备运行率', trend: '→ 0%', icon: '⚙️' }
+        ];
+      }
+    });
+  }
+
+  // 加载预警信息
+  private loadAlerts(): void {
+    this.loading.alerts = true;
+    this.businessApi.getAlerts({ page: 0, size: 5 }).subscribe({
+      next: (alerts) => {
+        this.alertInfo.content = alerts.content.map(a => a.title).slice(0, 3);
+        this.loading.alerts = false;
+      },
+      error: (error) => {
+        console.error('加载预警信息失败:', error);
+        this.loading.alerts = false;
+        this.alertInfo.content = [];
+      }
+    });
+  }
+
+  // 加载待办事项
+  private loadTodos(): void {
+    this.loading.todos = true;
+    this.businessApi.getTodos({ status: 'pending' }).subscribe({
+      next: (todos) => {
+        // 按类型分组统计
+        const todoGroups = this.groupTodosByType(todos);
+        this.todoItems = Object.keys(todoGroups).map(type => ({
+          title: this.getTodoTitle(type),
+          description: this.getTodoDescription(type),
+          count: todoGroups[type].length,
+          icon: this.getTodoIcon(type),
+          route: this.getTodoRoute(type)
+        }));
+        this.loading.todos = false;
+      },
+      error: (error) => {
+        console.error('加载待办事项失败:', error);
+        this.loading.todos = false;
+        this.todoItems = [];
+      }
+    });
+  }
+
+  // 加载AI建议
+  private loadAISuggestions(): void {
+    this.loading.aiSuggestions = true;
+    this.businessApi.getAIInsights().subscribe({
+      next: (insights) => {
+        this.aiSuggestions = insights.slice(0, 4).map(i => ({
+          text: i.title,
+          action: i.action
+        }));
+        this.loading.aiSuggestions = false;
+      },
+      error: (error) => {
+        console.error('加载AI建议失败:', error);
+        this.loading.aiSuggestions = false;
+        this.aiSuggestions = [];
+      }
+    });
+  }
+
+  // 格式化数字
+  private formatNumber(num: number): string {
+    if (num >= 10000) {
+      return `${(num / 10000).toFixed(1)}万`;
+    }
+    return num.toLocaleString();
+  }
+
+  // 格式化趋势
+  private formatTrend(trend: number | undefined): string {
+    if (!trend || trend === 0) return '→ 0%';
+    const symbol = trend > 0 ? '↑' : '↓';
+    return `${symbol} ${Math.abs(trend).toFixed(1)}%`;
+  }
+
+  // 按类型分组待办事项
+  private groupTodosByType(todos: any[]): any {
+    const groups: any = {};
+    todos.forEach(todo => {
+      const type = todo.type || 'other';
+      if (!groups[type]) {
+        groups[type] = [];
+      }
+      groups[type].push(todo);
+    });
+    return groups;
+  }
+
+  // 获取待办标题
+  private getTodoTitle(type: string): string {
+    const titles: any = {
+      'order': '待处理订单',
+      'application': '待审核申请',
+      'maintenance': '设备维护计划',
+      'other': '其他待办'
+    };
+    return titles[type] || '待办事项';
+  }
+
+  // 获取待办描述
+  private getTodoDescription(type: string): string {
+    const descriptions: any = {
+      'order': '需要及时处理的新订单',
+      'application': '用户提交的回收申请',
+      'maintenance': '本周需要维护的设备',
+      'other': '需要处理的事项'
+    };
+    return descriptions[type] || '待处理事项';
+  }
+
+  // 获取待办图标
+  private getTodoIcon(type: string): string {
+    const icons: any = {
+      'order': '📦',
+      'application': '📋',
+      'maintenance': '🔧',
+      'other': '📌'
+    };
+    return icons[type] || '📌';
+  }
+
+  // 获取待办路由
+  private getTodoRoute(type: string): string {
+    const routes: any = {
+      'order': '/business/orders/pending',
+      'application': '/business/applications',
+      'maintenance': '/business/equipment/maintenance',
+      'other': '/business/todos'
+    };
+    return routes[type] || '/business/todos';
   }
 
   // 数据卡片点击事件

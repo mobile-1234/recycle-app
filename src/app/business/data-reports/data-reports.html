@@ -94,6 +94,10 @@
 
     <!-- 快捷操作按钮 -->
     <div class="quick-actions">
+      <button class="quick-btn ai-btn" (click)="openAIChartModal()" title="AI智能图表">
+        <span class="btn-icon">🤖</span>
+        <span class="btn-label">AI图表</span>
+      </button>
       <button class="quick-btn" (click)="refreshData()" title="刷新数据">
         <span class="btn-icon">🔄</span>
         <span class="btn-label">刷新</span>
@@ -105,6 +109,10 @@
       <button class="quick-btn" (click)="openAIAnalysis()" title="AI分析">
         <span class="btn-icon">🤖</span>
         <span class="btn-label">AI分析</span>
+      </button>
+      <button class="quick-btn" (click)="openMapMonitor()" title="地图监控">
+        <span class="btn-icon">🗺️</span>
+        <span class="btn-label">地图</span>
       </button>
     </div>
   </div>
@@ -488,6 +496,217 @@
               </span>
             </li>
           </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 地图监控弹窗 -->
+  <div class="modal-overlay" *ngIf="showMapModal" (click)="closeMapMonitor()">
+    <div class="modal-content map-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <span class="title-icon">🗺️</span>
+          监控点地图分布
+        </h3>
+        <button class="close-btn" (click)="closeMapMonitor()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- 加载状态 -->
+        <div *ngIf="mapLoading" class="map-loading">
+          <div class="loading-spinner"></div>
+          <p>地图加载中...</p>
+        </div>
+        <!-- 错误状态 -->
+        <div *ngIf="mapLoadError" class="map-error">
+          <span class="error-icon">⚠️</span>
+          <p>地图加载失败，请检查网络连接</p>
+          <button class="retry-btn" (click)="openMapMonitor()">重试</button>
+        </div>
+        <div id="location-map-container" class="location-map-container" [style.display]="mapLoadError ? 'none' : 'block'"></div>
+        <div class="map-legend">
+          <div class="legend-item">
+            <span class="legend-dot normal"></span>
+            <span>正常</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot warning"></span>
+            <span>预警</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot critical"></span>
+            <span>严重</span>
+          </div>
+        </div>
+        <div class="location-summary">
+          <div class="summary-item">
+            <span class="summary-count">{{ locations.length }}</span>
+            <span class="summary-label">监控点总数</span>
+          </div>
+          <div class="summary-item normal">
+            <span class="summary-count">{{ locations.length - criticalLocations.length - warningLocations.length }}</span>
+            <span class="summary-label">正常</span>
+          </div>
+          <div class="summary-item warning">
+            <span class="summary-count">{{ warningLocations.length }}</span>
+            <span class="summary-label">预警</span>
+          </div>
+          <div class="summary-item critical">
+            <span class="summary-count">{{ criticalLocations.length }}</span>
+            <span class="summary-label">严重</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI智能图表生成弹窗 -->
+  <div class="modal-overlay" *ngIf="showAIModal" (click)="closeAIChartModal()">
+    <div class="modal-content ai-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <span class="title-icon">🤖</span>
+          AI智能图表生成
+        </h3>
+        <button class="close-btn" (click)="closeAIChartModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- 输入区域 -->
+        <div class="ai-input-section">
+          <label class="input-label">输入您的分析需求：</label>
+          <textarea 
+            class="ai-input" 
+            [(ngModel)]="aiPrompt" 
+            placeholder="例如：分析本月各品类回收占比、查看近6个月回收趋势、对比各区域回收量..."
+            rows="3"></textarea>
+          
+          <!-- 快捷分析按钮 -->
+          <div class="quick-prompts">
+            <span class="quick-label">快捷分析：</span>
+            <button class="quick-prompt-btn" (click)="quickAIAnalysis('trend')">📈 趋势</button>
+            <button class="quick-prompt-btn" (click)="quickAIAnalysis('category')">🥧 占比</button>
+            <button class="quick-prompt-btn" (click)="quickAIAnalysis('region')">🗺️ 区域</button>
+            <button class="quick-prompt-btn" (click)="quickAIAnalysis('forecast')">🔮 预测</button>
+          </div>
+          
+          <button class="generate-btn" (click)="generateAIChart()" [disabled]="aiGenerating">
+            <span *ngIf="!aiGenerating">✨ 一键生成图表</span>
+            <span *ngIf="aiGenerating">⏳ AI分析中...</span>
+          </button>
+        </div>
+
+        <!-- 生成结果区域 -->
+        <div class="ai-result-section" *ngIf="aiChartData || aiGenerating">
+          <!-- 加载动画 -->
+          <div class="ai-loading" *ngIf="aiGenerating">
+            <div class="ai-loading-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <p>AI正在分析数据...</p>
+          </div>
+
+          <!-- 图表展示 -->
+          <div class="ai-chart-container" *ngIf="aiChartData && !aiGenerating">
+            <h4 class="chart-title">📊 AI生成图表</h4>
+            
+            <!-- 柱状图 -->
+            <div class="chart-wrapper" *ngIf="aiChartType === 'bar'">
+              <svg viewBox="0 0 350 180" class="bar-chart">
+                <g *ngFor="let dataset of aiChartData.datasets; let di = index">
+                  <rect 
+                    *ngFor="let value of dataset.data; let i = index"
+                    [attr.x]="25 + i * 45 + di * 18"
+                    [attr.y]="160 - (value / getChartMax(dataset.data)) * 130"
+                    width="16"
+                    [attr.height]="(value / getChartMax(dataset.data)) * 130"
+                    [attr.fill]="dataset.color"
+                    rx="2">
+                  </rect>
+                </g>
+                <g class="x-axis">
+                  <text *ngFor="let label of aiChartData.labels; let i = index"
+                    [attr.x]="35 + i * 45"
+                    y="175"
+                    font-size="9"
+                    text-anchor="middle"
+                    fill="#666">{{label}}</text>
+                </g>
+              </svg>
+              <div class="chart-legend">
+                <span *ngFor="let dataset of aiChartData.datasets" class="legend-item">
+                  <span class="legend-color" [style.background]="dataset.color"></span>
+                  {{dataset.label}}
+                </span>
+              </div>
+            </div>
+
+            <!-- 折线图 -->
+            <div class="chart-wrapper" *ngIf="aiChartType === 'line'">
+              <svg viewBox="0 0 350 180" class="line-chart">
+                <g *ngFor="let dataset of aiChartData.datasets">
+                  <polyline
+                    fill="none"
+                    [attr.stroke]="dataset.color"
+                    stroke-width="2"
+                    [attr.points]="getLineChartPoints(dataset.data)"/>
+                  <circle 
+                    *ngFor="let value of dataset.data; let i = index"
+                    [attr.cx]="35 + i * 55"
+                    [attr.cy]="160 - (value / getChartMax(dataset.data)) * 130"
+                    r="4"
+                    [attr.fill]="dataset.color">
+                  </circle>
+                </g>
+                <g class="x-axis">
+                  <text *ngFor="let label of aiChartData.labels; let i = index"
+                    [attr.x]="35 + i * 55"
+                    y="175"
+                    font-size="9"
+                    text-anchor="middle"
+                    fill="#666">{{label}}</text>
+                </g>
+              </svg>
+              <div class="chart-legend">
+                <span *ngFor="let dataset of aiChartData.datasets" class="legend-item">
+                  <span class="legend-color" [style.background]="dataset.color"></span>
+                  {{dataset.label}}
+                </span>
+              </div>
+            </div>
+
+            <!-- 饼图 -->
+            <div class="chart-wrapper pie-wrapper" *ngIf="aiChartType === 'pie'">
+              <svg viewBox="0 0 200 200" class="pie-chart">
+                <path 
+                  *ngFor="let value of aiChartData.data; let i = index"
+                  [attr.d]="getPieSlicePath(i, aiChartData.data)"
+                  [attr.fill]="aiChartData.colors[i]">
+                </path>
+              </svg>
+              <div class="pie-legend">
+                <div *ngFor="let label of aiChartData.labels; let i = index" class="pie-legend-item">
+                  <span class="legend-color" [style.background]="aiChartData.colors[i]"></span>
+                  <span>{{label}}: {{aiChartData.data[i]}}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI分析报告 -->
+          <div class="ai-analysis-report" *ngIf="aiAnalysisResult && !aiGenerating">
+            <h4 class="report-title">📋 AI分析报告</h4>
+            <div class="report-content" [innerHTML]="aiAnalysisResult.split('\\n').join('<br>')"></div>
+            
+            <!-- AI来源标识 -->
+            <div class="ai-source-badge" [class.real-ai]="isRealAI">
+              <span class="badge-icon">{{ isRealAI ? '🤖' : '📊' }}</span>
+              <span class="badge-text">{{ isRealAI ? '真实AI分析' : '智能模拟分析' }}</span>
+            </div>
+            <div class="ai-note" *ngIf="aiNote">
+              <span class="note-icon">💡</span>
+              <span>{{ aiNote }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

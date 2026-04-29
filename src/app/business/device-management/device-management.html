@@ -4,7 +4,7 @@
     <div class="header-content">
       <div class="logo">
         <span class="logo-icon">♻️</span>
-        <span>智回回收</span>
+        <span>再生视界</span>
       </div>
       <div class="user-info">
         <span>企业管理员</span>
@@ -19,7 +19,13 @@
   <main class="content">
     <div class="container">
       <section id="device-management">
-        <h2 class="section-title">设备管理</h2>
+        <div class="section-header">
+          <h2 class="section-title">设备管理</h2>
+          <button class="view-toggle-btn" (click)="toggleViewMode()">
+            <i class="fas" [class.fa-map-marked-alt]="viewMode === 'list'" [class.fa-list]="viewMode === 'map'"></i>
+            {{ viewMode === 'list' ? '地图视图' : '列表视图' }}
+          </button>
+        </div>
 
         <!-- 设备总览状态卡片 -->
         <div class="stats-cards">
@@ -82,13 +88,36 @@
           </div>
         </div>
 
+        <!-- 地图视图 -->
+        <div class="map-view" *ngIf="viewMode === 'map'">
+          <div id="device-map-container" class="map-container"></div>
+          <div class="map-legend">
+            <div class="legend-item">
+              <span class="legend-dot online"></span>
+              <span>运行中</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot warning"></span>
+              <span>预警</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot maintenance"></span>
+              <span>维护中</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot offline"></span>
+              <span>离线</span>
+            </div>
+          </div>
+        </div>
+
         <!-- 设备列表 -->
-        <div class="device-list">
+        <div class="device-list" *ngIf="viewMode === 'list'">
           <div 
             *ngFor="let device of filteredDevices" 
             class="device-item"
             (click)="openDeviceDetail(device)">
-  <div class="device-header">
+            <div class="device-header">
               <div class="device-info-main">
                 <div class="device-name">{{ device.name }}</div>
                 <div class="device-meta">

@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { BottomNavComponent } from '../../shared/bottom-nav/bottom-nav.component';
+import { ConsumerApiService } from '../../core/services/consumer-api.service';
+import { AuthService } from '../../auth/services/auth.service';
 
 interface Collector {
   id: string;
@@ -33,106 +35,184 @@ interface Activity {
 })
 export class HomeComponent implements OnInit {
   // 用户状态数据
-  userLevel: number = 5;
-  levelProgress: number = 68;
-  userPoints: number = 2580;
-  userCash: number = 156.80;
+  userLevel: number = 0;
+  levelProgress: number = 0;
+  userPoints: number = 0;
+  userCash: number = 0;
   
   // 当前选中的底部导航标签
   currentTab: string = 'home';
   
+  // 数据加载状态
+  loading = {
+    user: false,
+    collectors: false,
+    dropPoints: false,
+    activities: false
+  };
+  
+  // 当前位置（用于获取附近数据）
+  currentLocation = {
+    longitude: 115.858197,
+    latitude: 28.682892
+  };
+  
   // 附近回收员数据
-  nearbyCollectors: Collector[] = [
-    {
-      id: '1',
-      name: '张师傅',
-      distance: '0.5km',
-      status: '在线'
-    },
-    {
-      id: '2',
-      name: '李师傅',
-      distance: '0.8km',
-      status: '忙碌'
-    },
-    {
-      id: '3',
-      name: '王师傅',
-      distance: '1.2km',
-      status: '在线'
-    },
-    {
-      id: '4',
-      name: '赵师傅',
-      distance: '1.5km',
-      status: '在线'
-    }
-  ];
+  nearbyCollectors: Collector[] = [];
   
   // 自助投递点数据
-  dropPoints: DropPoint[] = [
-    {
-      id: '1',
-      name: '万达广场投递点',
-      distance: '0.3km',
-      capacity: 25
-    },
-    {
-      id: '2',
-      name: '社区服务中心',
-      distance: '0.7km',
-      capacity: 68
-    },
-    {
-      id: '3',
-      name: '地铁站投递点',
-      distance: '1.1km',
-      capacity: 92
-    }
-  ];
+  dropPoints: DropPoint[] = [];
   
   // 环保活动数据
-  activities: Activity[] = [
-    {
-      id: '1',
-      tag: '政策公告',
-      title: '新版垃圾分类标准发布',
-      description: '了解最新的垃圾分类要求，正确投放获得更多积分奖励'
-    },
-    {
-      id: '2',
-      tag: '环保活动',
-      title: '地球日特别活动',
-      description: '参与环保知识竞答，赢取丰厚奖品和现金红包'
-    },
-    {
-      id: '3',
-      tag: '积分兑换',
-      title: '积分商城新品上架',
-      description: '环保购物袋、保温杯等实用商品，积分兑换更优惠'
-    }
-  ];
+  activities: Activity[] = [];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private consumerApi: ConsumerApiService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    // 组件初始化时的逻辑
+    // 获取当前位置
+    this.getCurrentLocation();
+    // 加载所有数据
     this.loadUserData();
-    this.loadDynamicData();
+    this.loadNearbyCollectors();
+    this.loadNearbyDropPoints();
+    this.loadActivities();
+  }
+
+  // 获取当前位置
+  private getCurrentLocation(): void {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          this.currentLocation = {
+            longitude: position.coords.longitude,
+            latitude: position.coords.latitude
+          };
+          // 位置获取后重新加载附近数据
+          this.loadNearbyCollectors();
+          this.loadNearbyDropPoints();
+        },
+        (error) => {
+          console.warn('获取位置失败，使用默认位置', error);
+        }
+      );
+    }
   }
 
   // 加载用户数据
   private loadUserData(): void {
-    // 模拟从服务获取用户数据
-    // 实际项目中这里会调用用户服务
-    console.log('Loading user data...');
+    this.loading.user = true;
+    this.consumerApi.getUserStats().subscribe({
+      next: (stats) => {
+        this.userLevel = stats.level || 1;
+        this.levelProgress = stats.levelProgress || 0;
+        this.userPoints = stats.availablePoints || 0;
+        this.userCash = stats.availableCash || 0;
+        this.loading.user = false;
+      },
+      error: (error) => {
+        console.error('加载用户数据失败:', error);
+        this.loading.user = false;
+        // 使用默认值
+        this.userLevel = 1;
+        this.levelProgress = 0;
+        this.userPoints = 0;
+        this.userCash = 0;
+      }
+    });
   }
 
-  // 加载动态数据
-  private loadDynamicData(): void {
-    // 模拟从服务获取动态数据
-    // 实际项目中这里会调用相关服务
-    console.log('Loading dynamic data...');
+  // 加载附近回收员
+  private loadNearbyCollectors(): void {
+    this.loading.collectors = true;
+    this.consumerApi.getNearbyCollectors(
+      this.currentLocation.longitude,
+      this.currentLocation.latitude,
+      5
+    ).subscribe({
+      next: (collectors) => {
+        this.nearbyCollectors = collectors.map(c => ({
+          id: c.id,
+          name: c.name,
+          distance: this.formatDistance(c.distance),
+          status: this.formatStatus(c.status)
+        }));
+        this.loading.collectors = false;
+      },
+      error: (error) => {
+        console.error('加载回收员失败:', error);
+        this.loading.collectors = false;
+        // 使用空数组或模拟数据
+        this.nearbyCollectors = [];
+      }
+    });
+  }
+
+  // 加载附近投递点
+  private loadNearbyDropPoints(): void {
+    this.loading.dropPoints = true;
+    this.consumerApi.getNearbyDropPoints(
+      this.currentLocation.longitude,
+      this.currentLocation.latitude,
+      5
+    ).subscribe({
+      next: (points) => {
+        this.dropPoints = points.map(p => ({
+          id: p.id,
+          name: p.name,
+          distance: this.formatDistance(p.distance),
+          capacity: p.currentVolume ? Math.round((p.currentVolume / p.capacity) * 100) : 0
+        }));
+        this.loading.dropPoints = false;
+      },
+      error: (error) => {
+        console.error('加载投递点失败:', error);
+        this.loading.dropPoints = false;
+        this.dropPoints = [];
+      }
+    });
+  }
+
+  // 加载活动列表
+  private loadActivities(): void {
+    this.loading.activities = true;
+    this.consumerApi.getActivities({ status: 1, limit: 3 }).subscribe({
+      next: (activities) => {
+        this.activities = activities.map(a => ({
+          id: a.id,
+          tag: a.tag || a.type || '活动',
+          title: a.title,
+          description: a.description
+        }));
+        this.loading.activities = false;
+      },
+      error: (error) => {
+        console.error('加载活动失败:', error);
+        this.loading.activities = false;
+        this.activities = [];
+      }
+    });
+  }
+
+  // 格式化距离
+  private formatDistance(distance: number): string {
+    if (distance < 1000) {
+      return `${Math.round(distance)}m`;
+    }
+    return `${(distance / 1000).toFixed(1)}km`;
+  }
+
+  // 格式化状态
+  private formatStatus(status: string): string {
+    const statusMap: any = {
+      'online': '在线',
+      'offline': '离线',
+      'busy': '忙碌'
+    };
+    return statusMap[status] || status;
   }
 
   // 打开通知页面
@@ -221,7 +301,9 @@ export class HomeComponent implements OnInit {
   refreshData(): void {
     console.log('Refreshing data...');
     this.loadUserData();
-    this.loadDynamicData();
+    this.loadNearbyCollectors();
+    this.loadNearbyDropPoints();
+    this.loadActivities();
   }
 
   // 处理用户等级进度更新

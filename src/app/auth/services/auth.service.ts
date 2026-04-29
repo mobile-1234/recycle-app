@@ -313,7 +313,8 @@ export class AuthService {
       id: fmodeUser.id || '',
       account: fmodeUser.username || '',
       name: '',
-      identity: identity
+      identity: identity,
+      token: fmodeUser.getSessionToken() || ''  // ✅ 保存sessionToken
     };
 
     // 获取显示名称

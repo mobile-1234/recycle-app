@@ -4,13 +4,15 @@
     <div class="header-content">
       <div class="logo">
         <span class="logo-icon">♻️</span>
-        <span>智回回收</span>
+        <span>再生视界</span>
       </div>
-      <div class="user-info">
-        <span>企业管理员</span>
+      <div class="user-info" (click)="openAvatarPicker()">
+        <span>{{ userNickname }}</span>
         <div class="avatar">
-          <span>管</span>
+          <img *ngIf="userAvatar" [src]="userAvatar" alt="头像">
+          <span *ngIf="!userAvatar">管</span>
         </div>
+        <i class="fas fa-pencil-alt edit-icon"></i>
       </div>
     </div>
   </header>
@@ -618,11 +620,11 @@
         <div class="about-content">
           <div class="about-logo">
             <span class="logo-icon">♻️</span>
-            <h2>智回回收</h2>
+            <h2>再生视界</h2>
           </div>
           <div class="about-info">
             <p class="about-desc">
-              智回回收是一款智能回收管理平台，致力于为企业提供全面的回收业务解决方案。
+              再生视界是一款智能回收管理平台，致力于为企业提供全面的回收业务解决方案。
               我们通过AI技术和大数据分析，帮助企业提升运营效率，降低成本，实现可持续发展。
             </p>
             <div class="about-stats">
@@ -737,3 +739,14 @@
   </div>
   </nav>
 </div>
+
+<!-- 精美头像选择器 -->
+<app-avatar-picker
+  [visible]="showAvatarPicker"
+  [currentAvatar]="userAvatar"
+  [currentNickname]="userNickname"
+  [userType]="'business'"
+  (visibleChange)="showAvatarPicker = $event"
+  (save)="saveProfile($event)"
+  (cancel)="closeAvatarPicker()"
+></app-avatar-picker>

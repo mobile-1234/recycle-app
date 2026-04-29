@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { BottomNavComponent } from '../../shared/bottom-nav/bottom-nav.component';
+import { AmapService, Location, RecycleStation } from '../../core/services/amap.service';
+import { Subscription } from 'rxjs';
 
 interface WasteCategory {
   id: string;
@@ -55,8 +57,17 @@ interface AdditionalService {
   templateUrl: './booking-recycle.html',
   styleUrl: './booking-recycle.scss'
 })
-export class BookingRecycle implements OnInit {
+export class BookingRecycle implements OnInit, OnDestroy {
   
+  // 高德地图相关
+  currentLocation: Location | null = null;
+  isLocating = false;
+  locationError = '';
+  nearbyStations: RecycleStation[] = [];
+  selectedDropPoint: RecycleStation | null = null;
+  showLocationPicker = false;
+  private subscriptions: Subscription[] = [];
+
   // 废品分类 - 采用简约清新的图标设计（Font Awesome 6.0兼容）
   wasteCategories: WasteCategory[] = [
     { id: 'paper', name: '纸类', icon: 'fas fa-newspaper', active: true },
@@ -123,11 +134,59 @@ export class BookingRecycle implements OnInit {
   // 当前选中的导航标签
   currentTab: string = 'booking';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private amapService: AmapService
+  ) {}
 
   ngOnInit(): void {
     this.calculateEarnings();
     this.loadSavedAddress();
+    
+    // 检查是否从投递点页面跳转过来
+    this.route.queryParams.subscribe(params => {
+      if (params['dropPointId']) {
+        this.selectedDropPoint = {
+          id: params['dropPointId'],
+          name: params['dropPointName'] || '',
+          address: params['dropPointAddress'] || '',
+          location: {
+            lat: parseFloat(params['lat']) || 0,
+            lng: parseFloat(params['lng']) || 0
+          },
+          distance: 0,
+          distanceText: '',
+          status: 'open',
+          types: [],
+          hours: '',
+          phone: '',
+          features: []
+        };
+        // 如果是自助投递模式，切换到该模式
+        this.recycleMethods.forEach(m => m.active = m.id === 'dropoff');
+      }
+    });
+
+    // 订阅位置更新
+    this.subscriptions.push(
+      this.amapService.currentLocation$.subscribe(location => {
+        if (location) {
+          this.currentLocation = location;
+        }
+      })
+    );
+
+    // 订阅附近站点
+    this.subscriptions.push(
+      this.amapService.nearbyStations$.subscribe(stations => {
+        this.nearbyStations = stations;
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   // 选择废品分类
@@ -318,6 +377,62 @@ export class BookingRecycle implements OnInit {
     this.router.navigate(['/consumer/address-management']);
   }
 
+  // 使用当前定位作为地址
+  async useCurrentLocation(): Promise<void> {
+    this.isLocating = true;
+    this.locationError = '';
+
+    try {
+      const location = await this.amapService.getCurrentLocation();
+      this.currentLocation = location;
+      
+      if (location.formattedAddress) {
+        this.address = location.formattedAddress;
+      } else if (location.address) {
+        this.address = location.address;
+      }
+      
+      this.showSuccessToast('已获取当前位置');
+    } catch (error: any) {
+      this.locationError = error.message || '定位失败';
+      console.error('定位失败:', error);
+    } finally {
+      this.isLocating = false;
+    }
+  }
+
+  // 打开位置选择器
+  openLocationPicker(): void {
+    this.showLocationPicker = true;
+    // 如果还没有获取过位置，先获取
+    if (!this.currentLocation) {
+      this.useCurrentLocation();
+    }
+    // 搜索附近站点
+    this.searchNearbyStations();
+  }
+
+  // 关闭位置选择器
+  closeLocationPicker(): void {
+    this.showLocationPicker = false;
+  }
+
+  // 搜索附近回收站点
+  async searchNearbyStations(): Promise<void> {
+    try {
+      await this.amapService.searchNearbyStations('回收站', this.currentLocation || undefined, 5000);
+    } catch (error) {
+      console.error('搜索附近站点失败:', error);
+    }
+  }
+
+  // 选择投递点
+  selectDropPoint(station: RecycleStation): void {
+    this.selectedDropPoint = station;
+    this.closeLocationPicker();
+    this.showSuccessToast(`已选择: ${station.name}`);
+  }
+
   // 加载保存的地址信息
   loadSavedAddress(): void {
     const savedAddresses = localStorage.getItem('userAddresses');
@@ -334,7 +449,12 @@ export class BookingRecycle implements OnInit {
 
   // 导航到投递点
   navigateToPoint(): void {
-    console.log('导航到投递点');
+    if (this.selectedDropPoint) {
+      this.amapService.openAmapNavigation(
+        this.selectedDropPoint.location,
+        this.selectedDropPoint.name
+      );
+    }
   }
 
   // 返回上一页

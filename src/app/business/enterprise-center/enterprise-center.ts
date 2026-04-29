@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { AvatarPickerComponent } from '../../shared/avatar-picker/avatar-picker.component';
+import { BusinessApiService } from '../../core/services/business-api.service';
 
 interface Employee {
   id: string;
@@ -35,11 +37,11 @@ interface Plan {
 @Component({
   selector: 'app-enterprise-center',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, AvatarPickerComponent],
   templateUrl: './enterprise-center.html',
   styleUrl: './enterprise-center.scss'
 })
-export class EnterpriseCenter {
+export class EnterpriseCenter implements OnInit {
   activeTab: 'info' | 'employee' | 'contract' | 'subscription' | 'settings' = 'info';
   
   // 模态框控制
@@ -49,9 +51,15 @@ export class EnterpriseCenter {
   showHelpModal = false;
   showAboutModal = false;
   showLoginHistoryModal = false;
+  showAvatarPicker = false;  // 头像选择器
   
   // 选中的套餐
   selectedPlan: Plan | null = null;
+  
+  // 用户个人信息
+  userNickname = '企业管理员';
+  userAvatar = '';
+  userAvatarIndex = 1;
 
   // 企业信息
   enterpriseInfo = {
@@ -357,5 +365,129 @@ export class EnterpriseCenter {
     }
   }
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private businessApi: BusinessApiService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadUserProfile();
+  }
+
+  /**
+   * 加载用户个人资料
+   */
+  loadUserProfile(): void {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        this.userNickname = user.nickname || user.name || '企业管理员';
+        this.userAvatar = user.avatar || '';
+        this.userAvatarIndex = user.avatarIndex || 1;
+      } catch (e) {
+        console.error('解析用户信息失败', e);
+      }
+    }
+
+    this.businessApi.getUserProfile().subscribe({
+      next: (user) => {
+        if (user) {
+          this.userNickname = user.nickname || '企业管理员';
+          this.userAvatar = user.avatar || '';
+          this.userAvatarIndex = user.avatarIndex || 1;
+          this.updateLocalStorage({ 
+            nickname: this.userNickname, 
+            avatar: this.userAvatar,
+            avatarIndex: this.userAvatarIndex 
+          });
+        }
+      },
+      error: (err) => console.error('加载用户资料失败:', err)
+    });
+  }
+
+  /**
+   * 打开头像选择器
+   */
+  openAvatarPicker(): void {
+    this.showAvatarPicker = true;
+  }
+
+  /**
+   * 关闭头像选择器
+   */
+  closeAvatarPicker(): void {
+    this.showAvatarPicker = false;
+  }
+
+  /**
+   * 保存头像和昵称
+   */
+  saveProfile(data: { avatar: string; avatarIndex: number; nickname: string }): void {
+    this.businessApi.updateProfile({
+      nickname: data.nickname,
+      avatar: data.avatar,
+      avatarIndex: data.avatarIndex
+    }).subscribe({
+      next: () => {
+        this.userNickname = data.nickname;
+        this.userAvatar = data.avatar;
+        this.userAvatarIndex = data.avatarIndex;
+        this.updateLocalStorage(data);
+        this.showAvatarPicker = false;
+        this.showToast('资料保存成功！');
+      },
+      error: (err) => {
+        console.error('保存失败:', err);
+        this.userNickname = data.nickname;
+        this.userAvatar = data.avatar;
+        this.userAvatarIndex = data.avatarIndex;
+        this.updateLocalStorage(data);
+        this.showAvatarPicker = false;
+        this.showToast('资料已保存到本地');
+      }
+    });
+  }
+
+  /**
+   * 更新本地存储
+   */
+  private updateLocalStorage(data: { nickname?: string; avatar?: string; avatarIndex?: number }): void {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        if (data.nickname) user.nickname = data.nickname;
+        if (data.nickname) user.name = data.nickname;
+        if (data.avatar) user.avatar = data.avatar;
+        if (data.avatarIndex) user.avatarIndex = data.avatarIndex;
+        localStorage.setItem('currentUser', JSON.stringify(user));
+      } catch (e) {
+        console.error('更新本地存储失败', e);
+      }
+    }
+  }
+
+  /**
+   * 显示提示消息
+   */
+  private showToast(message: string): void {
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.cssText = `
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-size: 14px;
+      z-index: 10001;
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+  }
 }

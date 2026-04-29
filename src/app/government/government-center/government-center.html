@@ -2,7 +2,14 @@
   <header class="header">
     <div class="header-content">
       <div class="logo"><span class="logo-icon">🏛️</span><span>智回监管</span></div>
-      <div class="user-info"><span>政府管理员</span><div class="avatar"><span>政</span></div></div>
+      <div class="user-info" (click)="openAvatarPickerModal()">
+        <span>{{ governmentInfo.name }}</span>
+        <div class="avatar">
+          <img *ngIf="governmentInfo.avatar" [src]="governmentInfo.avatar" alt="头像">
+          <span *ngIf="!governmentInfo.avatar">政</span>
+        </div>
+        <i class="fas fa-pencil-alt edit-icon"></i>
+      </div>
     </div>
   </header>
 
@@ -22,7 +29,7 @@
       <!-- 个人信息 -->
       <div *ngIf="activeTab === 'profile'" class="profile-section">
         <div class="profile-card">
-          <div class="avatar-section" (click)="openAvatarModal()">
+          <div class="avatar-section" (click)="openAvatarPickerModal()">
             <div class="avatar-wrapper">
               <img *ngIf="governmentInfo.avatar" [src]="governmentInfo.avatar" alt="头像" class="avatar-img">
               <div *ngIf="!governmentInfo.avatar" class="avatar-placeholder">
@@ -228,8 +235,8 @@
     </div>
   </div>
 
-  <!-- 头像上传弹窗 -->
-  <div class="modal-overlay" [class.show]="showAvatarModal" (click)="closeAvatarModal()">
+  <!-- 头像上传弹窗（旧版，已替换为精美头像选择器） -->
+  <div class="modal-overlay" [class.show]="showAvatarModal" (click)="closeAvatarModal()" style="display: none;">
     <div class="modal-content avatar-modal" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3 class="modal-title">更换头像</h3>
@@ -429,3 +436,14 @@
     <div class="nav-item active"><div class="nav-icon">⚙️</div><div>政务</div></div>
   </nav>
 </div>
+
+<!-- 精美头像选择器 -->
+<app-avatar-picker
+  [visible]="showAvatarPicker"
+  [currentAvatar]="governmentInfo.avatar"
+  [currentNickname]="governmentInfo.name"
+  [userType]="'government'"
+  (visibleChange)="showAvatarPicker = $event"
+  (save)="saveAvatarProfile($event)"
+  (cancel)="closeAvatarPickerModal()"
+></app-avatar-picker>

@@ -1,10 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
+import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { AmapService } from '../../core/services/amap.service';
+import { BusinessApiService } from '../../core/services/business-api.service';
+
+// 声明高德地图全局变量
+declare const AMap: any;
 
 interface LocationData {
   id: string;
@@ -15,6 +20,7 @@ interface LocationData {
   capacity: number;
   status: 'normal' | 'warning' | 'critical';
   lastUpdate: string;
+  coordinates?: [number, number]; // [经度, 纬度]
 }
 
 interface ChartData {
@@ -40,17 +46,43 @@ interface TrendData {
 @Component({
   selector: 'app-data-reports',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, NgIf, NgFor],
   templateUrl: './data-reports.html',
   styleUrl: './data-reports.scss'
 })
-export class DataReports implements OnInit {
+export class DataReports implements OnInit, AfterViewInit, OnDestroy {
   reportType: 'business' | 'environmental' | 'government' = 'business';
   timeRange: 'today' | 'week' | 'month' | 'year' = 'month';
   showMonitorModal = false;
   currentNav = 'reports'; // 当前导航项
   showCompareModal = false; // 数据对比弹窗
   compareTimeRange: 'today' | 'week' | 'month' | 'year' = 'week'; // 对比时间范围
+
+  // 地图相关
+  showMapModal = false;
+  private map: any = null;
+  private markers: any[] = [];
+  private infoWindow: any = null;
+  mapLoadError = false;
+  mapLoading = false;
+
+  // AI图表生成相关
+  showAIModal = false;
+  aiPrompt = '';
+  aiGenerating = false;
+  aiChartData: any = null;
+  aiChartType: 'bar' | 'line' | 'pie' | 'area' = 'bar';
+  aiAnalysisResult = '';
+
+  // AI分析来源标识
+  isRealAI = false;
+  aiNote = '';
+
+  constructor(
+    private router: Router, 
+    private amapService: AmapService,
+    private businessApi: BusinessApiService
+  ) {}
 
   // 地点监控数据
   locations: LocationData[] = [
@@ -62,7 +94,8 @@ export class DataReports implements OnInit {
       recycleVolume: 680,
       capacity: 1000,
       status: 'warning',
-      lastUpdate: '2分钟前'
+      lastUpdate: '2分钟前',
+      coordinates: [116.480983, 40.002102]
     },
     {
       id: 'LOC-002',
@@ -72,7 +105,8 @@ export class DataReports implements OnInit {
       recycleVolume: 750,
       capacity: 1000,
       status: 'critical',
-      lastUpdate: '5分钟前'
+      lastUpdate: '5分钟前',
+      coordinates: [116.468695, 39.928255]
     },
     {
       id: 'LOC-003',
@@ -82,7 +116,8 @@ export class DataReports implements OnInit {
       recycleVolume: 380,
       capacity: 1000,
       status: 'normal',
-      lastUpdate: '10分钟前'
+      lastUpdate: '10分钟前',
+      coordinates: [116.310003, 39.984154]
     },
     {
       id: 'LOC-004',
@@ -92,7 +127,8 @@ export class DataReports implements OnInit {
       recycleVolume: 580,
       capacity: 1000,
       status: 'normal',
-      lastUpdate: '15分钟前'
+      lastUpdate: '15分钟前',
+      coordinates: [116.352792, 39.945428]
     },
     {
       id: 'LOC-005',
@@ -102,7 +138,8 @@ export class DataReports implements OnInit {
       recycleVolume: 820,
       capacity: 1000,
       status: 'critical',
-      lastUpdate: '3分钟前'
+      lastUpdate: '3分钟前',
+      coordinates: [116.461937, 39.909175]
     },
     {
       id: 'LOC-006',
@@ -112,12 +149,193 @@ export class DataReports implements OnInit {
       recycleVolume: 600,
       capacity: 1000,
       status: 'normal',
-      lastUpdate: '8分钟前'
+      lastUpdate: '8分钟前',
+      coordinates: [116.298566, 39.959912]
     }
   ];
 
   ngOnInit() {
     // 初始化数据
+  }
+
+  ngAfterViewInit(): void {}
+
+  ngOnDestroy(): void {
+    this.destroyMap();
+  }
+
+  // 打开地图监控弹窗
+  openMapMonitor(): void {
+    this.showMapModal = true;
+    this.mapLoadError = false;
+    this.mapLoading = true;
+    setTimeout(() => this.initMap(), 300);
+  }
+
+  // 关闭地图监控弹窗
+  closeMapMonitor(): void {
+    this.showMapModal = false;
+    this.destroyMap();
+  }
+
+  // 初始化地图
+  private initMap(): void {
+    if (this.map) {
+      this.mapLoading = false;
+      return;
+    }
+
+    const container = document.getElementById('location-map-container');
+    if (!container) {
+      console.error('地图容器不存在');
+      this.mapLoadError = true;
+      this.mapLoading = false;
+      return;
+    }
+
+    // 确保容器有尺寸
+    container.style.width = '100%';
+    container.style.height = '350px';
+
+    try {
+      // 检查AMap是否已加载
+      if (typeof AMap === 'undefined') {
+        console.error('高德地图API未加载');
+        this.mapLoadError = true;
+        this.mapLoading = false;
+        return;
+      }
+
+      this.map = new AMap.Map('location-map-container', {
+        zoom: 11,
+        center: [116.397428, 39.90923],
+        viewMode: '2D',
+        resizeEnable: true
+      });
+
+      this.map.on('complete', () => {
+        this.mapLoading = false;
+        this.addLocationMarkers();
+      });
+
+      AMap.plugin(['AMap.ToolBar', 'AMap.Scale'], () => {
+        if (this.map) {
+          this.map.addControl(new AMap.ToolBar({ position: 'RB' }));
+          this.map.addControl(new AMap.Scale({ position: 'LB' }));
+        }
+      });
+    } catch (error) {
+      console.error('初始化地图失败:', error);
+      this.mapLoadError = true;
+      this.mapLoading = false;
+    }
+  }
+
+  // 添加监控点标记
+  private addLocationMarkers(): void {
+    this.clearMarkers();
+
+    this.locations.forEach(location => {
+      if (!location.coordinates) return;
+
+      const marker = new AMap.Marker({
+        position: new AMap.LngLat(location.coordinates[0], location.coordinates[1]),
+        title: location.name,
+        icon: this.getLocationMarkerIcon(location.status),
+        offset: new AMap.Pixel(-15, -30)
+      });
+
+      marker.on('click', () => {
+        this.showLocationInfoWindow(location, marker);
+      });
+
+      this.map.add(marker);
+      this.markers.push(marker);
+    });
+
+    if (this.markers.length > 0) {
+      this.map.setFitView(this.markers);
+    }
+  }
+
+  // 获取监控点图标
+  private getLocationMarkerIcon(status: string): any {
+    const colors: { [key: string]: string } = {
+      'normal': '#4CAF50',
+      'warning': '#FF9800',
+      'critical': '#F44336'
+    };
+    const color = colors[status] || '#9E9E9E';
+
+    return new AMap.Icon({
+      size: new AMap.Size(30, 40),
+      image: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="40" viewBox="0 0 30 40">
+          <path d="M15 0C6.716 0 0 6.716 0 15c0 8.284 15 25 15 25s15-16.716 15-25C30 6.716 23.284 0 15 0z" fill="${color}"/>
+          <circle cx="15" cy="15" r="8" fill="white"/>
+          <text x="15" y="19" text-anchor="middle" font-size="10" fill="${color}">📍</text>
+        </svg>
+      `)}`,
+      imageSize: new AMap.Size(30, 40)
+    });
+  }
+
+  // 显示监控点信息窗口
+  private showLocationInfoWindow(location: LocationData, marker: any): void {
+    if (this.infoWindow) {
+      this.infoWindow.close();
+    }
+
+    const usagePercent = Math.round((location.wasteVolume / location.capacity) * 100);
+    const content = `
+      <div style="padding: 10px; min-width: 200px;">
+        <h4 style="margin: 0 0 10px; color: #333;">${this.getLocationIcon(location.type)} ${location.name}</h4>
+        <p style="margin: 5px 0; font-size: 13px; color: #666;">
+          <strong>废品量:</strong> ${location.wasteVolume}kg / ${location.capacity}kg (${usagePercent}%)
+        </p>
+        <p style="margin: 5px 0; font-size: 13px; color: #666;">
+          <strong>回收量:</strong> ${location.recycleVolume}kg
+        </p>
+        <p style="margin: 5px 0; font-size: 13px; color: #666;">
+          <strong>状态:</strong> 
+          <span style="color: ${this.getStatusColor(location.status)};">${this.getStatusText(location.status)}</span>
+        </p>
+        <p style="margin: 5px 0; font-size: 12px; color: #999;">
+          更新: ${location.lastUpdate}
+        </p>
+      </div>
+    `;
+
+    this.infoWindow = new AMap.InfoWindow({
+      content: content,
+      offset: new AMap.Pixel(0, -30)
+    });
+
+    this.infoWindow.open(this.map, marker.getPosition());
+  }
+
+  // 获取状态颜色
+  private getStatusColor(status: string): string {
+    const colors: { [key: string]: string } = {
+      'normal': '#4CAF50',
+      'warning': '#FF9800',
+      'critical': '#F44336'
+    };
+    return colors[status] || '#9E9E9E';
+  }
+
+  // 清除标记
+  private clearMarkers(): void {
+    this.markers.forEach(marker => this.map.remove(marker));
+    this.markers = [];
+  }
+
+  // 销毁地图
+  private destroyMap(): void {
+    if (this.map) {
+      this.map.destroy();
+      this.map = null;
+    }
   }
 
   // 根据时间范围获取统计卡片数据
@@ -602,5 +820,180 @@ export class DataReports implements OnInit {
     }
   }
 
-  constructor(private router: Router) {}
+  // ==================== AI智能图表生成功能 ====================
+
+  // 打开AI图表生成弹窗
+  openAIChartModal(): void {
+    this.showAIModal = true;
+    this.aiPrompt = '';
+    this.aiChartData = null;
+    this.aiAnalysisResult = '';
+  }
+
+  // 关闭AI图表弹窗
+  closeAIChartModal(): void {
+    this.showAIModal = false;
+  }
+
+  // AI生成图表 - 调用真实后端API
+  generateAIChart(): void {
+    if (!this.aiPrompt.trim()) {
+      alert('请输入分析需求');
+      return;
+    }
+
+    this.aiGenerating = true;
+    this.aiAnalysisResult = '';
+    this.isRealAI = false;
+    this.aiNote = '';
+
+    // 调用后端AI分析接口
+    this.businessApi.aiAnalyze(this.aiPrompt).subscribe({
+      next: (response: any) => {
+        if (response && response.data) {
+          const data = response.data;
+          
+          // 设置图表类型
+          this.aiChartType = data.chartType || 'bar';
+          
+          // 设置图表数据
+          this.aiChartData = data.chartData;
+          
+          // 设置分析报告
+          this.aiAnalysisResult = data.analysis || '';
+          
+          // 标识是否为真实AI
+          this.isRealAI = data.isAI === true;
+          this.aiNote = data.aiNote || '';
+        }
+        this.aiGenerating = false;
+      },
+      error: (err: any) => {
+        console.error('AI分析请求失败:', err);
+        // 失败时使用本地模拟
+        this.aiChartData = this.generateChartFromPrompt(this.aiPrompt);
+        this.aiAnalysisResult = this.generateAnalysisReport(this.aiPrompt);
+        this.isRealAI = false;
+        this.aiNote = '网络请求失败，显示本地模拟数据';
+        this.aiGenerating = false;
+      }
+    });
+  }
+
+  // 根据用户输入生成图表数据
+  private generateChartFromPrompt(prompt: string): any {
+    const lowerPrompt = prompt.toLowerCase();
+    
+    // 根据关键词判断图表类型和数据
+    if (lowerPrompt.includes('趋势') || lowerPrompt.includes('走势') || lowerPrompt.includes('变化')) {
+      this.aiChartType = 'line';
+      return {
+        labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+        datasets: [{
+          label: '回收量(吨)',
+          data: [65, 78, 90, 81, 95, 110],
+          color: '#4CAF50'
+        }, {
+          label: '收入(万元)',
+          data: [35, 42, 50, 45, 55, 62],
+          color: '#2196F3'
+        }]
+      };
+    } else if (lowerPrompt.includes('占比') || lowerPrompt.includes('比例') || lowerPrompt.includes('分布')) {
+      this.aiChartType = 'pie';
+      return {
+        labels: ['塑料', '纸类', '金属', '玻璃', '纺织品', '其他'],
+        data: [35, 28, 18, 10, 5, 4],
+        colors: ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#00BCD4', '#607D8B']
+      };
+    } else if (lowerPrompt.includes('对比') || lowerPrompt.includes('比较')) {
+      this.aiChartType = 'bar';
+      return {
+        labels: ['朝阳区', '海淀区', '西城区', '东城区', '丰台区'],
+        datasets: [{
+          label: '本月',
+          data: [120, 95, 80, 70, 65],
+          color: '#4CAF50'
+        }, {
+          label: '上月',
+          data: [100, 85, 75, 65, 55],
+          color: '#90CAF9'
+        }]
+      };
+    } else {
+      this.aiChartType = 'bar';
+      return {
+        labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+        datasets: [{
+          label: '日均回收量(kg)',
+          data: [850, 920, 780, 1050, 980, 1200, 650],
+          color: '#4CAF50'
+        }]
+      };
+    }
+  }
+
+  // 生成AI分析报告
+  private generateAnalysisReport(prompt: string): string {
+    const reports: { [key: string]: string } = {
+      '趋势': `📊 **趋势分析报告**\n\n根据近6个月数据分析：\n\n1. **回收量趋势**: 整体呈上升态势，月均增长率约12.3%\n2. **收入趋势**: 与回收量正相关，月均增长约15.8%\n3. **峰值分析**: 6月达到最高值110吨，环比增长15.8%\n4. **建议**: 加大夏季回收力度，预计Q3将持续增长`,
+      '占比': `📊 **品类分布分析**\n\n当前回收品类构成：\n\n1. **塑料类(35%)**: 主要来源为社区和商超\n2. **纸类(28%)**: 办公区域贡献最大\n3. **金属(18%)**: 具有较高单价值\n4. **其他(19%)**: 包括玻璃、纺织品等\n\n**建议**: 可针对塑料和纸类进行专项回收活动`,
+      '对比': `📊 **区域对比分析**\n\n各区域回收表现对比：\n\n1. **朝阳区**: 领先第一，增长20%\n2. **海淀区**: 稳步增长，潜力大\n3. **西城区**: 增速放缓，需关注\n\n**建议**: 海淀区可增加回收点密度，挖掘增长潜力`
+    };
+
+    for (const key in reports) {
+      if (prompt.includes(key)) {
+        return reports[key];
+      }
+    }
+
+    return `📊 **数据分析报告**\n\n基于您的查询"${prompt}"，AI已为您生成相关图表和分析：\n\n1. **数据概况**: 本周日均回收量约920kg\n2. **高峰时段**: 周六达到峰值1200kg\n3. **低谷时段**: 周日最低650kg\n4. **环比变化**: 整体增长8.5%\n\n**智能建议**: 建议周末安排更多回收人员，提升服务响应速度。`;
+  }
+
+  // 获取图表最大值
+  getChartMax(data: number[]): number {
+    return Math.max(...data) * 1.2;
+  }
+
+  // 计算饼图路径
+  getPieSlicePath(index: number, data: number[]): string {
+    const total = data.reduce((a, b) => a + b, 0);
+    let startAngle = -90;
+    for (let i = 0; i < index; i++) {
+      startAngle += (data[i] / total) * 360;
+    }
+    const angle = (data[index] / total) * 360;
+    const endAngle = startAngle + angle;
+    
+    const startRad = (startAngle * Math.PI) / 180;
+    const endRad = (endAngle * Math.PI) / 180;
+    
+    const x1 = 100 + 80 * Math.cos(startRad);
+    const y1 = 100 + 80 * Math.sin(startRad);
+    const x2 = 100 + 80 * Math.cos(endRad);
+    const y2 = 100 + 80 * Math.sin(endRad);
+    
+    const largeArc = angle > 180 ? 1 : 0;
+    
+    return `M 100 100 L ${x1} ${y1} A 80 80 0 ${largeArc} 1 ${x2} ${y2} Z`;
+  }
+
+  // 生成折线图的points属性
+  getLineChartPoints(data: number[]): string {
+    const max = this.getChartMax(data);
+    return data.map((v, i) => `${35 + i * 55},${160 - (v / max) * 130}`).join(' ');
+  }
+
+  // 快捷AI分析按钮
+  quickAIAnalysis(type: string): void {
+    const prompts: { [key: string]: string } = {
+      'trend': '分析近6个月回收量和收入的趋势变化',
+      'category': '分析当前各品类回收占比分布情况',
+      'region': '对比各区域回收量表现',
+      'forecast': '预测下个月的回收量走势'
+    };
+    this.aiPrompt = prompts[type] || '';
+    this.generateAIChart();
+  }
+
 }

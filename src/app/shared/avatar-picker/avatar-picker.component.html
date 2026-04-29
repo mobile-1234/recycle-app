@@ -1,0 +1,101 @@
+<div class="avatar-picker-overlay" *ngIf="visible" (click)="onBackdropClick($event)">
+  <div class="avatar-picker-modal">
+    <!-- 头部 -->
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <i class="fas fa-user-circle"></i>
+        编辑个人资料
+      </h3>
+      <button class="close-btn" (click)="close()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- 预览区域 -->
+    <div class="preview-section">
+      <div class="avatar-preview" [class.custom]="isCustomAvatar">
+        <img [src]="customAvatarUrl" alt="自定义头像" *ngIf="isCustomAvatar && customAvatarUrl">
+        <img [src]="getSelectedAvatar()?.url" alt="头像预览" *ngIf="!isCustomAvatar && getSelectedAvatar()">
+        <div class="avatar-placeholder" *ngIf="!isCustomAvatar && !getSelectedAvatar()">
+          <i class="fas fa-user"></i>
+        </div>
+      </div>
+      <div class="nickname-input">
+        <label>昵称</label>
+        <input 
+          type="text" 
+          [(ngModel)]="nickname" 
+          [placeholder]="getDefaultNickname()"
+          maxlength="20"
+        >
+        <span class="char-count">{{ nickname.length }}/20</span>
+      </div>
+    </div>
+
+    <!-- 头像分类标签 -->
+    <div class="category-tabs">
+      <button 
+        *ngFor="let cat of categories" 
+        class="category-tab"
+        [class.active]="activeCategory === cat.id"
+        (click)="selectCategory(cat.id)"
+      >
+        {{ cat.name }}
+      </button>
+    </div>
+
+    <!-- 上传头像区域 -->
+    <div class="upload-section" *ngIf="activeCategory === 'upload'">
+      <div class="upload-area">
+        <label class="upload-box">
+          <input type="file" accept="image/*" (change)="onFileSelect($event)" style="display: none;">
+          <div class="upload-content">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>点击或拖拽上传图片</p>
+            <span>支持 JPG、PNG、GIF，最大 5MB</span>
+          </div>
+        </label>
+        
+        <!-- 已上传的自定义头像预览 -->
+        <div class="custom-avatar-preview" *ngIf="customAvatarUrl">
+          <img [src]="customAvatarUrl" alt="已上传头像">
+          <div class="preview-actions">
+            <button class="use-btn" [class.active]="isCustomAvatar" (click)="useCustomAvatar()">
+              <i class="fas fa-check"></i>
+              {{ isCustomAvatar ? '已选用' : '使用此头像' }}
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="upload-tips">
+        <p><i class="fas fa-info-circle"></i> 提示：建议上传正方形图片以获得最佳显示效果</p>
+      </div>
+    </div>
+
+    <!-- 头像网格 -->
+    <div class="avatar-grid" *ngIf="activeCategory !== 'upload'">
+      <div 
+        *ngFor="let avatar of filteredAvatars" 
+        class="avatar-item"
+        [class.selected]="!isCustomAvatar && selectedAvatarIndex === avatar.id"
+        (click)="selectAvatar(avatar)"
+      >
+        <img [src]="avatar.url" [alt]="avatar.name">
+        <div class="avatar-name">{{ avatar.name }}</div>
+        <div class="check-mark" *ngIf="!isCustomAvatar && selectedAvatarIndex === avatar.id">
+          <i class="fas fa-check"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部按钮 -->
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="close()">取消</button>
+      <button class="btn-save" (click)="onSave()" [disabled]="!nickname.trim()">
+        <i class="fas fa-save"></i>
+        保存更改
+      </button>
+    </div>
+  </div>
+</div>

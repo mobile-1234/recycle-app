@@ -4,6 +4,7 @@ com\recycle\entity\CheckinRecord.class
 com\recycle\service\impl\BusinessTodoServiceImpl.class
 com\recycle\service\NotificationService.class
 com\recycle\service\impl\NotificationSettingServiceImpl.class
+com\recycle\controller\business\BusinessUserController.class
 com\recycle\entity\StatisticsReport.class
 com\recycle\entity\Activity.class
 com\recycle\mapper\CollectorMapper.class
@@ -100,6 +101,7 @@ com\recycle\config\SwaggerConfig$1.class
 com\recycle\mapper\BusinessTodoMapper.class
 com\recycle\service\impl\MonitoringLocationServiceImpl.class
 com\recycle\service\impl\CollectorServiceImpl.class
+com\recycle\controller\government\GovernmentUserController.class
 com\recycle\service\impl\RiskAssessmentServiceImpl.class
 com\recycle\entity\RecycleOrder.class
 com\recycle\service\EnterpriseEmployeeService.class

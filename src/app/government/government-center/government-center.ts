@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { AvatarPickerComponent } from '../../shared/avatar-picker/avatar-picker.component';
+import { GovernmentApiService } from '../../core/services/government-api.service';
 
 interface GovernmentInfo {
   name: string;
@@ -29,14 +31,15 @@ interface Region {
 @Component({
   selector: 'app-government-center',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, AvatarPickerComponent],
   templateUrl: './government-center.html',
   styleUrl: './government-center.scss'
 })
-export class GovernmentCenter {
+export class GovernmentCenter implements OnInit {
   activeTab: 'region' | 'user' | 'notice' | 'log' | 'settings' | 'profile' = 'profile';
   showProfileModal = false;
-  showAvatarModal = false;
+  showAvatarPicker = false;  // 精美头像选择器
+  showAvatarModal = false;   // 旧版头像上传弹窗
   showRegionModal = false;
   showAddRegionModal = false;
   selectedRegion: Region | null = null;
@@ -274,7 +277,8 @@ export class GovernmentCenter {
 
   // 打开头像上传弹窗
   openAvatarModal(): void {
-    this.showAvatarModal = true;
+    // 使用新的精美头像选择器
+    this.showAvatarPicker = true;
   }
 
   // 关闭头像上传弹窗
@@ -303,11 +307,128 @@ export class GovernmentCenter {
     this.closeAvatarModal();
   }
 
-  constructor(private router: Router) {
-    // 从localStorage加载政府信息
+  /**
+   * 打开精美头像选择器
+   */
+  openAvatarPickerModal(): void {
+    this.showAvatarPicker = true;
+  }
+
+  /**
+   * 关闭头像选择器
+   */
+  closeAvatarPickerModal(): void {
+    this.showAvatarPicker = false;
+  }
+
+  /**
+   * 保存头像和昵称（从精美头像选择器）
+   */
+  constructor(
+    private router: Router,
+    private governmentApi: GovernmentApiService
+  ) {
+    // 从 localStorage加载政府信息
     const savedInfo = localStorage.getItem('governmentInfo');
     if (savedInfo) {
       this.governmentInfo = JSON.parse(savedInfo);
     }
+  }
+
+  ngOnInit(): void {
+    this.loadUserProfile();
+  }
+
+  /**
+   * 加载用户个人资料
+   */
+  loadUserProfile(): void {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        if (user.nickname) this.governmentInfo.name = user.nickname;
+        if (user.avatar) this.governmentInfo.avatar = user.avatar;
+      } catch (e) {
+        console.error('解析用户信息失败', e);
+      }
+    }
+
+    this.governmentApi.getUserInfo().subscribe({
+      next: (user) => {
+        if (user) {
+          this.governmentInfo.name = user.nickname || '政府管理员';
+          this.governmentInfo.avatar = user.avatar || '';
+        }
+      },
+      error: (err: any) => console.error('加载用户资料失败:', err)
+    });
+  }
+
+  saveAvatarProfile(data: { avatar: string; avatarIndex: number; nickname: string }): void {
+    this.governmentApi.updateProfile({
+      nickname: data.nickname,
+      avatar: data.avatar,
+      avatarIndex: data.avatarIndex
+    }).subscribe({
+      next: () => {
+        this.governmentInfo.name = data.nickname;
+        this.governmentInfo.avatar = data.avatar;
+        this.updateLocalStorageG(data);
+        localStorage.setItem('governmentInfo', JSON.stringify(this.governmentInfo));
+        this.showAvatarPicker = false;
+        this.showToastG('资料保存成功！');
+      },
+      error: (err: any) => {
+        console.error('保存失败:', err);
+        this.governmentInfo.name = data.nickname;
+        this.governmentInfo.avatar = data.avatar;
+        this.updateLocalStorageG(data);
+        localStorage.setItem('governmentInfo', JSON.stringify(this.governmentInfo));
+        this.showAvatarPicker = false;
+        this.showToastG('资料已保存到本地');
+      }
+    });
+  }
+
+  /**
+   * 更新本地存储
+   */
+  private updateLocalStorageG(data: { nickname?: string; avatar?: string; avatarIndex?: number }): void {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        if (data.nickname) user.nickname = data.nickname;
+        if (data.nickname) user.name = data.nickname;
+        if (data.avatar) user.avatar = data.avatar;
+        if (data.avatarIndex) user.avatarIndex = data.avatarIndex;
+        localStorage.setItem('currentUser', JSON.stringify(user));
+      } catch (e) {
+        console.error('更新本地存储失败', e);
+      }
+    }
+  }
+
+  /**
+   * 显示提示消息
+   */
+  private showToastG(message: string): void {
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.cssText = `
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-size: 14px;
+      z-index: 10001;
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
   }
 }

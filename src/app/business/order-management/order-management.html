@@ -4,7 +4,7 @@
     <div class="header-content">
       <div class="logo">
         <span class="logo-icon">♻️</span>
-        <span>智回回收</span>
+        <span>再生视界</span>
       </div>
       <div class="user-info">
         <span>企业管理员</span>
@@ -19,7 +19,13 @@
   <main class="content">
     <div class="container">
       <section id="order-management">
-        <h2 class="section-title">订单管理</h2>
+        <div class="section-header">
+          <h2 class="section-title">订单管理</h2>
+          <button class="view-toggle-btn" (click)="toggleViewMode()">
+            <i class="fas" [class.fa-map-marked-alt]="viewMode === 'list'" [class.fa-list]="viewMode === 'map'"></i>
+            {{ viewMode === 'list' ? '地图视图' : '列表视图' }}
+          </button>
+        </div>
         
         <!-- 筛选和搜索栏 -->
         <div class="filter-search-bar">
@@ -65,13 +71,36 @@
           </div>
         </div>
         
+        <!-- 地图视图 -->
+        <div class="map-view" *ngIf="viewMode === 'map'">
+          <div id="order-map-container" class="map-container"></div>
+          <div class="map-legend">
+            <div class="legend-item">
+              <span class="legend-dot pending"></span>
+              <span>待分配</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot in-progress"></span>
+              <span>回收中</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot completed"></span>
+              <span>已完成</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot cancelled"></span>
+              <span>已取消</span>
+            </div>
+          </div>
+        </div>
+
         <!-- 订单列表 -->
-        <div class="order-list">
+        <div class="order-list" *ngIf="viewMode === 'list'">
           <div 
             *ngFor="let order of filteredOrders" 
             class="order-item"
             (click)="openOrderDetail(order)">
-  <div class="order-header">
+            <div class="order-header">
               <div class="order-id">{{ order.id }}</div>
               <div class="order-status" [ngClass]="getStatusClass(order.status)">
                 {{ getStatusText(order.status) }}

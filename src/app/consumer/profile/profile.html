@@ -2,13 +2,14 @@
 <div class="header">
   <div class="back-btn" (click)="goBack()"><i class="fas fa-arrow-left"></i></div>
   <div class="header-title">个人中心</div>
-  <div class="edit-profile" (click)="openEditModal()"><i class="fas fa-cog"></i></div>
+  <div class="edit-profile" (click)="openAvatarPicker()"><i class="fas fa-cog"></i></div>
   
   <div class="avatar-container">
-    <div class="avatar" id="userAvatar">
-      <i class="fas fa-user"></i>
+    <div class="avatar" id="userAvatar" (click)="openAvatarPicker()">
+      <img *ngIf="userAvatar" [src]="userAvatar" alt="头像">
+      <i *ngIf="!userAvatar" class="fas fa-user"></i>
     </div>
-    <div class="avatar-edit" (click)="openEditModal()">
+    <div class="avatar-edit" (click)="openAvatarPicker()">
       <i class="fas fa-pencil-alt"></i>
     </div>
   </div>
@@ -183,31 +184,16 @@
   </div>
 </div>
 
-<!-- 编辑资料模态框 -->
-<div class="modal" [style.display]="showEdit ? 'flex' : 'none'" (click)="closeEditModal($event)">
-  <div class="modal-content">
-    <div class="modal-title">编辑资料</div>
-    <div class="edit-form">
-      <div class="form-group">
-        <label class="form-label">昵称</label>
-        <input class="form-input" [(ngModel)]="userName" placeholder="请输入昵称" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">头像</label>
-        <div class="avatar-options">
-          <div class="avatar-option avatar-1" [class.active]="selectedAvatar === 1" (click)="selectAvatar(1)"><i class="fas fa-user"></i></div>
-          <div class="avatar-option avatar-2" [class.active]="selectedAvatar === 2" (click)="selectAvatar(2)"><i class="fas fa-user"></i></div>
-          <div class="avatar-option avatar-3" [class.active]="selectedAvatar === 3" (click)="selectAvatar(3)"><i class="fas fa-user"></i></div>
-          <div class="avatar-option avatar-4" [class.active]="selectedAvatar === 4" (click)="selectAvatar(4)"><i class="fas fa-user"></i></div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-buttons">
-      <button class="modal-btn cancel" (click)="showEdit = false">取消</button>
-      <button class="modal-btn confirm" (click)="saveProfile()">保存</button>
-    </div>
-  </div>
-</div>
+<!-- 精美头像选择器 -->
+<app-avatar-picker
+  [visible]="showAvatarPicker"
+  [currentAvatar]="userAvatar"
+  [currentNickname]="userName"
+  [userType]="'consumer'"
+  (visibleChange)="showAvatarPicker = $event"
+  (save)="saveProfile($event)"
+  (cancel)="closeAvatarPicker()"
+></app-avatar-picker>
 
 <!-- 底部统一导航 -->
 <app-bottom-nav [activeTab]="'profile'"></app-bottom-nav>

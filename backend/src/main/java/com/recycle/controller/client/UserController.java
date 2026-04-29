@@ -36,6 +36,22 @@ public class UserController {
         return Result.success();
     }
 
+    @ApiOperation("更新用户头像和昵称")
+    @PutMapping("/profile")
+    public Result<Void> updateProfile(@RequestAttribute(value = "userId", required = false) Long userId, @RequestBody User user) {
+        // 开发环境允许不传userId，使用默认值1
+        Long effectiveUserId = userId != null ? userId : 1L;
+        
+        User updateUser = new User();
+        updateUser.setId(effectiveUserId);
+        updateUser.setNickname(user.getNickname());
+        updateUser.setAvatar(user.getAvatar());
+        updateUser.setAvatarIndex(user.getAvatarIndex());
+        
+        userService.updateById(updateUser);
+        return Result.success();
+    }
+
     @ApiOperation("获取用户地址列表")
     @GetMapping("/addresses")
     public Result<List<UserAddress>> getAddresses(@RequestAttribute("userId") Long userId) {

@@ -5,9 +5,31 @@
       <app-svg-icon name="arrow-left" class="back-icon"></app-svg-icon>
     </div>
     <div class="header-title">附近投放点</div>
-    <div class="header-right">
-      <app-svg-icon name="map" class="map-icon"></app-svg-icon>
+    <div class="header-right" (click)="toggleViewMode()">
+      <i class="fas" [class.fa-map-marked-alt]="viewMode === 'list'" [class.fa-list]="viewMode === 'map'"></i>
     </div>
+  </div>
+
+  <!-- 当前位置信息 -->
+  <div class="location-bar" *ngIf="currentLocation">
+    <i class="fas fa-location-dot"></i>
+    <span class="location-text">{{ currentLocation.formattedAddress || currentLocation.address || '当前位置' }}</span>
+    <button class="refresh-btn" (click)="refreshLocation()" [disabled]="isLocating">
+      <i class="fas fa-sync-alt" [class.fa-spin]="isLocating"></i>
+    </button>
+  </div>
+
+  <!-- 定位中提示 -->
+  <div class="location-loading" *ngIf="isLocating && !currentLocation">
+    <i class="fas fa-spinner fa-spin"></i>
+    <span>正在获取您的位置...</span>
+  </div>
+
+  <!-- 定位错误提示 -->
+  <div class="location-error" *ngIf="locationError && !isLocating">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span>{{ locationError }}</span>
+    <button class="retry-btn" (click)="refreshLocation()">重新定位</button>
   </div>
 
   <!-- Search Section -->
@@ -33,42 +55,55 @@
       </div>
       <div 
         class="filter-tab" 
-        [class.active]="selectedFilter === 'nearby'"
-        (click)="selectFilter('nearby')"
+        [class.active]="selectedFilter === 'paper'"
+        (click)="selectFilter('paper')"
       >
-        附近
+        纸张
       </div>
       <div 
         class="filter-tab" 
-        [class.active]="selectedFilter === 'available'"
-        (click)="selectFilter('available')"
+        [class.active]="selectedFilter === 'plastic'"
+        (click)="selectFilter('plastic')"
       >
-        可用
+        塑料
       </div>
       <div 
         class="filter-tab" 
-        [class.active]="selectedFilter === 'full-service'"
-        (click)="selectFilter('full-service')"
+        [class.active]="selectedFilter === 'electronic'"
+        (click)="selectFilter('electronic')"
       >
-        全服务
+        电子
       </div>
     </div>
   </div>
 
+  <!-- 地图视图 -->
+  <div class="map-view" *ngIf="viewMode === 'map'">
+    <div id="map-container" class="map-container"></div>
+  </div>
+
+  <!-- 加载中提示 -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>正在搜索附近回收站...</span>
+    </div>
+  </div>
+
   <!-- Drop Points List -->
-  <div class="drop-points-list">
+  <div class="drop-points-list" *ngIf="viewMode === 'list'">
     <div class="drop-point-item" *ngFor="let point of filteredDropPoints">
       <div class="drop-point-header">
         <div class="drop-point-info">
           <h3 class="drop-point-name">{{ point.name }}</h3>
           <div class="drop-point-meta">
-            <div class="meta-item">
-              <app-svg-icon name="location" class="meta-icon"></app-svg-icon>
-              <span>{{ point.distance }}</span>
+            <div class="meta-item distance">
+              <i class="fas fa-route"></i>
+              <span>{{ point.distanceText }}</span>
             </div>
-            <div class="meta-item">
-              <app-svg-icon name="star" class="meta-icon"></app-svg-icon>
-              <span>{{ point.rating }}</span>
+            <div class="meta-item rating">
+              <i class="fas fa-star"></i>
+              <span>{{ point.rating | number:'1.1-1' }}</span>
             </div>
           </div>
         </div>
@@ -135,10 +170,60 @@
     </div>
 
     <!-- Empty State -->
-    <div class="empty-state" *ngIf="filteredDropPoints.length === 0">
-      <app-svg-icon name="empty-location" class="empty-icon"></app-svg-icon>
+    <div class="empty-state" *ngIf="filteredDropPoints.length === 0 && !isLoading">
+      <i class="fas fa-map-marker-alt empty-icon"></i>
       <div class="empty-text">未找到符合条件的投放点</div>
       <div class="empty-sub-text">请尝试调整筛选条件或搜索关键词</div>
+    </div>
+  </div>
+
+  <!-- 导航面板 -->
+  <div class="navigation-panel" *ngIf="showNavigationPanel && selectedStation">
+    <div class="panel-backdrop" (click)="closeNavigationPanel()"></div>
+    <div class="panel-content">
+      <div class="panel-header">
+        <h3>导航到 {{ selectedStation.name }}</h3>
+        <button class="close-btn" (click)="closeNavigationPanel()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="panel-body">
+        <div class="station-info">
+          <p><i class="fas fa-map-marker-alt"></i> {{ selectedStation.address }}</p>
+          <p><i class="fas fa-route"></i> 距离您 {{ selectedStation.distanceText }}</p>
+        </div>
+        
+        <div class="navigation-modes">
+          <button 
+            class="mode-btn" 
+            [class.active]="navigationMode === 'walking'"
+            (click)="setNavigationMode('walking')"
+          >
+            <i class="fas fa-walking"></i>
+            <span>步行</span>
+          </button>
+          <button 
+            class="mode-btn" 
+            [class.active]="navigationMode === 'driving'"
+            (click)="setNavigationMode('driving')"
+          >
+            <i class="fas fa-car"></i>
+            <span>驾车</span>
+          </button>
+        </div>
+        
+        <div class="navigation-actions">
+          <button class="nav-btn primary" (click)="startNavigation()">
+            <i class="fas fa-directions"></i>
+            打开高德地图导航
+          </button>
+          <button class="nav-btn secondary" (click)="showRouteOnMap()" *ngIf="viewMode === 'map'">
+            <i class="fas fa-route"></i>
+            在地图上查看路线
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

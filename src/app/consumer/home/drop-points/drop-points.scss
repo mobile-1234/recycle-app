@@ -549,3 +549,358 @@
     }
   }
 }
+
+// 当前位置栏
+.location-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+
+  i {
+    color: #4CAF50;
+    font-size: 16px;
+  }
+
+  .location-text {
+    flex: 1;
+    font-size: 14px;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .refresh-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+      background: rgba(76, 175, 80, 0.3);
+      transform: scale(1.1);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// 定位加载中
+.location-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #666;
+  font-size: 14px;
+
+  i {
+    color: #4CAF50;
+    font-size: 20px;
+  }
+}
+
+// 定位错误
+.location-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 20px;
+  background: #fff3e0;
+  color: #e65100;
+  font-size: 14px;
+
+  i {
+    font-size: 18px;
+  }
+
+  span {
+    flex: 1;
+  }
+
+  .retry-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    background: #ff9800;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: #f57c00;
+      transform: scale(1.05);
+    }
+  }
+}
+
+// 地图视图
+.map-view {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 200px);
+  min-height: 400px;
+
+  .map-container {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// 加载遮罩
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+
+  .loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+
+    i {
+      font-size: 40px;
+      color: #4CAF50;
+    }
+
+    span {
+      font-size: 16px;
+      color: #666;
+    }
+  }
+}
+
+// 导航面板
+.navigation-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+
+  .panel-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .panel-content {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+
+    h3 {
+      margin: 0;
+      font-size: 18px;
+      color: #333;
+    }
+
+    .close-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 50%;
+      background: #f5f5f5;
+      color: #666;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: #e0e0e0;
+      }
+    }
+  }
+
+  .panel-body {
+    padding: 20px;
+  }
+
+  .station-info {
+    margin-bottom: 20px;
+
+    p {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      i {
+        color: #4CAF50;
+        width: 20px;
+      }
+    }
+  }
+
+  .navigation-modes {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+
+    .mode-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      i {
+        font-size: 24px;
+        color: #666;
+      }
+
+      span {
+        font-size: 14px;
+        color: #666;
+      }
+
+      &.active {
+        border-color: #4CAF50;
+        background: #e8f5e9;
+
+        i, span {
+          color: #4CAF50;
+        }
+      }
+
+      &:hover:not(.active) {
+        border-color: #bdbdbd;
+        background: #fafafa;
+      }
+    }
+  }
+
+  .navigation-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 15px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &.primary {
+        background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+        color: white;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+      }
+
+      &.secondary {
+        background: #f5f5f5;
+        color: #666;
+
+        &:hover {
+          background: #e0e0e0;
+        }
+      }
+    }
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+// 空状态图标样式
+.empty-state {
+  .empty-icon {
+    font-size: 60px;
+    color: #bdbdbd;
+    margin-bottom: 20px;
+  }
+}
+
+// 距离和评分元信息样式
+.drop-point-meta {
+  .meta-item {
+    &.distance {
+      i {
+        color: #4CAF50;
+      }
+      span {
+        color: #4CAF50;
+        font-weight: 600;
+      }
+    }
+
+    &.rating {
+      i {
+        color: #FFC107;
+      }
+      span {
+        color: #FF9800;
+      }
+    }
+  }
+}

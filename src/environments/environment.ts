@@ -1,5 +1,6 @@
 export const environment = {
   production: false,
+  apiUrl: 'http://localhost:8080/api',
   deepseek: {
     // DeepSeek API 配置
     // API Key 已预配置，可直接使用

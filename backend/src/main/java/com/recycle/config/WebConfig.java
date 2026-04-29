@@ -25,19 +25,26 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        // 🔧 开发环境临时禁用Token验证，便于前端测试
+        // 生产环境请启用并配置正确的Token验证
+        /*
         registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/api/**")
                 .excludePathPatterns(
-                        "/api/c/auth/login",
-                        "/api/c/auth/register",
-                        "/api/c/categories/**",
-                        "/api/c/collectors/nearby",
-                        "/api/c/collectors/online",
-                        "/api/b/auth/**",
-                        "/api/g/auth/**",
+                        // C端接口
+                        "/api/c/**",
+                        "/api/client/**",
+                        // B端接口
+                        "/api/b/**",
+                        "/api/business/**",
+                        // G端接口
+                        "/api/g/**",
+                        "/api/government/**",
+                        // 文档接口
                         "/doc.html",
                         "/swagger-ui/**",
                         "/v3/api-docs/**"
                 );
+        */
     }
 }

@@ -2,6 +2,8 @@ import { Component, OnInit, AfterViewInit, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { GovernmentApiService } from '../../core/services/government-api.service';
+import { AuthService } from '../../auth/services/auth.service';
 
 // 声明高德地图全局变量
 declare const AMap: any;
@@ -154,15 +156,23 @@ export class SupervisionOverview implements OnInit, AfterViewInit {
     }
   ];
   
+  // 数据加载状态
+  loading = {
+    overview: false,
+    warnings: false,
+    areas: false,
+    stations: false
+  };
+
   // 核心指标
   indicators = {
-    todayRecycle: 45680,
-    accuracyRate: 92.5,
-    carbonReduction: 1250,
+    todayRecycle: 0,
+    accuracyRate: 0,
+    carbonReduction: 0,
     trend: {
-      recycle: '+12%',
-      accuracy: '+2.5%',
-      carbon: '+8%'
+      recycle: '0%',
+      accuracy: '0%',
+      carbon: '0%'
     }
   };
 
@@ -181,44 +191,7 @@ export class SupervisionOverview implements OnInit, AfterViewInit {
   recyclePoints: RecyclePoint[] = [];
 
   // 预警列表
-  warnings: Warning[] = [
-    {
-      id: 'W001',
-      type: 'violation',
-      title: '某企业未按规定分类处理',
-      area: '朝阳区',
-      time: '10分钟前',
-      level: 'high',
-      status: 'pending'
-    },
-    {
-      id: 'W002',
-      type: 'anomaly',
-      title: '海淀区回收量异常下降',
-      area: '海淀区',
-      time: '30分钟前',
-      level: 'medium',
-      status: 'processing'
-    },
-    {
-      id: 'W003',
-      type: 'complaint',
-      title: '居民投诉回收点脏乱',
-      area: '西城区',
-      time: '1小时前',
-      level: 'low',
-      status: 'processing'
-    },
-    {
-      id: 'W004',
-      type: 'violation',
-      title: '东城区企业超标排放',
-      area: '东城区',
-      time: '2小时前',
-      level: 'high',
-      status: 'pending'
-    }
-  ];
+  warnings: Warning[] = [];
 
   get pendingWarnings(): number {
     return this.warnings.filter(w => w.status === 'pending').length;
@@ -522,6 +495,8 @@ export class SupervisionOverview implements OnInit, AfterViewInit {
 
   constructor(
     private router: Router,
+    private governmentApi: GovernmentApiService,
+    private authService: AuthService,
     @Inject('AMAP_LOCATION_CONFIG') private config: any
   ) {
     // 从本地存储加载通知设置
@@ -1840,3 +1815,4 @@ export class SupervisionOverview implements OnInit, AfterViewInit {
     }
   }
 }
+
